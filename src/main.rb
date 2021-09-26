@@ -1,6 +1,6 @@
 require 'minigl'
 require_relative 'constants'
-require_relative 'iso_game_object'
+require_relative 'character'
 require_relative 'iso_block'
 
 include MiniGL
@@ -16,16 +16,13 @@ class Cogmura < GameWindow
     @map = Map.new(Graphics::TILE_WIDTH, Graphics::TILE_HEIGHT, 20, 20, Graphics::SCR_W, Graphics::SCR_H, true)
     @map.set_camera(5 * Graphics::TILE_WIDTH, 5 * Graphics::TILE_HEIGHT)
 
-    @man = IsoGameObject.new(5, 5, 20, 20)
-    @blocks = []
-    @obstacles = []
-    add_block(6, 7, :block1)
-    add_block(7, 7, :step1)
-  end
-
-  def add_block(i, j, type)
-    @blocks << (block = IsoBlock.new(@map, i, j, type))
-    @obstacles << block
+    @man = Character.new(5, 5, 20, 20)
+    @blocks = [
+      IsoBlock.new(@map, 9, 10, 2),
+      IsoBlock.new(@map, 10, 10, 1),
+      IsoBlock.new(@map, 9, 9, 4),
+      IsoBlock.new(@map, 10, 9, 4),
+    ]
   end
 
   def update
@@ -34,7 +31,10 @@ class Cogmura < GameWindow
     toggle_fullscreen if KB.key_pressed?(Gosu::KB_F4)
     close if KB.key_pressed?(Gosu::KB_ESCAPE)
 
-    @man.update(@obstacles, @map)
+    @man.update(
+      @blocks.select { |b| b.height > @man.height_level },
+      @blocks.select { |b| b.height == @man.height_level }
+    )
   end
 
   def draw

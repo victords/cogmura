@@ -8,4 +8,5 @@ end
 
 module Physics
   UNIT = 45
+  V_UNIT = 16
 end

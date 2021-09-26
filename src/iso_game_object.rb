@@ -7,12 +7,10 @@ Vector = MiniGL::Vector
 class IsoGameObject
   include Movement
 
-  SPEED = 5
-  SPEED_D = 3.535
-
   def initialize(i, j, w, h)
     @x = i * Physics::UNIT
     @y = j * Physics::UNIT
+    @z = 0
     @w = w
     @h = h
     @mass = 1
@@ -29,45 +27,14 @@ class IsoGameObject
     (@y + @h / 2).to_f
   end
 
-  def update(obstacles, map)
-    up = KB.key_down?(Gosu::KB_UP)
-    rt = KB.key_down?(Gosu::KB_RIGHT)
-    dn = KB.key_down?(Gosu::KB_DOWN)
-    lf = KB.key_down?(Gosu::KB_LEFT)
-    speed =
-      if up && !rt && !dn && !lf
-        Vector.new(-SPEED_D, -SPEED_D)
-      elsif rt && !up && !dn && !lf
-        Vector.new(SPEED_D, -SPEED_D)
-      elsif dn && !up && !rt && !lf
-        Vector.new(SPEED_D, SPEED_D)
-      elsif lf && !up && !rt && !dn
-        Vector.new(-SPEED_D, SPEED_D)
-      elsif up && rt && !dn && !lf
-        Vector.new(0, -SPEED)
-      elsif rt && dn && !up && !lf
-        Vector.new(SPEED, 0)
-      elsif dn && lf && !up && !rt
-        Vector.new(0, SPEED)
-      elsif lf && up && !rt && !dn
-        Vector.new(-SPEED, 0)
-      else
-        Vector.new(0, 0)
-      end
-    move(speed, obstacles, [], true)
-
+  def draw(map)
     i = x_c / Physics::UNIT
     j = y_c / Physics::UNIT
-    @map_pos = Vector.new((map.size.y + i - j) * map.tile_size.x / 2, (i + j) * map.tile_size.y / 2)
-  end
-
-  def draw(map)
-    i = (x_c / Physics::UNIT).floor
-    j = (y_c / Physics::UNIT).floor
-    pos = @map_pos - Vector.new(map.cam.x + 10, map.cam.y + 20)
-    G.window.draw_quad(pos.x, pos.y, 0xff993399,
-                       pos.x + 20, pos.y, 0xff993399,
-                       pos.x, pos.y + 20, 0xff993399,
-                       pos.x + 20, pos.y + 20, 0xff993399, i + j + 1)
+    map_pos = Vector.new((map.size.y + i - j) * map.tile_size.x / 2, (i + j) * map.tile_size.y / 2)
+    pos = map_pos - Vector.new(map.cam.x + 10, map.cam.y + 20)
+    G.window.draw_quad(pos.x, pos.y - @z, 0xff993399,
+                       pos.x + 20, pos.y - @z, 0xff993399,
+                       pos.x, pos.y + 20 - @z, 0xff993399,
+                       pos.x + 20, pos.y + 20 - @z, 0xff993399, i.floor + j.floor + 1)
   end
 end
