@@ -16,7 +16,7 @@ class Cogmura < GameWindow
     @map = Map.new(Graphics::TILE_WIDTH, Graphics::TILE_HEIGHT, 20, 20, Graphics::SCR_W, Graphics::SCR_H, true)
     @map.set_camera(5 * Graphics::TILE_WIDTH, 5 * Graphics::TILE_HEIGHT)
 
-    @man = Character.new(5, 5, 20, 20)
+    @man = Character.new(5, 5)
     @blocks = [
       IsoBlock.new(@map, 9, 10, 2),
       IsoBlock.new(@map, 10, 10, 1),

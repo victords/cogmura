@@ -4,19 +4,10 @@ include MiniGL
 
 Vector = MiniGL::Vector
 
-class IsoGameObject
-  include Movement
-
-  def initialize(i, j, w, h)
-    @x = i * Physics::UNIT
-    @y = j * Physics::UNIT
+class IsoGameObject < GameObject
+  def initialize(i, j, w, h, img, img_gap = nil, sprite_cols = nil, sprite_rows = nil)
+    super(i * Physics::UNIT, j * Physics::UNIT, w, h, img, img_gap, sprite_cols, sprite_rows)
     @z = 0
-    @w = w
-    @h = h
-    @mass = 1
-    @speed = Vector.new
-    @max_speed = Vector.new(15, 15)
-    @stored_forces = Vector.new
   end
 
   def x_c
@@ -27,14 +18,13 @@ class IsoGameObject
     (@y + @h / 2).to_f
   end
 
-  def draw(map)
+  def draw(map, flip = nil)
     i = x_c / Physics::UNIT
     j = y_c / Physics::UNIT
-    map_pos = Vector.new((map.size.y + i - j) * map.tile_size.x / 2, (i + j) * map.tile_size.y / 2)
-    pos = map_pos - Vector.new(map.cam.x + 10, map.cam.y + 20)
-    G.window.draw_quad(pos.x, pos.y - @z, 0xff993399,
-                       pos.x + 20, pos.y - @z, 0xff993399,
-                       pos.x, pos.y + 20 - @z, 0xff993399,
-                       pos.x + 20, pos.y + 20 - @z, 0xff993399, i.floor + j.floor + 1)
+    phys_x = @x; phys_y = @y
+    @x = (map.size.y + i - j) * map.tile_size.x / 2
+    @y = (i + j) * map.tile_size.y / 2
+    super(map, Graphics::SCALE, Graphics::SCALE, 255, 0xffffff, nil, flip, i.floor + j.floor + 1)
+    @x = phys_x; @y = phys_y
   end
 end

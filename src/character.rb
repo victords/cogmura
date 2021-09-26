@@ -7,8 +7,8 @@ class Character < IsoGameObject
   SPEED_D = SPEED * 0.7071
   JUMP_SPEED = 9
 
-  def initialize(i, j, w, h)
-    super
+  def initialize(i, j)
+    super(i, j, 20, 20, :cogmura, Vector.new(-32, -72), 3, 5)
 
     @speed_z = 0
   end
@@ -59,5 +59,40 @@ class Character < IsoGameObject
     else
       @z += @speed_z
     end
+
+    indices, @flip =
+      if @speed.x > 0
+        if @speed.y > 0
+          [[0, 1, 0, 2], false]
+        elsif @speed.y < 0
+          [[6, 7, 6, 8], true]
+        else
+          [[9, 10, 9, 11], true]
+        end
+      elsif @speed.x < 0
+        if @speed.y > 0
+          [[6, 7, 6, 8], false]
+        elsif @speed.y < 0
+          [[3, 4, 3, 5], false]
+        else
+          [[12, 13, 12, 14], false]
+        end
+      elsif @speed.y > 0
+        [[9, 10, 9, 11], false]
+      elsif @speed.y < 0
+        [[12, 13, 12, 14], true]
+      else
+        [[3 * (@img_index / 3)], @flip]
+      end
+
+    if @speed.x.zero? && @speed.y.zero?
+      set_animation(indices[0])
+    else
+      animate(indices, 7)
+    end
+  end
+
+  def draw(map)
+    super(map, @flip ? :horiz : nil)
   end
 end
