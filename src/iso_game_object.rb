@@ -23,7 +23,7 @@ class IsoGameObject < GameObject
     j = y_c / Physics::UNIT
     phys_x = @x; phys_y = @y
     @x = (map.size.y + i - j) * map.tile_size.x / 2
-    @y = (i + j) * map.tile_size.y / 2
+    @y = (i + j) * map.tile_size.y / 2 - @z
     super(map, Graphics::SCALE, Graphics::SCALE, 255, 0xffffff, nil, flip, i.floor + j.floor + 1)
     @x = phys_x; @y = phys_y
   end
