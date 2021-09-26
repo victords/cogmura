@@ -10,9 +10,9 @@ class IsoGameObject
   SPEED = 5
   SPEED_D = 3.535
 
-  def initialize(x, y, w, h)
-    @x = x
-    @y = y
+  def initialize(i, j, w, h)
+    @x = i * Physics::UNIT
+    @y = j * Physics::UNIT
     @w = w
     @h = h
     @mass = 1
