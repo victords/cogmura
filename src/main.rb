@@ -17,17 +17,15 @@ class Cogmura < GameWindow
     @map.set_camera(5 * Graphics::TILE_WIDTH, 5 * Graphics::TILE_HEIGHT)
 
     @man = IsoGameObject.new(5, 5, 20, 20)
-    @blocks = Array.new(@map.size.x) do
-      Array.new(@map.size.y)
-    end
+    @blocks = []
     @obstacles = []
     add_block(6, 7, :block1)
     add_block(7, 7, :step1)
   end
 
   def add_block(i, j, type)
-    @blocks[i][j] = IsoBlock.new(i, j, type)
-    @obstacles << @blocks[i][j]
+    @blocks << (block = IsoBlock.new(@map, i, j, type))
+    @obstacles << block
   end
 
   def update
@@ -41,14 +39,10 @@ class Cogmura < GameWindow
 
   def draw
     @map.foreach do |i, j, x, y|
-      if @blocks[i][j]
-        @blocks[i][j].draw(x, y, i + j + 1)
-      else
-        index = i == 2 && j == 3 ? 1 : 0
-        @tile[index].draw(x, y, 0, Graphics::SCALE, Graphics::SCALE)
-      end
+      @tile[0].draw(x, y, 0, Graphics::SCALE, Graphics::SCALE)
     end
-    @man.draw(self, @map)
+    @blocks.each { |b| b.draw(@map) }
+    @man.draw(@map)
   end
 end
 

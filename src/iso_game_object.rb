@@ -61,13 +61,13 @@ class IsoGameObject
     @map_pos = Vector.new((map.size.y + i - j) * map.tile_size.x / 2, (i + j) * map.tile_size.y / 2)
   end
 
-  def draw(window, map)
+  def draw(map)
     i = (x_c / Physics::UNIT).floor
     j = (y_c / Physics::UNIT).floor
     pos = @map_pos - Vector.new(map.cam.x + 10, map.cam.y + 20)
-    window.draw_quad(pos.x, pos.y, 0xff993399,
-                     pos.x + 20, pos.y, 0xff993399,
-                     pos.x, pos.y + 20, 0xff993399,
-                     pos.x + 20, pos.y + 20, 0xff993399, i + j + 1)
+    G.window.draw_quad(pos.x, pos.y, 0xff993399,
+                       pos.x + 20, pos.y, 0xff993399,
+                       pos.x, pos.y + 20, 0xff993399,
+                       pos.x + 20, pos.y + 20, 0xff993399, i + j + 1)
   end
 end
