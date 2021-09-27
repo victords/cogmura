@@ -2,8 +2,6 @@ require_relative 'constants'
 
 include MiniGL
 
-Vector = MiniGL::Vector
-
 class IsoGameObject < GameObject
   def initialize(i, j, w, h, img, img_gap = nil, sprite_cols = nil, sprite_rows = nil)
     super(i * Physics::UNIT, j * Physics::UNIT, w, h, img, img_gap, sprite_cols, sprite_rows)

@@ -2,6 +2,7 @@ require 'minigl'
 require_relative 'constants'
 require_relative 'character'
 require_relative 'iso_block'
+require_relative 'iso_tex_block'
 
 include MiniGL
 
@@ -18,10 +19,11 @@ class Cogmura < GameWindow
 
     @man = Character.new(5, 5)
     @blocks = [
-      IsoBlock.new(@map, 9, 10, 2),
-      IsoBlock.new(@map, 10, 10, 1),
-      IsoBlock.new(@map, 9, 9, 4),
-      IsoBlock.new(@map, 10, 9, 4),
+      IsoBlock.new(9, 10, 2),
+      IsoBlock.new(10, 10, 1),
+      IsoBlock.new(9, 9, 4),
+      IsoBlock.new(10, 9, 4),
+      IsoTexBlock.new(6, 13, 2, 3, 3, :house1, Vector.new)
     ]
   end
 

@@ -5,9 +5,9 @@ Vector = MiniGL::Vector
 class IsoBlock < Block
   V_OFFSET = Physics::V_UNIT
 
-  attr_reader :height, :col, :row
+  attr_reader :height
 
-  def initialize(map, i, j, height, index = 0)
+  def initialize(i, j, height, index = 0)
     super(i * Physics::UNIT, j * Physics::UNIT, Physics::UNIT, Physics::UNIT)
     @col = i
     @row = j

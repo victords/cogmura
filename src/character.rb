@@ -24,28 +24,28 @@ class Character < IsoGameObject
     r_up, r_rt, r_dn, r_lf = DIR_KEYS.map { |k| KB.key_released?(k) }
     speed =
       if up && !rt && !dn && !lf
-        set_walk_animation(3, false) if p_up || r_rt || r_lf
+        set_walk_animation(3, false) if p_up || r_rt || r_lf || r_dn
         Vector.new(-SPEED_D, -SPEED_D)
       elsif rt && !up && !dn && !lf
-        set_walk_animation(6, true) if p_rt || r_up || r_dn
+        set_walk_animation(6, true) if p_rt || r_up || r_dn || r_lf
         Vector.new(SPEED_D, -SPEED_D)
       elsif dn && !up && !rt && !lf
-        set_walk_animation(0, false) if p_dn || r_rt || r_lf
+        set_walk_animation(0, false) if p_dn || r_rt || r_lf || r_up
         Vector.new(SPEED_D, SPEED_D)
       elsif lf && !up && !rt && !dn
-        set_walk_animation(6, false) if p_lf || r_up || r_dn
+        set_walk_animation(6, false) if p_lf || r_up || r_dn || r_rt
         Vector.new(-SPEED_D, SPEED_D)
       elsif up && rt && !dn && !lf
-        set_walk_animation(12, true) if p_up || p_rt
+        set_walk_animation(12, true) if p_up || p_rt || r_dn || r_lf
         Vector.new(0, -SPEED)
       elsif rt && dn && !up && !lf
-        set_walk_animation(9, true) if p_rt || p_dn
+        set_walk_animation(9, true) if p_rt || p_dn || r_lf || r_up
         Vector.new(SPEED, 0)
       elsif dn && lf && !up && !rt
-        set_walk_animation(9, false) if p_dn || p_lf
+        set_walk_animation(9, false) if p_dn || p_lf || r_up || r_rt
         Vector.new(0, SPEED)
       elsif lf && up && !rt && !dn
-        set_walk_animation(12, false) if p_lf || p_up
+        set_walk_animation(12, false) if p_lf || p_up || r_rt || r_dn
         Vector.new(-SPEED, 0)
       else
         set_animation(3 * (@img_index / 3))
