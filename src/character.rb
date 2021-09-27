@@ -6,6 +6,7 @@ class Character < IsoGameObject
   SPEED = 4
   SPEED_D = SPEED * 0.7071
   JUMP_SPEED = 9
+  DIR_KEYS = [Gosu::KB_UP, Gosu::KB_RIGHT, Gosu::KB_DOWN, Gosu::KB_LEFT].freeze
 
   def initialize(i, j)
     super(i, j, 20, 20, :cogmura, Vector.new(-22, -72), 3, 5)
@@ -18,28 +19,36 @@ class Character < IsoGameObject
   end
 
   def update(obstacles, floors)
-    up = KB.key_down?(Gosu::KB_UP)
-    rt = KB.key_down?(Gosu::KB_RIGHT)
-    dn = KB.key_down?(Gosu::KB_DOWN)
-    lf = KB.key_down?(Gosu::KB_LEFT)
+    up, rt, dn, lf = DIR_KEYS.map { |k| KB.key_down?(k) }
+    p_up, p_rt, p_dn, p_lf = DIR_KEYS.map { |k| KB.key_pressed?(k) }
+    r_up, r_rt, r_dn, r_lf = DIR_KEYS.map { |k| KB.key_released?(k) }
     speed =
       if up && !rt && !dn && !lf
+        set_walk_animation(3, false) if p_up || r_rt || r_lf
         Vector.new(-SPEED_D, -SPEED_D)
       elsif rt && !up && !dn && !lf
+        set_walk_animation(6, true) if p_rt || r_up || r_dn
         Vector.new(SPEED_D, -SPEED_D)
       elsif dn && !up && !rt && !lf
+        set_walk_animation(0, false) if p_dn || r_rt || r_lf
         Vector.new(SPEED_D, SPEED_D)
       elsif lf && !up && !rt && !dn
+        set_walk_animation(6, false) if p_lf || r_up || r_dn
         Vector.new(-SPEED_D, SPEED_D)
       elsif up && rt && !dn && !lf
+        set_walk_animation(12, true) if p_up || p_rt
         Vector.new(0, -SPEED)
       elsif rt && dn && !up && !lf
+        set_walk_animation(9, true) if p_rt || p_dn
         Vector.new(SPEED, 0)
       elsif dn && lf && !up && !rt
+        set_walk_animation(9, false) if p_dn || p_lf
         Vector.new(0, SPEED)
       elsif lf && up && !rt && !dn
+        set_walk_animation(12, false) if p_lf || p_up
         Vector.new(-SPEED, 0)
       else
+        set_animation(3 * (@img_index / 3))
         Vector.new(0, 0)
       end
     move(speed, obstacles, [], true)
@@ -60,36 +69,13 @@ class Character < IsoGameObject
       @z += @speed_z
     end
 
-    indices, @flip =
-      if speed.x > 0
-        if speed.y > 0
-          [[0, 1, 0, 2], false]
-        elsif speed.y < 0
-          [[6, 7, 6, 8], true]
-        else
-          [[9, 10, 9, 11], true]
-        end
-      elsif speed.x < 0
-        if speed.y > 0
-          [[6, 7, 6, 8], false]
-        elsif speed.y < 0
-          [[3, 4, 3, 5], false]
-        else
-          [[12, 13, 12, 14], false]
-        end
-      elsif speed.y > 0
-        [[9, 10, 9, 11], false]
-      elsif speed.y < 0
-        [[12, 13, 12, 14], true]
-      else
-        [[3 * (@img_index / 3)], @flip]
-      end
+    animate(@indices, 7)
+  end
 
-    if speed.x.zero? && speed.y.zero?
-      set_animation(indices[0])
-    else
-      animate(indices, 7)
-    end
+  def set_walk_animation(index, flip)
+    set_animation(index)
+    @indices = [index, index + 1, index, index + 2]
+    @flip = flip
   end
 
   def draw(map)
