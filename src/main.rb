@@ -23,7 +23,7 @@ class Cogmura < GameWindow
       IsoBlock.new(10, 10, 1),
       IsoBlock.new(9, 9, 4),
       IsoBlock.new(10, 9, 4),
-      IsoTexBlock.new(6, 13, 2, 3, 3, :house1, Vector.new)
+      IsoTexBlock.new(6, 13, 2, 3, 3, :house1, Vector.new(-6, -16))
     ]
   end
 
