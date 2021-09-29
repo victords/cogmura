@@ -18,7 +18,7 @@ class Character < IsoGameObject
     (@z / Physics::V_UNIT).floor
   end
 
-  def update(obstacles, floors)
+  def update(obstacles, floors, steps)
     up, rt, dn, lf = DIR_KEYS.map { |k| KB.key_down?(k) }
     p_up, p_rt, p_dn, p_lf = DIR_KEYS.map { |k| KB.key_pressed?(k) }
     r_up, r_rt, r_dn, r_lf = DIR_KEYS.map { |k| KB.key_released?(k) }
@@ -55,7 +55,6 @@ class Character < IsoGameObject
 
     floor = height_level.zero? || floors.any? { |f| f.bounds.intersect?(bounds) }
     floor_z = height_level * Physics::V_UNIT
-
     if floor && @z == floor_z
       @speed_z = JUMP_SPEED if KB.key_pressed?(Gosu::KB_SPACE)
     else
@@ -68,6 +67,9 @@ class Character < IsoGameObject
     else
       @z += @speed_z
     end
+
+    step = steps.find { |s| s.bounds.intersect?(bounds) }
+    @z += Physics::V_UNIT if step && floor && @z == floor_z
 
     animate(@indices, 7)
   end
