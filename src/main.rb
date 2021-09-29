@@ -17,6 +17,10 @@ class Cogmura < GameWindow
     @map = Map.new(Graphics::TILE_WIDTH, Graphics::TILE_HEIGHT, 40, 40, Graphics::SCR_W, Graphics::SCR_H, true)
     @map.set_camera(10 * Graphics::TILE_WIDTH, 10 * Graphics::TILE_HEIGHT)
 
+    File.open("#{Res.prefix}map/1") do |f|
+      @tiles = f.read.split("\n").map { |l| l.chars.map(&:to_i) }.transpose
+    end
+
     @man = Character.new(11, 11)
     @blocks = [
       IsoBlock.new(14, 15, 2),
@@ -42,7 +46,7 @@ class Cogmura < GameWindow
 
   def draw
     @map.foreach do |i, j, x, y|
-      @tile[0].draw(x, y, 0, Graphics::SCALE, Graphics::SCALE)
+      @tile[@tiles[i][j]].draw(x, y, 0, Graphics::SCALE, Graphics::SCALE)
     end
     @blocks.each { |b| b.draw(@map) }
     @man.draw(@map)
