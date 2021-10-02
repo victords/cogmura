@@ -18,7 +18,7 @@ class Character < IsoGameObject
     (@z / Physics::V_UNIT).floor
   end
 
-  def update(obstacles, floors, steps)
+  def update(obstacles, floors, steps, ramps)
     up, rt, dn, lf = DIR_KEYS.map { |k| KB.key_down?(k) }
     p_up, p_rt, p_dn, p_lf = DIR_KEYS.map { |k| KB.key_pressed?(k) }
     r_up, r_rt, r_dn, r_lf = DIR_KEYS.map { |k| KB.key_released?(k) }
@@ -51,7 +51,7 @@ class Character < IsoGameObject
         set_animation(3 * (@img_index / 3))
         Vector.new(0, 0)
       end
-    move(speed, obstacles, [], true)
+    move(speed, obstacles, ramps, true)
 
     floor = height_level.zero? || floors.any? { |f| f.bounds.intersect?(bounds) }
     floor_z = height_level * Physics::V_UNIT
