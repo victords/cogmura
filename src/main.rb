@@ -41,11 +41,12 @@ class Cogmura < GameWindow
     toggle_fullscreen if KB.key_pressed?(Gosu::KB_F4)
     close if KB.key_pressed?(Gosu::KB_ESCAPE)
 
-    obstacles = @blocks.select { |b| b.height > @man.height_level + 1 }
+    base_collide_level = @man.grounded ? @man.height_level + 1 : @man.height_level
+    obstacles = @blocks.select { |b| b.height > base_collide_level }
     @man.update(
       obstacles,
       @blocks.select { |b| b.height == @man.height_level },
-      @blocks.select { |b| b.height == @man.height_level + 1 },
+      @man.grounded ? @blocks.select { |b| b.height == base_collide_level } : [],
       obstacles.map(&:ramps).compact.flatten
     )
   end

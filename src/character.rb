@@ -8,6 +8,8 @@ class Character < IsoGameObject
   JUMP_SPEED = 9
   DIR_KEYS = [Gosu::KB_UP, Gosu::KB_RIGHT, Gosu::KB_DOWN, Gosu::KB_LEFT].freeze
 
+  attr_reader :grounded
+
   def initialize(i, j)
     super(i, j, 20, 20, :cogmura, Vector.new(-22, -72), 3, 5)
 
@@ -64,8 +66,9 @@ class Character < IsoGameObject
       @z += @speed_z
     end
 
+    @grounded = floor && @z == floor_z
     step = steps.find { |s| s.intersect?(bounds) }
-    @z += Physics::V_UNIT if step && floor && @z == floor_z
+    @z += Physics::V_UNIT if step && @grounded
 
     animate(@indices, 7)
   end
