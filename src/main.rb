@@ -3,7 +3,6 @@ require_relative 'constants'
 require_relative 'character'
 require_relative 'iso_block'
 require_relative 'iso_tex_block'
-require_relative 'iso_ramp'
 
 include MiniGL
 
@@ -28,13 +27,11 @@ class Cogmura < GameWindow
       IsoBlock.new(15, 15, 1),
       IsoBlock.new(14, 14, 4),
       IsoBlock.new(15, 14, 4),
-      IsoTexBlock.new(11, 18, 2, 3, 4, :house1, Vector.new(-6, 0))
-    ]
-    @ramps = [
-      IsoRamp.new(19, 19, true, false),
-      IsoRamp.new(20, 19, false, false),
-      IsoRamp.new(19, 20, true, true),
-      IsoRamp.new(20, 20, false, true)
+      IsoBlock.new(20, 20, 4, true),
+      IsoBlock.new(21, 19, 1, true),
+      IsoBlock.new(22, 18, 2, true),
+      IsoTexBlock.new(11, 18, 2, 3, 4, :house1, Vector.new(-6, 0)),
+      IsoTexBlock.new(11, 25, 3, 1, 3, :wall1, Vector.new, true)
     ]
   end
 
@@ -44,11 +41,12 @@ class Cogmura < GameWindow
     toggle_fullscreen if KB.key_pressed?(Gosu::KB_F4)
     close if KB.key_pressed?(Gosu::KB_ESCAPE)
 
+    obstacles = @blocks.select { |b| b.height > @man.height_level + 1 }
     @man.update(
-      @blocks.select { |b| b.height > @man.height_level + 1 },
+      obstacles,
       @blocks.select { |b| b.height == @man.height_level },
       @blocks.select { |b| b.height == @man.height_level + 1 },
-      @ramps
+      obstacles.map(&:ramps).compact.flatten
     )
   end
 
@@ -57,7 +55,6 @@ class Cogmura < GameWindow
       @tile[@tiles[i][j]].draw(x, y, 0, Graphics::SCALE, Graphics::SCALE)
     end
     @blocks.each { |b| b.draw(@map) }
-    @ramps.each { |r| r.draw(@map) }
     @man.draw(@map)
   end
 end
