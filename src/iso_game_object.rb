@@ -8,25 +8,18 @@ class IsoGameObject < GameObject
     @z = 0
   end
 
-  def x_c
-    (@x + @w / 2).to_f
-  end
-
-  def y_c
-    (@y + @h / 2).to_f
-  end
-
   def height_level
     (@z / Physics::V_UNIT).floor
   end
 
-  def draw(map, flip = nil)
-    i = x_c / Physics::UNIT
-    j = y_c / Physics::UNIT
+  def draw(map, flip = nil, z_index = nil)
+    i = (@x + @w / 2).to_f / Physics::UNIT
+    j = (@y + @h / 2).to_f / Physics::UNIT
     phys_x = @x; phys_y = @y
     @x = (map.size.y + i - j) * map.tile_size.x / 2 - @w / 2
     @y = (i + j) * map.tile_size.y / 2 - @z
-    super(map, Graphics::SCALE, Graphics::SCALE, 255, 0xffffff, nil, flip, i.floor + j.floor + height_level + 1)
+    z_index ||= i.floor + j.floor + 1
+    super(map, Graphics::SCALE, Graphics::SCALE, 255, 0xffffff, nil, flip, z_index)
     @x = phys_x; @y = phys_y
   end
 end

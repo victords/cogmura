@@ -5,7 +5,7 @@ Vector = MiniGL::Vector
 class IsoBlock
   V_OFFSET = Physics::V_UNIT
 
-  attr_reader :x, :y, :w, :h, :height, :ramps
+  attr_reader :x, :y, :w, :h, :height, :ramps, :z_index
 
   def initialize(col, row, height, angled = false)
     unit = Physics::UNIT

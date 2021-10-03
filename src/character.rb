@@ -51,22 +51,22 @@ class Character < IsoGameObject
       end
     move(speed, obstacles, ramps, true)
 
-    floor = height_level.zero? || floors.any? { |f| f.intersect?(bounds) }
+    @floor = height_level.zero? || floors.find { |f| f.intersect?(bounds) }
     floor_z = height_level * Physics::V_UNIT
-    if floor && @z == floor_z
+    if @floor && @z == floor_z
       @speed_z = JUMP_SPEED if KB.key_pressed?(Gosu::KB_SPACE)
     else
       @speed_z -= G.gravity.y
     end
 
-    if floor && @speed_z < 0 && @z + @speed_z < floor_z
+    if @floor && @speed_z < 0 && @z + @speed_z < floor_z
       @speed_z = 0
       @z = height_level * Physics::V_UNIT
     else
       @z += @speed_z
     end
 
-    @grounded = floor && @z == floor_z
+    @grounded = @floor && @z == floor_z
     step = steps.find { |s| s.intersect?(bounds) }
     @z += Physics::V_UNIT if step && @grounded
 
@@ -80,6 +80,6 @@ class Character < IsoGameObject
   end
 
   def draw(map)
-    super(map, @flip ? :horiz : nil)
+    super(map, @flip ? :horiz : nil, @floor && @floor.is_a?(IsoBlock) && @floor.z_index)
   end
 end
