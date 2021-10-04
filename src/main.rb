@@ -55,7 +55,7 @@ class Cogmura < GameWindow
     @map.foreach do |i, j, x, y|
       @tile[@tiles[i][j]].draw(x, y, 0, Graphics::SCALE, Graphics::SCALE)
     end
-    @blocks.each { |b| b.draw(@map) }
+    @blocks.each { |b| b.draw(@map, @man) }
     @man.draw(@map)
   end
 end

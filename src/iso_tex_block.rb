@@ -42,19 +42,35 @@ class IsoTexBlock < IsoBlock
     @img_gap = img_gap
   end
 
-  def draw(map)
+  def draw(map, man)
     pos = map.get_screen_pos(@col, @row)
     if @img
       x = pos.x + @img_gap.x
       y = pos.y + Graphics::TILE_HEIGHT / 2 - @height * Physics::V_UNIT + @img_gap.y
-      @img.draw(x, y, @z_index, Graphics::SCALE, Graphics::SCALE)
+      behind = man_behind(man, x, x + @img.width * Graphics::SCALE, y, @z_index)
+      color = behind ? 0x80ffffff : 0xffffffff
+      @img.draw(x, y, @z_index, Graphics::SCALE, Graphics::SCALE, color)
     else
       x = pos.x - ((@y_tiles - 1) * Graphics::TILE_WIDTH / 2)
       y = pos.y - @height * Physics::V_UNIT + @img_gap.y
+      behind =
+        (0...@imgs.size).any? do |i|
+          x1 = x + (i >= @x_tiles ? (i + 1) : i) * Graphics::TILE_WIDTH / 2 + (i == 0 ? @img_gap.x : 0)
+          x2 = x1 + @imgs[i].width * Graphics::SCALE
+          man_behind(man, x1, x2, y, @z_index - (i + 1 - @x_tiles).abs)
+        end
+      color = behind ? 0x80ffffff : 0xffffffff
       @imgs.each_with_index do |img, i|
         img.draw(x + (i >= @x_tiles ? (i + 1) : i) * Graphics::TILE_WIDTH / 2 + (i == 0 ? @img_gap.x : 0), y,
-                 @z_index - (i + 1 - @x_tiles).abs, Graphics::SCALE, Graphics::SCALE)
+                 @z_index - (i + 1 - @x_tiles).abs, Graphics::SCALE, Graphics::SCALE, color)
       end
     end
+  end
+
+  private
+
+  def man_behind(man, x1, x2, y, z_index)
+    man.screen_x + man.w > x1 && man.screen_x < x2 && man.screen_y + man.h - 12 > y && man.z_index < z_index &&
+      man.height_level < @height
   end
 end

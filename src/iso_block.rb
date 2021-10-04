@@ -21,12 +21,17 @@ class IsoBlock
     @z_index = col + row + (angled ? 3 : 1)
     @img = Res.imgs(angled ? :block2 : :block1, 1, 1)[0]
     
-    @ramps = angled ? [
-      Ramp.new(col * unit, row * unit, unit, unit, true, false),
-      Ramp.new((col + 1) * unit, row * unit, unit, unit, false, false),
-      Ramp.new(col * unit, (row + 1) * unit, unit, unit, true, true),
-      Ramp.new((col + 1) * unit, (row + 1) * unit, unit, unit, false, true)
-    ] : nil
+    @ramps =
+      if angled
+        [
+          Ramp.new(col * unit, row * unit, unit, unit, true, false),
+          Ramp.new((col + 1) * unit, row * unit, unit, unit, false, false),
+          Ramp.new(col * unit, (row + 1) * unit, unit, unit, true, true),
+          Ramp.new((col + 1) * unit, (row + 1) * unit, unit, unit, false, true)
+        ]
+      else
+        nil
+      end
   end
   
   def passable; false; end
@@ -43,11 +48,20 @@ class IsoBlock
     end
   end
 
-  def draw(map)
+  def draw(map, man)
     pos = map.get_screen_pos(@col, @row)
     pos.y += Graphics::TILE_HEIGHT / 2 if @ramps
+    color =
+      if man.screen_x + man.w > pos.x &&
+         man.screen_x < pos.x + Graphics::TILE_WIDTH &&
+         man.screen_y + man.h - 12 > pos.y - @height * V_OFFSET &&
+         man.z_index < @z_index && man.height_level < @height
+        0x80ffffff
+      else
+        0xffffffff
+      end
     (1..@height).each do |i|
-      @img.draw(pos.x, pos.y - i * V_OFFSET, @z_index, Graphics::SCALE, Graphics::SCALE)
+      @img.draw(pos.x, pos.y - i * V_OFFSET, @z_index, Graphics::SCALE, Graphics::SCALE, color)
     end
   end
 end
