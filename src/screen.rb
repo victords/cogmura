@@ -1,4 +1,4 @@
-require_relative 'iso_tex_block'
+require_relative 'iso_block'
 
 include MiniGL
 
@@ -9,7 +9,12 @@ class Screen
     @map = Map.new(Graphics::TILE_WIDTH, Graphics::TILE_HEIGHT, 40, 40, Graphics::SCR_W, Graphics::SCR_H, true)
     @map.set_camera(10 * Graphics::TILE_WIDTH, 10 * Graphics::TILE_HEIGHT)
     @tiles = Array.new(40) { Array.new(40) }
-    @blocks = []
+    @blocks = [
+      IsoBlock.new(0, -1, 18),
+      IsoBlock.new(0, 20, 39),
+      IsoBlock.new(1, -1, 20),
+      IsoBlock.new(1, 20, -1)
+    ]
     File.open("#{Res.prefix}map/#{id}") do |f|
       info, data = f.read.split('#')
       @tileset = Res.imgs("tile#{info}", 1, 2)
@@ -26,9 +31,7 @@ class Screen
             @tiles[i][j] = tile_type
           end
         when 'b'
-          @blocks << IsoBlock.new(d[3], i, j, d[4].to_i, d[5])
-        when 't'
-          @blocks << IsoTexBlock.new(d[3].to_i, i, j)
+          @blocks << IsoBlock.new(d[3].to_i, i, j)
         end
         i, j = next_tile(i, j)
       end
