@@ -5,15 +5,22 @@ include MiniGL
 class IsoTexBlock < IsoBlock
   IMG_SLICE_OFFSET = Graphics::TILE_WIDTH / 2 / Graphics::SCALE
 
-  def initialize(col, row, x_tiles, y_tiles, height, img, img_gap, angled = false)
-    super(col, row, height, angled)
+  TYPE_MAP = [
+    [2, 3, 4, :house1, -6, 0, false],
+    [3, 1, 3, :wall1, 0, 0, true]
+  ].freeze
+
+  def initialize(type, col, row)
+    x_tiles, y_tiles, height, img_id, img_gap_x, img_gap_y, angled = TYPE_MAP[type]
+    super(nil, col, row, height, angled)
+
     unit = Physics::UNIT
     @w = x_tiles * unit
     @h = y_tiles * unit
     @x_tiles = x_tiles
     @y_tiles = y_tiles
-    image = Res.img(img)
 
+    image = Res.img(img_id)
     if angled
       @img = image
       @z_index = col + row + 3
@@ -28,18 +35,17 @@ class IsoTexBlock < IsoBlock
         @ramps << Ramp.new(x + (x_tiles + i) * unit, @y + (i - x_tiles + 1) * unit, unit, unit, false, false)
       end
     else
-      @img = nil
       @imgs = (0...(x_tiles + y_tiles - 1)).map do |i|
-        img_gap_offset = i == 0 ? 0 : -img_gap.x / Graphics::SCALE
+        img_gap_offset = i == 0 ? 0 : -img_gap_x / Graphics::SCALE
         x = (i >= x_tiles ? (i + 1) : i) * IMG_SLICE_OFFSET + img_gap_offset
         w = i == x_tiles + y_tiles - 2 ? image.width - x :
-              (i == x_tiles - 1 ? 2 : 1) * IMG_SLICE_OFFSET + (i == 0 ? -img_gap.x / Graphics::SCALE : 0)
+              (i == x_tiles - 1 ? 2 : 1) * IMG_SLICE_OFFSET + (i == 0 ? -img_gap_x / Graphics::SCALE : 0)
         image.subimage(x, 0, w, image.height)
       end
       @z_index = @col + @row + @x_tiles + @y_tiles - 1
       @ramps = nil
     end
-    @img_gap = img_gap
+    @img_gap = Vector.new(img_gap_x, img_gap_y)
   end
 
   def draw(map, man)

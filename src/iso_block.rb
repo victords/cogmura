@@ -7,7 +7,7 @@ class IsoBlock
 
   attr_reader :x, :y, :w, :h, :height, :ramps, :z_index
 
-  def initialize(col, row, height, angled = false)
+  def initialize(type, col, row, height, angled)
     unit = Physics::UNIT
 
     # making the "main" block not collide, since the collision will be checked against the ramps
@@ -19,7 +19,7 @@ class IsoBlock
     @row = row
     @height = height
     @z_index = col + row + (angled ? 3 : 1)
-    @img = Res.imgs(angled ? :block2 : :block1, 1, 1)[0]
+    @img = Res.img("block#{type}#{angled ? 'a' : ''}", 1, 1) if type
     
     @ramps =
       if angled
