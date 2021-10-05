@@ -51,7 +51,7 @@ class Character < IsoGameObject
       end
     move(speed, obstacles, ramps, true)
 
-    @floor = height_level.zero? || floors.find { |f| f.intersect?(bounds) }
+    @floor = height_level.zero? || floors.select { |f| f.intersect?(bounds) }.max_by(&:z_index)
     floor_z = height_level * Physics::V_UNIT
     if @floor && @z == floor_z
       @speed_z = JUMP_SPEED if KB.key_pressed?(Gosu::KB_SPACE)
