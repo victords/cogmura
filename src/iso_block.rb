@@ -1,3 +1,5 @@
+require_relative 'constants'
+
 include MiniGL
 
 class IsoBlock

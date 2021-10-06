@@ -2,8 +2,18 @@ require_relative 'iso_block'
 
 include MiniGL
 
+class Exit < Rectangle
+  attr_reader :dest, :z
+
+  def initialize(dest, i, j, z)
+    super((i - 0.5) * Physics::UNIT, (j - 0.5) * Physics::UNIT, Physics::UNIT, Physics::UNIT)
+    @dest = dest
+    @z = z
+  end
+end
+
 class Screen
-  attr_reader :blocks
+  attr_writer :on_player_exit
 
   def initialize(id)
     @map = Map.new(Graphics::TILE_WIDTH, Graphics::TILE_HEIGHT, 40, 40, Graphics::SCR_W, Graphics::SCR_H, true)
@@ -20,8 +30,14 @@ class Screen
       IsoBlock.new(2, 39.5, 19.5)
     ]
     File.open("#{Res.prefix}map/#{id}") do |f|
-      info, data = f.read.split('#')
+      info, exits, data = f.read.split('#')
       @tileset = Res.imgs("tile#{info}", 1, 2)
+
+      @exits = exits.split(';').map do |e|
+        d = e.split(',')
+        pos = @map.get_map_pos(d[1].to_f * Graphics::SCR_W, d[2].to_f * Graphics::SCR_H)
+        Exit.new(d[0].to_i, pos.x, pos.y, d[3].to_i)
+      end
 
       i = 19; j = 0
       data.split(';').each do |d|
@@ -47,6 +63,9 @@ class Screen
     end
 
     @man = Character.new(11, 11)
+    @man.on_exit = lambda { |dest|
+      @on_player_exit.call(dest)
+    }
   end
 
   def update
@@ -56,7 +75,8 @@ class Screen
       obstacles,
       @blocks.select { |b| b.height == @man.height_level },
       @man.grounded ? @blocks.select { |b| b.height == base_collide_level } : [],
-      obstacles.map(&:ramps).compact.flatten
+      obstacles.map(&:ramps).compact.flatten,
+      @exits.select { |e| e.z == @man.height_level }
     )
   end
 

@@ -9,6 +9,7 @@ class Character < IsoGameObject
   DIR_KEYS = [Gosu::KB_UP, Gosu::KB_RIGHT, Gosu::KB_DOWN, Gosu::KB_LEFT].freeze
 
   attr_reader :grounded
+  attr_writer :on_exit
 
   def initialize(i, j)
     super(i, j, 20, 20, :cogmura, Vector.new(-22, -72), 3, 5)
@@ -16,9 +17,9 @@ class Character < IsoGameObject
     @speed_z = 0
   end
 
-  def update(obstacles, floors, steps, ramps)
+  def update(obstacles, floors, steps, ramps, exits)
     up, rt, dn, lf = DIR_KEYS.map { |k| KB.key_down?(k) }
-    p_up, p_rt, p_dn, p_lf = DIR_KEYS.map { |k| KB.key_pressed?(k) }
+    p_up, p_rt, p_dn, p_lf = DIR_KEYS.map { |k| KB.key_pressed?(k) || KB.key_down?(k) && @indices.nil? }
     r_up, r_rt, r_dn, r_lf = DIR_KEYS.map { |k| KB.key_released?(k) }
     speed =
       if up && !rt && !dn && !lf
@@ -47,6 +48,7 @@ class Character < IsoGameObject
         Vector.new(-SPEED, 0)
       else
         set_animation(3 * (@img_index / 3))
+        @indices = [3 * (@img_index / 3)]
         Vector.new(0, 0)
       end
     move(speed, obstacles, ramps, true)
@@ -69,6 +71,13 @@ class Character < IsoGameObject
     @grounded = @floor && @z == floor_z
     step = steps.find { |s| s.intersect?(bounds) }
     @z += Physics::V_UNIT if step && @grounded
+
+    exits.each do |e|
+      if e.intersect?(bounds)
+        @on_exit.call(e.dest)
+        break
+      end
+    end
 
     animate(@indices, 7)
   end

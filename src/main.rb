@@ -12,7 +12,7 @@ class Cogmura < GameWindow
     Res.prefix = File.expand_path(__FILE__).split('/')[0..-3].join('/') + '/data'
     Res.retro_images = true
 
-    @screen = Screen.new(1)
+    change_screen(1)
   end
 
   def update
@@ -22,6 +22,11 @@ class Cogmura < GameWindow
     close if KB.key_pressed?(Gosu::KB_ESCAPE)
 
     @screen.update
+  end
+
+  def change_screen(num)
+    @screen = Screen.new(num)
+    @screen.on_player_exit = method(:change_screen)
   end
 
   def draw

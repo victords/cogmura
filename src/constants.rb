@@ -1,3 +1,5 @@
+Vector = MiniGL::Vector
+
 module Graphics
   SCR_W = 1280
   SCR_H = 640
