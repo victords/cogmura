@@ -13,7 +13,11 @@ class Screen
       IsoBlock.new(0, -1, 18),
       IsoBlock.new(0, 20, 39),
       IsoBlock.new(1, -1, 20),
-      IsoBlock.new(1, 20, -1)
+      IsoBlock.new(1, 20, -1),
+      IsoBlock.new(2, -0.5, 19.5),
+      IsoBlock.new(2, 19.5, -0.5),
+      IsoBlock.new(2, 19.5, 39.5),
+      IsoBlock.new(2, 39.5, 19.5)
     ]
     File.open("#{Res.prefix}map/#{id}") do |f|
       info, data = f.read.split('#')

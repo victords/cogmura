@@ -6,6 +6,7 @@ class IsoBlock
   TYPE_MAP = [
     [20, 1, 999, nil, 0, 0, true],
     [1, 20, 999, nil, 0, 0, true],
+    [1, 1, 999, nil, 0, 0, false],
     [1, 1, 1, :block1, 0, 0, false],
     [2, 3, 4, :house1, -6, 0, false],
     [3, 1, 3, :wall1, 0, 0, true]
@@ -43,7 +44,7 @@ class IsoBlock
         @ramps << Ramp.new(x + i * unit, @y + (i + 1) * unit, unit, unit, true, true)
         @ramps << Ramp.new(x + (x_tiles + i) * unit, @y + (i - x_tiles + 1) * unit, unit, unit, false, false)
       end
-    else
+    elsif image
       @imgs = (0...(x_tiles + y_tiles - 1)).map do |i|
         img_gap_offset = i == 0 ? 0 : -img_gap_x / Graphics::SCALE
         x = (i >= x_tiles ? (i + 1) : i) * IMG_SLICE_OFFSET + img_gap_offset
@@ -52,7 +53,6 @@ class IsoBlock
         image.subimage(x, 0, w, image.height)
       end
       @z_index = @col + @row + @x_tiles + @y_tiles - 1
-      @ramps = nil
     end
     @img_gap = Vector.new(img_gap_x, img_gap_y)
   end
