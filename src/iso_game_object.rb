@@ -6,7 +6,7 @@ class IsoGameObject < GameObject
   attr_reader :screen_x, :screen_y, :z_index
 
   def initialize(i, j, w, h, img, img_gap = nil, sprite_cols = nil, sprite_rows = nil)
-    super(i * Physics::UNIT, j * Physics::UNIT, w, h, img, img_gap, sprite_cols, sprite_rows)
+    super((i + 0.5) * Physics::UNIT - w / 2, (j + 0.5) * Physics::UNIT - h / 2, w, h, img, img_gap, sprite_cols, sprite_rows)
     @screen_x = @screen_y = -10000
     @z = 0
     @z_index = i + j + 1

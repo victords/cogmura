@@ -11,9 +11,10 @@ class Character < IsoGameObject
   attr_reader :grounded
   attr_writer :on_exit
 
-  def initialize(i, j)
+  def initialize(i, j, z)
     super(i, j, 20, 20, :cogmura, Vector.new(-22, -72), 3, 5)
 
+    @z = z * Physics::V_UNIT
     @speed_z = 0
   end
 
@@ -74,7 +75,7 @@ class Character < IsoGameObject
 
     exits.each do |e|
       if e.intersect?(bounds)
-        @on_exit.call(e.dest)
+        @on_exit.call(e)
         break
       end
     end

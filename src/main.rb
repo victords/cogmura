@@ -12,7 +12,8 @@ class Cogmura < GameWindow
     Res.prefix = File.expand_path(__FILE__).split('/')[0..-3].join('/') + '/data'
     Res.retro_images = true
 
-    change_screen(1)
+    @screen = Screen.new(1)
+    @screen.on_player_exit = method(:change_screen)
   end
 
   def update
@@ -24,8 +25,8 @@ class Cogmura < GameWindow
     @screen.update
   end
 
-  def change_screen(num)
-    @screen = Screen.new(num)
+  def change_screen(exit)
+    @screen = Screen.new(exit.dest_scr, exit.dest_entr)
     @screen.on_player_exit = method(:change_screen)
   end
 

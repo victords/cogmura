@@ -3,11 +3,12 @@ require_relative 'iso_block'
 include MiniGL
 
 class Exit < Rectangle
-  attr_reader :dest, :z
+  attr_reader :dest_scr, :dest_entr, :z
 
-  def initialize(dest, i, j, z)
-    super((i - 0.5) * Physics::UNIT, (j - 0.5) * Physics::UNIT, Physics::UNIT, Physics::UNIT)
-    @dest = dest
+  def initialize(dest_scr, dest_entr, i, j, z)
+    super(i * Physics::UNIT, j * Physics::UNIT, Physics::UNIT, Physics::UNIT)
+    @dest_scr = dest_scr
+    @dest_entr = dest_entr
     @z = z
   end
 end
@@ -15,7 +16,7 @@ end
 class Screen
   attr_writer :on_player_exit
 
-  def initialize(id)
+  def initialize(id, entrance_index = 0)
     @map = Map.new(Graphics::TILE_WIDTH, Graphics::TILE_HEIGHT, 40, 40, Graphics::SCR_W, Graphics::SCR_H, true)
     @map.set_camera(10 * Graphics::TILE_WIDTH, 10 * Graphics::TILE_HEIGHT)
     @tiles = Array.new(40) { Array.new(40) }
@@ -30,13 +31,13 @@ class Screen
       IsoBlock.new(2, 39.5, 19.5)
     ]
     File.open("#{Res.prefix}map/#{id}") do |f|
-      info, exits, data = f.read.split('#')
+      info, entrances, exits, data = f.read.split('#')
       @tileset = Res.imgs("tile#{info}", 1, 2)
 
+      @entrances = entrances.split(';').map { |e| e.split(',').map(&:to_f) }
       @exits = exits.split(';').map do |e|
         d = e.split(',')
-        pos = @map.get_map_pos(d[1].to_f * Graphics::SCR_W, d[2].to_f * Graphics::SCR_H)
-        Exit.new(d[0].to_i, pos.x, pos.y, d[3].to_i)
+        Exit.new(d[0].to_i, d[1].to_i, d[2].to_f, d[3].to_f, d[4].to_i)
       end
 
       i = 19; j = 0
@@ -62,9 +63,10 @@ class Screen
       end
     end
 
-    @man = Character.new(11, 11)
-    @man.on_exit = lambda { |dest|
-      @on_player_exit.call(dest)
+    entrance = @entrances[entrance_index]
+    @man = Character.new(entrance[0], entrance[1], entrance[2])
+    @man.on_exit = lambda { |exit|
+      @on_player_exit.call(exit)
     }
   end
 
