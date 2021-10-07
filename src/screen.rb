@@ -1,4 +1,5 @@
 require_relative 'iso_block'
+require_relative 'graphic'
 
 include MiniGL
 
@@ -32,6 +33,8 @@ class Screen
       IsoBlock.new(2, 19.5, 39.5),
       IsoBlock.new(2, 39.5, 19.5)
     ]
+    @graphics = []
+
     File.open("#{Res.prefix}map/#{id}") do |f|
       info, entrances, exits, data = f.read.split('#')
       @tileset = Res.imgs("tile#{info}", 1, 2)
@@ -55,6 +58,8 @@ class Screen
           end
         when 'b'
           @blocks << IsoBlock.new(d[3].to_i, i, j)
+        when 'g'
+          @graphics << Graphic.new(d[3].to_i, i, j)
         end
         i, j = next_tile(i, j)
       end
@@ -109,6 +114,7 @@ class Screen
       @tileset[@tiles[i][j]].draw(x, y, 0, Graphics::SCALE, Graphics::SCALE) if @tiles[i][j]
     end
     @blocks.each { |b| b.draw(@map, @man) }
+    @graphics.each { |g| g.draw(@map) }
     @man.draw(@map)
     if @overlay_alpha > 0
       color = @overlay_alpha.round << 24
