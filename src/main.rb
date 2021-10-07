@@ -13,7 +13,7 @@ class Cogmura < GameWindow
     Res.retro_images = true
 
     @screen = Screen.new(1)
-    @screen.on_player_exit = method(:change_screen)
+    @screen.on_exit = method(:change_screen)
   end
 
   def update
@@ -27,7 +27,7 @@ class Cogmura < GameWindow
 
   def change_screen(exit)
     @screen = Screen.new(exit.dest_scr, exit.dest_entr)
-    @screen.on_player_exit = method(:change_screen)
+    @screen.on_exit = method(:change_screen)
   end
 
   def draw

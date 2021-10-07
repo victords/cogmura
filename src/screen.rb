@@ -14,7 +14,9 @@ class Exit < Rectangle
 end
 
 class Screen
-  attr_writer :on_player_exit
+  FADE_DURATION = 30.0
+
+  attr_writer :on_exit
 
   def initialize(id, entrance_index = 0)
     @map = Map.new(Graphics::TILE_WIDTH, Graphics::TILE_HEIGHT, 40, 40, Graphics::SCR_W, Graphics::SCR_H, true)
@@ -66,11 +68,31 @@ class Screen
     entrance = @entrances[entrance_index]
     @man = Character.new(entrance[0], entrance[1], entrance[2])
     @man.on_exit = lambda { |exit|
-      @on_player_exit.call(exit)
+      @active_exit = exit
+      @fading = :out
     }
+
+    @fading = :in
+    @overlay_alpha = 255
   end
 
   def update
+    if @fading == :in
+      @overlay_alpha -= 255 / FADE_DURATION
+      if @overlay_alpha <= 0
+        @overlay_alpha = 0
+        @fading = nil
+      end
+    elsif @fading == :out
+      @overlay_alpha += 255 / FADE_DURATION
+      if @overlay_alpha >= 255
+        @overlay_alpha = 255
+        @on_exit.call(@active_exit)
+      end
+    end
+
+    return if @fading == :out || @fading == :in && @overlay_alpha > 127
+
     base_collide_level = @man.grounded ? @man.height_level + 1 : @man.height_level
     obstacles = @blocks.select { |b| b.height > base_collide_level }
     @man.update(
@@ -88,6 +110,10 @@ class Screen
     end
     @blocks.each { |b| b.draw(@map, @man) }
     @man.draw(@map)
+    if @overlay_alpha > 0
+      color = @overlay_alpha.round << 24
+      G.window.draw_quad(0, 0, color, Graphics::SCR_W, 0, color, 0, Graphics::SCR_H, color, Graphics::SCR_W, Graphics::SCR_H, color, 10000)
+    end
   end
 
   private
