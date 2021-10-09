@@ -16,28 +16,29 @@ end
 
 class Screen
   FADE_DURATION = 30.0
+  M_S = Graphics::MAP_SIZE
 
   attr_writer :on_exit
 
   def initialize(id, entrance_index = 0)
-    @map = Map.new(Graphics::TILE_WIDTH, Graphics::TILE_HEIGHT, 40, 40, Graphics::SCR_W, Graphics::SCR_H, true)
-    @map.set_camera(10 * Graphics::TILE_WIDTH, 10 * Graphics::TILE_HEIGHT)
-    @tiles = Array.new(40) { Array.new(40) }
+    @map = Map.new(Graphics::TILE_WIDTH, Graphics::TILE_HEIGHT, M_S, M_S, Graphics::SCR_W, Graphics::SCR_H, true)
+    @map.set_camera(M_S / 4 * Graphics::TILE_WIDTH, M_S / 4 * Graphics::TILE_HEIGHT)
+    @tiles = Array.new(M_S) { Array.new(M_S) }
     @blocks = [
-      IsoBlock.new(0, -1, 18),
-      IsoBlock.new(0, 20, 39),
-      IsoBlock.new(1, -1, 20),
-      IsoBlock.new(1, 20, -1),
-      IsoBlock.new(2, -0.5, 19.5),
-      IsoBlock.new(2, 19.5, -0.5),
-      IsoBlock.new(2, 19.5, 39.5),
-      IsoBlock.new(2, 39.5, 19.5)
+      IsoBlock.new(0, -1, M_S / 2 - 2),
+      IsoBlock.new(0, M_S / 2, M_S - 1),
+      IsoBlock.new(1, -1, M_S / 2),
+      IsoBlock.new(1, M_S / 2, -1),
+      IsoBlock.new(2, -0.5, M_S / 2 - 0.5),
+      IsoBlock.new(2, M_S / 2 - 0.5, -0.5),
+      IsoBlock.new(2, M_S / 2 - 0.5, M_S - 0.5),
+      IsoBlock.new(2, M_S - 0.5, M_S / 2 - 0.5)
     ]
     @graphics = []
 
     File.open("#{Res.prefix}map/#{id}") do |f|
       info, entrances, exits, data = f.read.split('#')
-      @tileset = Res.imgs("tile#{info}", 1, 2)
+      @tileset = Res.imgs("tile#{info}", 1, 7)
 
       @entrances = entrances.split(';').map { |e| e.split(',').map(&:to_f) }
       @exits = exits.split(';').map do |e|
@@ -45,7 +46,7 @@ class Screen
         Exit.new(d[0].to_i, d[1].to_i, d[2].to_f, d[3].to_f, d[4].to_i)
       end
 
-      i = 19; j = 0
+      i = M_S / 2 - 1; j = 0
       data.split(';').each do |d|
         tile_type = d[0..1].to_i
         @tiles[i][j] = tile_type
@@ -64,7 +65,7 @@ class Screen
         i, j = next_tile(i, j)
       end
 
-      while j < 39 || j == 39 && i < 21
+      while j < M_S - 1 || j == M_S - 1 && i < M_S / 2 + 1
         @tiles[i][j] = 0
         i, j = next_tile(i, j)
       end
@@ -126,9 +127,9 @@ class Screen
 
   def next_tile(i, j)
     i += 1
-    if i >= 40 - (j >= 20 ? j - 20 : 19 - j)
+    if i >= M_S - (j >= M_S / 2 ? j - M_S / 2 : M_S / 2 - 1 - j)
       j += 1
-      i = 20 - (j >= 20 ? 40 - j : j + 1)
+      i = M_S / 2 - (j >= M_S / 2 ? M_S - j : j + 1)
     end
     [i, j]
   end

@@ -10,8 +10,9 @@ class IsoBlock
     [1, 20, 999, nil, 0, 0, true],
     [1, 1, 999, nil, 0, 0, false],
     [1, 1, 1, :block1, 0, 0, false],
-    [2, 3, 4, :house1, -6, 0, false],
-    [3, 1, 3, :wall1, 0, 0, true]
+    [4, 6, 7, :house1, -8, -20, false],
+    [3, 1, 3, :wall1, 0, 0, true],
+    [1, 1, 15, :tree1, -64, 0, false]
   ].freeze
 
   attr_reader :x, :y, :w, :h, :height, :ramps, :z_index
