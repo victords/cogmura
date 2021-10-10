@@ -4,6 +4,7 @@ include MiniGL
 
 class IsoBlock
   IMG_SLICE_OFFSET = Graphics::TILE_WIDTH / 2 / Graphics::SCALE
+  FADE_DURATION = 15.0
 
   TYPE_MAP = [
     [20, 1, 999, nil, 0, 0, true],
@@ -58,6 +59,8 @@ class IsoBlock
       @z_index = @col + @row + @x_tiles + @y_tiles - 1
     end
     @img_gap = Vector.new(img_gap_x, img_gap_y)
+
+    @alpha = 255
   end
 
   def passable; false; end
@@ -80,7 +83,8 @@ class IsoBlock
       x = pos.x + @img_gap.x
       y = pos.y + Graphics::TILE_HEIGHT / 2 - @height * Physics::V_UNIT + @img_gap.y
       behind = man_behind(man, x, x + @img.width * Graphics::SCALE, y, @z_index)
-      color = behind ? 0x80ffffff : 0xffffffff
+      update_alpha(behind)
+      color = (@alpha << 24) | 0xffffff
       @img.draw(x, y, @z_index, Graphics::SCALE, Graphics::SCALE, color)
     elsif @imgs
       x = pos.x - ((@y_tiles - 1) * Graphics::TILE_WIDTH / 2)
@@ -91,7 +95,8 @@ class IsoBlock
           x2 = x1 + @imgs[i].width * Graphics::SCALE
           man_behind(man, x1, x2, y, @z_index - (i + 1 - @x_tiles).abs)
         end
-      color = behind ? 0x80ffffff : 0xffffffff
+      update_alpha(behind)
+      color = (@alpha << 24) | 0xffffff
       @imgs.each_with_index do |img, i|
         img.draw(x + (i >= @x_tiles ? (i + 1) : i) * Graphics::TILE_WIDTH / 2 + (i == 0 ? @img_gap.x : 0), y,
                  @z_index - (i + 1 - @x_tiles).abs, Graphics::SCALE, Graphics::SCALE, color)
@@ -104,5 +109,11 @@ class IsoBlock
   def man_behind(man, x1, x2, y, z_index)
     man.screen_x + man.w > x1 && man.screen_x < x2 && man.screen_y + man.h - 12 > y && man.z_index < z_index &&
       man.height_level < @height
+  end
+
+  def update_alpha(behind)
+    @alpha -= 127 / FADE_DURATION if behind && @alpha > 128
+    @alpha += 127 / FADE_DURATION if !behind && @alpha < 255
+    @alpha = @alpha.round
   end
 end
