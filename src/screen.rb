@@ -1,5 +1,6 @@
 require_relative 'iso_block'
 require_relative 'graphic'
+require_relative 'npc'
 
 include MiniGL
 
@@ -35,6 +36,7 @@ class Screen
       IsoBlock.new(2, M_S - 0.5, M_S / 2 - 0.5)
     ]
     @graphics = []
+    @npcs = []
 
     File.open("#{Res.prefix}map/#{id}") do |f|
       info, entrances, exits, data = f.read.split('#')
@@ -61,6 +63,8 @@ class Screen
           @blocks << IsoBlock.new(d[3].to_i, i, j)
         when 'g'
           @graphics << Graphic.new(d[3].to_i, i, j)
+        when 'n'
+          @npcs << Npc.new(d[3].to_i, i, j)
         end
         i, j = next_tile(i, j)
       end
@@ -100,7 +104,7 @@ class Screen
     return if @fading == :out || @fading == :in && @overlay_alpha > 127
 
     base_collide_level = @man.grounded ? @man.height_level + 1 : @man.height_level
-    obstacles = @blocks.select { |b| b.height > base_collide_level }
+    obstacles = (@blocks + @npcs).select { |b| b.height > base_collide_level }
     @man.update(
       obstacles,
       @blocks.select { |b| b.height == @man.height_level },
@@ -108,6 +112,13 @@ class Screen
       obstacles.map(&:ramps).compact.flatten,
       @exits.select { |e| e.z == @man.height_level }
     )
+
+    npc_in_range = nil
+    @npcs.each do |n|
+      in_range = @man.grounded && npc_in_range.nil? && n.z == @man.z && n.in_range?(@man)
+      n.man_in_range = in_range
+      npc_in_range = n if in_range
+    end
   end
 
   def draw
@@ -117,6 +128,7 @@ class Screen
     @blocks.each { |b| b.draw(@map, @man) }
     @graphics.each { |g| g.draw(@map) }
     @man.draw(@map)
+    @npcs.each { |n| n.draw(@map) }
     if @overlay_alpha > 0
       color = @overlay_alpha.round << 24
       G.window.draw_quad(0, 0, color, Graphics::SCR_W, 0, color, 0, Graphics::SCR_H, color, Graphics::SCR_W, Graphics::SCR_H, color, 10000)

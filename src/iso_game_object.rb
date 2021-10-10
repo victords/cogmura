@@ -3,7 +3,7 @@ require_relative 'constants'
 include MiniGL
 
 class IsoGameObject < GameObject
-  attr_reader :screen_x, :screen_y, :z_index
+  attr_reader :z, :screen_x, :screen_y, :z_index
 
   def initialize(i, j, w, h, img, img_gap = nil, sprite_cols = nil, sprite_rows = nil)
     super((i + 0.5) * Physics::UNIT - w / 2, (j + 0.5) * Physics::UNIT - h / 2, w, h, img, img_gap, sprite_cols, sprite_rows)
