@@ -7,6 +7,7 @@ module Graphics
   TILE_HEIGHT = 32
   SCR_W = MAP_SIZE * TILE_WIDTH / 2
   SCR_H = MAP_SIZE * TILE_HEIGHT / 2
+  UI_Z_INDEX = 10000
 end
 
 module Physics

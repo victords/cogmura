@@ -1,5 +1,7 @@
 require_relative 'iso_block'
 
+include MiniGL
+
 class Npc < IsoGameObject
   ID_MAP = [
     [:cogjian, -12, -72]
@@ -26,10 +28,31 @@ class Npc < IsoGameObject
     @range.intersect?(obj)
   end
 
+  def update
+    @talking = false unless @man_in_range
+
+    if KB.key_pressed?(Gosu::KB_Z)
+      if @talking
+        @talking = false
+      elsif @man_in_range
+        @talking = true
+      end
+    end
+  end
+
   def draw(map)
     super
-    if @man_in_range
-      pos = map.get_screen_pos((@x + @w / 2) / Physics::UNIT, (@y + @h / 2) / Physics::UNIT)
+
+    pos = map.get_screen_pos((@x + @w / 2) / Physics::UNIT, (@y + @h / 2) / Physics::UNIT)
+    if @talking
+      y = pos.y - @height * Physics::V_UNIT >= Graphics::SCR_H / 2 ? 10 : Graphics::SCR_H - 90
+      G.window.draw_rect(10, y, Graphics::SCR_W - 20, 80, 0xccffffff, Graphics::UI_Z_INDEX)
+      G.window.font.write_breaking(
+        "Hello my friend, this is the first NPC speech, just for testing purposes. \
+Let's see if it looks good on the screen with multiple lines and all that.\nWith a total of three lines, to be more precise.",
+        20, y + 5, Graphics::SCR_W - 40, :justified, 0, 255, Graphics::UI_Z_INDEX
+      )
+    elsif @man_in_range
       @balloon.draw(pos.x + Graphics::TILE_WIDTH / 2 - 14, pos.y - 2 * Physics::V_UNIT + @img_gap.y, @z_index, Graphics::SCALE, Graphics::SCALE)
     end
   end
