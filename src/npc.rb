@@ -1,4 +1,4 @@
-require_relative 'iso_block'
+require_relative 'iso_game_object'
 
 include MiniGL
 
@@ -16,6 +16,24 @@ class Npc < IsoGameObject
     @ramps = nil
     @range = Rectangle.new(@x - Physics::UNIT, @y - Physics::UNIT, @w + 2 * Physics::UNIT, @h + 2 * Physics::UNIT)
     @balloon = Res.img(:balloon)
+
+    @texts = Game.npc_texts[id].map { |t| t.split(' ', 2) }
+    check_text_switches
+    @text_index = 0 if @text_index.nil?
+
+    Game.on_switch_activated << method(:check_text_switches)
+  end
+
+  def check_text_switches(s = nil)
+    (@texts.size - 1).downto(0).each do |i|
+      t = @texts[i]
+      next unless t[0].to_i > 0
+
+      if Game.switch_active?(t[0].to_i)
+        @text_index = i
+        break
+      end
+    end
   end
 
   def passable; false; end
@@ -28,12 +46,20 @@ class Npc < IsoGameObject
     @range.intersect?(obj)
   end
 
+  def check_next_text
+    @text_index += 1 if @texts[@text_index + 1]&.[](0) == '>'
+  end
+
   def update
-    @talking = false unless @man_in_range
+    if @talking && !@man_in_range
+      @talking = false
+      check_next_text
+    end
 
     if KB.key_pressed?(Gosu::KB_Z)
       if @talking
         @talking = false
+        check_next_text
       elsif @man_in_range
         @talking = true
       end
@@ -47,11 +73,7 @@ class Npc < IsoGameObject
     if @talking
       y = pos.y - @height * Physics::V_UNIT >= Graphics::SCR_H / 2 ? 10 : Graphics::SCR_H - 90
       G.window.draw_rect(10, y, Graphics::SCR_W - 20, 80, 0xccffffff, Graphics::UI_Z_INDEX)
-      G.window.font.write_breaking(
-        "Hello my friend, this is the first NPC speech, just for testing purposes. \
-Let's see if it looks good on the screen with multiple lines and all that.\nWith a total of three lines, to be more precise.",
-        20, y + 5, Graphics::SCR_W - 40, :justified, 0, 255, Graphics::UI_Z_INDEX
-      )
+      G.window.font.write_breaking(@texts[@text_index][1], 20, y + 5, Graphics::SCR_W - 40, :justified, 0, 255, Graphics::UI_Z_INDEX)
     elsif @man_in_range
       @balloon.draw(pos.x + Graphics::TILE_WIDTH / 2 - 14, pos.y - 2 * Physics::V_UNIT + @img_gap.y, @z_index, Graphics::SCALE, Graphics::SCALE)
     end

@@ -1,7 +1,7 @@
 require 'minigl'
 require_relative 'constants'
-require_relative 'character'
 require_relative 'screen'
+require_relative 'game'
 
 include MiniGL
 
@@ -13,6 +13,8 @@ class Cogmura < GameWindow
 
     Res.prefix = File.expand_path(__FILE__).split('/')[0..-3].join('/') + '/data'
     Res.retro_images = true
+
+    Game.init
 
     @screen = Screen.new(1)
     @screen.on_exit = method(:change_screen)
@@ -42,6 +44,9 @@ class Cogmura < GameWindow
 
     toggle_fullscreen if KB.key_pressed?(Gosu::KB_F4)
     close if KB.key_pressed?(Gosu::KB_ESCAPE)
+
+    Game.activate_switch(1) if KB.key_pressed?(Gosu::KB_A)
+    Game.activate_switch(2) if KB.key_pressed?(Gosu::KB_S)
 
     @screen.update
   end

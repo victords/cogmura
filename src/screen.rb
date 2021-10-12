@@ -1,6 +1,7 @@
 require_relative 'iso_block'
 require_relative 'graphic'
 require_relative 'npc'
+require_relative 'character'
 
 include MiniGL
 
