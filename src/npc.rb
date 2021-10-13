@@ -6,15 +6,15 @@ class Npc < IsoGameObject
   ID_MAP = [
     [:cogjian, -12, -72]
   ].freeze
+  SQ_RANGE = (1.5 * Physics::UNIT) ** 2
 
-  attr_reader :height, :ramps
-  attr_writer :man_in_range
+  attr_reader :height, :ramps, :man_in_range
 
   def initialize(id, col, row)
-    super(col, row, 20, 20, ID_MAP[id][0], Vector.new(ID_MAP[id][1], ID_MAP[id][2]))
+    data = ID_MAP[id]
+    super(col, row, 20, 20, data[0], Vector.new(data[1], data[2]), 5, 1)
     @height = 3
     @ramps = nil
-    @range = Rectangle.new(@x - Physics::UNIT, @y - Physics::UNIT, @w + 2 * Physics::UNIT, @h + 2 * Physics::UNIT)
     @balloon = Res.img(:balloon)
 
     @texts = Game.npc_texts[id].map { |t| t.split(' ', 2) }
@@ -43,14 +43,38 @@ class Npc < IsoGameObject
   end
 
   def in_range?(obj)
-    @range.intersect?(obj)
+    (@x + @w / 2 - obj.x - obj.w / 2) ** 2 + (@y + @h / 2 - obj.y - obj.h / 2) ** 2 <= SQ_RANGE
   end
 
   def check_next_text
     @text_index += 1 if @texts[@text_index + 1]&.[](0) == '>'
   end
 
-  def update
+  def set_angle(man)
+    angle = Math.atan2(man.y + man.h / 2 - @y - @h / 2, man.x + man.w / 2 - @x - @w / 2)
+    angle = 180 * angle / Math::PI
+    if angle >= -22.5 && angle < 22.5
+      @img_index = 3; @flip = true
+    elsif angle >= 22.5 && angle < 67.5
+      @img_index = 0; @flip = false
+    elsif angle >= 67.5 && angle < 112.5
+      @img_index = 3; @flip = false
+    elsif angle >= 112.5 && angle < 157.5
+      @img_index = 2; @flip = false
+    elsif angle >= 157.5 || angle < -157.5
+      @img_index = 4; @flip = false
+    elsif angle >= -157.5 && angle < -112.5
+      @img_index = 1; @flip = false
+    elsif angle >= -112.5 && angle < -67.5
+      @img_index = 4; @flip = true
+    else
+      @img_index = 2; @flip = true
+    end
+  end
+
+  def update(man)
+    @man_in_range = man&.grounded && @z == man.z && in_range?(man)
+
     if @talking && !@man_in_range
       @talking = false
       check_next_text
@@ -62,12 +86,13 @@ class Npc < IsoGameObject
         check_next_text
       elsif @man_in_range
         @talking = true
+        set_angle(man)
       end
     end
   end
 
   def draw(map)
-    super
+    super(map, @flip ? :horiz : nil)
 
     pos = map.get_screen_pos((@x + @w / 2) / Physics::UNIT, (@y + @h / 2) / Physics::UNIT)
     if @talking

@@ -116,10 +116,8 @@ class Screen
 
     npc_in_range = nil
     @npcs.each do |n|
-      in_range = @man.grounded && npc_in_range.nil? && n.z == @man.z && n.in_range?(@man)
-      n.man_in_range = in_range
-      n.update
-      npc_in_range = n if in_range
+      n.update(npc_in_range ? nil : @man)
+      npc_in_range = n if n.man_in_range
     end
   end
 
