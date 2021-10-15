@@ -1,6 +1,7 @@
 require_relative 'iso_block'
 require_relative 'graphic'
 require_relative 'npc'
+require_relative 'door'
 require_relative 'character'
 
 include MiniGL
@@ -40,13 +41,20 @@ class Screen
     @npcs = []
 
     File.open("#{Res.prefix}map/#{id}") do |f|
-      info, entrances, exits, data = f.read.split('#')
+      info, entrances, exits, doors, data = f.read.split('#')
       @tileset = Res.imgs("tile#{info}", 1, 7)
 
       @entrances = entrances.split(';').map { |e| e.split(',').map(&:to_f) }
       @exits = exits.split(';').map do |e|
         d = e.split(',')
         Exit.new(d[0].to_i, d[1].to_i, d[2].to_f, d[3].to_f, d[4].to_i)
+      end
+      @doors = doors.split(';').map do |d|
+        d = d.split(',')
+        Door.new(d[0].to_i, d[1].to_i, d[2].to_f, d[3].to_f, d[4].to_i)
+      end
+      @doors.each do |d|
+        d.on_open = method(:on_player_leave)
       end
 
       i = M_S / 2 - 1; j = 0
@@ -78,13 +86,15 @@ class Screen
 
     entrance = @entrances[entrance_index]
     @man = Character.new(entrance[0], entrance[1], entrance[2])
-    @man.on_exit = lambda { |exit|
-      @active_exit = exit
-      @fading = :out
-    }
+    @man.on_exit = method(:on_player_leave)
 
     @fading = :in
     @overlay_alpha = 255
+  end
+
+  def on_player_leave(exit_obj)
+    @active_exit = exit_obj
+    @fading = :out
   end
 
   def update
@@ -102,23 +112,25 @@ class Screen
       end
     end
 
-    return if @fading == :out || @fading == :in && @overlay_alpha > 127
+    unless @fading == :out || @fading == :in && @overlay_alpha > 127
+      base_collide_level = @man.grounded ? @man.height_level + 1 : @man.height_level
+      obstacles = (@blocks + @npcs).select { |b| b.height > base_collide_level }
+      @man.update(
+        obstacles,
+        @blocks.select { |b| b.height == @man.height_level },
+        @man.grounded ? @blocks.select { |b| b.height == base_collide_level } : [],
+        obstacles.map(&:ramps).compact.flatten,
+        @exits.select { |e| e.z == @man.height_level }
+      )
 
-    base_collide_level = @man.grounded ? @man.height_level + 1 : @man.height_level
-    obstacles = (@blocks + @npcs).select { |b| b.height > base_collide_level }
-    @man.update(
-      obstacles,
-      @blocks.select { |b| b.height == @man.height_level },
-      @man.grounded ? @blocks.select { |b| b.height == base_collide_level } : [],
-      obstacles.map(&:ramps).compact.flatten,
-      @exits.select { |e| e.z == @man.height_level }
-    )
-
-    npc_in_range = nil
-    @npcs.each do |n|
-      n.update(npc_in_range ? nil : @man)
-      npc_in_range = n if n.man_in_range
+      npc_in_range = nil
+      @npcs.each do |n|
+        n.update(npc_in_range ? nil : @man)
+        npc_in_range = n if n.man_in_range
+      end
     end
+
+    @doors.each { |d| d.update(@man) }
   end
 
   def draw
@@ -126,6 +138,7 @@ class Screen
       @tileset[@tiles[i][j]].draw(x, y, 0, Graphics::SCALE, Graphics::SCALE) if @tiles[i][j]
     end
     @blocks.each { |b| b.draw(@map, @man) }
+    @doors.each { |d| d.draw(@map) }
     @graphics.each { |g| g.draw(@map) }
     @man.draw(@map)
     @npcs.each { |n| n.draw(@map) }

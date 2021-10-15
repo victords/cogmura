@@ -30,8 +30,8 @@ class Cogmura < GameWindow
     )
   end
 
-  def change_screen(exit)
-    @screen = Screen.new(exit.dest_scr, exit.dest_entr)
+  def change_screen(exit_obj)
+    @screen = Screen.new(exit_obj.dest_scr, exit_obj.dest_entr)
     @screen.on_exit = method(:change_screen)
   end
 
