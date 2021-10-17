@@ -1,10 +1,11 @@
 require 'set'
+require_relative 'player_stats'
 
 include MiniGL
 
 class Game
   class << self
-    attr_reader :npc_texts, :on_switch_activated
+    attr_reader :npc_texts, :on_switch_activated, :player_stats
 
     def init
       @language = 'en'
@@ -13,6 +14,8 @@ class Game
       end
       @switches = Set.new
       @on_switch_activated = []
+
+      @player_stats = PlayerStats.new
     end
 
     def switch_active?(id)

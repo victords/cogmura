@@ -2,6 +2,7 @@ require_relative 'iso_block'
 require_relative 'graphic'
 require_relative 'npc'
 require_relative 'door'
+require_relative 'screen_item'
 require_relative 'character'
 
 include MiniGL
@@ -41,6 +42,7 @@ class Screen
     ]
     @graphics = []
     @npcs = []
+    @items = []
 
     File.open("#{Res.prefix}map/#{id}") do |f|
       info, entrances, exits, doors, data = f.read.split('#')
@@ -89,6 +91,9 @@ class Screen
           @graphics << Graphic.new(d[3].to_i, i, j)
         when 'n' # NPC
           @npcs << Npc.new(d[3].to_i, i, j)
+        when 'i' # item
+          @items << (item = ScreenItem.new(d[3].to_i, i, j))
+          item.on_picked_up = method(:on_item_picked_up)
         end
         i, j = next_tile(i, j)
       end
@@ -114,6 +119,10 @@ class Screen
   def on_player_leave(exit_obj)
     @active_exit = exit_obj
     @fading = :out
+  end
+
+  def on_item_picked_up(item)
+    Game.player_stats.add_item(item)
   end
 
   def update
@@ -147,6 +156,11 @@ class Screen
         n.update(npc_in_range ? nil : @man)
         npc_in_range = n if n.man_in_range
       end
+
+      @items.reverse_each do |item|
+        item.update(@man)
+        @items.delete(item) if item.destroyed
+      end
     end
 
     @doors.each { |d| d.update(@man) }
@@ -164,6 +178,7 @@ class Screen
     @graphics.each { |g| g.draw(@map) }
     @man.draw(@map)
     @npcs.each { |n| n.draw(@map) }
+    @items.each { |i| i.draw(@map) }
     if @overlay_alpha > 0
       color = @overlay_alpha.round << 24
       G.window.draw_quad(0, 0, color, Graphics::SCR_W, 0, color, 0, Graphics::SCR_H, color, Graphics::SCR_W, Graphics::SCR_H, color, 10000)

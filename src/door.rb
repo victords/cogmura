@@ -9,7 +9,7 @@ class Door < IsoGameObject
   # type 1: along iso x-axis
   # type 2: angled (facing front)
   def initialize(type, dest_scr, dest_entr, i, j, z)
-    super(i, j, Physics::UNIT, Physics::UNIT, type == 2 ? :obj_door1a : :obj_door1, Vector.new(-4, type == 2 ? -64 : -76), 5, 1)
+    super(i, j, Physics::UNIT, Physics::UNIT, type == 2 ? :obj_door1a : :obj_door1, Vector.new(-4, type == 2 ? -24 : -36), 5, 1)
     @type = type
     @dest_scr = dest_scr
     @dest_entr = dest_entr
