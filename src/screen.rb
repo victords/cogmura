@@ -60,8 +60,16 @@ class Screen
 
       i = M_S / 2 - 1; j = 0
       data.split(';').each do |d|
-        tile_type = d[0..1].to_i
-        @tiles[i][j] = tile_type
+        if d[0] == '_' && d[1] != '_'
+          d[1..-1].to_i.times { i, j = next_tile(i, j) }
+          next
+        end
+
+        if d[0] != '_'
+          tile_type = d[0..1].to_i
+          @tiles[i][j] = tile_type
+        end
+
         case d[2]
         when '*'
           num_tiles = d[3..-1].to_i - 1
@@ -69,11 +77,14 @@ class Screen
             i, j = next_tile(i, j)
             @tiles[i][j] = tile_type
           end
-        when 'b'
+        when 'b' # textured block
           @blocks << IsoBlock.new(d[3].to_i, i, j)
-        when 'g'
+        when 'w' # invisible block
+          values = d[3..-1].split(',').map(&:to_f)
+          @blocks << IsoBlock.new(nil, i, j, values[0], values[1], values[2])
+        when 'g' # graphic (no collision)
           @graphics << Graphic.new(d[3].to_i, i, j)
-        when 'n'
+        when 'n' # NPC
           @npcs << Npc.new(d[3].to_i, i, j)
         end
         i, j = next_tile(i, j)
