@@ -9,7 +9,7 @@ class Graphic
     img, img_gap_x, img_gap_y = TYPE_MAP[type]
     @col = col
     @row = row
-    @img = Res.img(img)
+    @img = Res.img("obj_#{img}")
     @img_gap = Vector.new(img_gap_x, img_gap_y)
     @z_index = col + row + 2
   end

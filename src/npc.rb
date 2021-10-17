@@ -12,10 +12,10 @@ class Npc < IsoGameObject
 
   def initialize(id, col, row)
     data = ID_MAP[id]
-    super(col, row, 20, 20, data[0], Vector.new(data[1], data[2]), 5, 1)
+    super(col, row, 20, 20, "char_#{data[0]}", Vector.new(data[1], data[2]), 5, 1)
     @height = 3
     @ramps = nil
-    @balloon = Res.img(:balloon)
+    @balloon = Res.img(:fx_balloon)
 
     @texts = Game.npc_texts[id].map { |t| t.split(' ', 2) }
     check_text_switches

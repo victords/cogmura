@@ -35,7 +35,7 @@ class IsoBlock
     @x_tiles = x_tiles
     @y_tiles = y_tiles
 
-    image = img_id && Res.img(img_id)
+    image = img_id && Res.img("block_#{img_id}")
     if angled
       @img = image
       @z_index = col + row + 3

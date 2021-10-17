@@ -24,8 +24,10 @@ class Screen
   attr_writer :on_exit
 
   def initialize(id, entrance_index = 0)
-    @map = Map.new(Graphics::TILE_WIDTH, Graphics::TILE_HEIGHT, M_S, M_S, Graphics::SCR_W, Graphics::SCR_H, true)
-    @map.set_camera(M_S / 4 * Graphics::TILE_WIDTH, M_S / 4 * Graphics::TILE_HEIGHT)
+    t_w = Graphics::TILE_WIDTH
+    t_h = Graphics::TILE_HEIGHT
+    @map = Map.new(t_w, t_h, M_S, M_S, Graphics::SCR_W, Graphics::SCR_H, true)
+    @map.set_camera(M_S / 4 * t_w, M_S / 4 * t_h)
     @tiles = Array.new(M_S) { Array.new(M_S) }
     @blocks = [
       IsoBlock.new(0, -1, M_S / 2 - 2),
@@ -42,8 +44,9 @@ class Screen
 
     File.open("#{Res.prefix}map/#{id}") do |f|
       info, entrances, exits, doors, data = f.read.split('#')
-      @tileset = Res.imgs("tile#{info.to_i}", 1, 7)
-      fill = info.split(',')[1]
+      info = info.split(',')
+      @tileset = Res.tileset(info[0], t_w / Graphics::SCALE, t_h / Graphics::SCALE)
+      fill = info[1]
 
       @entrances = entrances.split(';').map { |e| e.split(',').map(&:to_f) }
       @exits = exits.split(';').map do |e|
