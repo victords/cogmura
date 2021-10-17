@@ -42,7 +42,8 @@ class Screen
 
     File.open("#{Res.prefix}map/#{id}") do |f|
       info, entrances, exits, doors, data = f.read.split('#')
-      @tileset = Res.imgs("tile#{info}", 1, 7)
+      @tileset = Res.imgs("tile#{info.to_i}", 1, 7)
+      fill = info.split(',')[1]
 
       @entrances = entrances.split(';').map { |e| e.split(',').map(&:to_f) }
       @exits = exits.split(';').map do |e|
@@ -77,9 +78,10 @@ class Screen
         end
         i, j = next_tile(i, j)
       end
+      next unless fill
 
       while j < M_S - 1 || j == M_S - 1 && i < M_S / 2 + 1
-        @tiles[i][j] = 0
+        @tiles[i][j] = fill.to_i
         i, j = next_tile(i, j)
       end
     end
@@ -138,7 +140,9 @@ class Screen
 
   def draw
     @map.foreach do |i, j, x, y|
-      @tileset[@tiles[i][j]].draw(x, y, 0, Graphics::SCALE, Graphics::SCALE) if @tiles[i][j]
+      next unless @tiles[i][j]
+
+      @tileset[@tiles[i][j]].draw(x, y, 0, Graphics::SCALE, Graphics::SCALE)
       @grid.draw(x, y, 0, Graphics::SCALE, Graphics::SCALE)
     end
     @blocks.each { |b| b.draw(@map, @man) }
