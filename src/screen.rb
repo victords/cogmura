@@ -90,6 +90,9 @@ class Screen
 
     @fading = :in
     @overlay_alpha = 255
+
+    # TODO remove later
+    @grid = Res.img(:grid)
   end
 
   def on_player_leave(exit_obj)
@@ -136,6 +139,7 @@ class Screen
   def draw
     @map.foreach do |i, j, x, y|
       @tileset[@tiles[i][j]].draw(x, y, 0, Graphics::SCALE, Graphics::SCALE) if @tiles[i][j]
+      @grid.draw(x, y, 0, Graphics::SCALE, Graphics::SCALE)
     end
     @blocks.each { |b| b.draw(@map, @man) }
     @doors.each { |d| d.draw(@map) }
