@@ -5,11 +5,20 @@ class Door < IsoGameObject
   attr_reader :dest_scr, :dest_entr
   attr_writer :on_open
 
-  def initialize(dest_scr, dest_entr, i, j, z)
-    super(i, j, Physics::UNIT, Physics::UNIT, :door1, Vector.new(-4, -76), 5, 1)
+  # type 0: along iso y-axis
+  # type 1: along iso x-axis
+  # type 2: angled (facing front)
+  def initialize(type, dest_scr, dest_entr, i, j, z)
+    super(i, j, Physics::UNIT, Physics::UNIT, type == 2 ? :door1a : :door1, Vector.new(-4, type == 2 ? -64 : -76), 5, 1)
+    @type = type
     @dest_scr = dest_scr
     @dest_entr = dest_entr
     @z = z
+    @z_index = i.floor + j.floor + 1
+
+    if type != 2
+      @sub_img = @img.map { |img| img.subimage(0, 0, img.width / 2, img.height) }
+    end
   end
 
   def update(man)
@@ -19,5 +28,14 @@ class Door < IsoGameObject
       @on_open.call(self)
       @opening = true
     end
+  end
+
+  def draw(map)
+    super(map, @type == 1 ? :horiz : nil, @z_index)
+    return unless @sub_img
+
+    x_offset = @type == 0 ? 0 : @img[0].width * Graphics::SCALE
+    @sub_img[@img_index].draw(@screen_x + @img_gap.x + x_offset, @screen_y + @img_gap.y, @z_index + 1,
+                              Graphics::SCALE * (@type == 0 ? 1 : -1), Graphics::SCALE)
   end
 end

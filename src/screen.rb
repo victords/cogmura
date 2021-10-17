@@ -51,7 +51,7 @@ class Screen
       end
       @doors = doors.split(';').map do |d|
         d = d.split(',')
-        Door.new(d[0].to_i, d[1].to_i, d[2].to_f, d[3].to_f, d[4].to_i)
+        Door.new(d[0].to_i, d[1].to_i, d[2].to_i, d[3].to_f, d[4].to_f, d[5].to_i)
       end
       @doors.each do |d|
         d.on_open = method(:on_player_leave)
