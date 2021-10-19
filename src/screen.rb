@@ -4,6 +4,7 @@ require_relative 'npc'
 require_relative 'door'
 require_relative 'screen_item'
 require_relative 'character'
+require_relative 'effect'
 
 include MiniGL
 
@@ -43,6 +44,7 @@ class Screen
     @graphics = []
     @npcs = []
     @items = []
+    @effects = []
 
     File.open("#{Res.prefix}map/#{id}") do |f|
       info, entrances, exits, doors, data = f.read.split('#')
@@ -123,6 +125,7 @@ class Screen
 
   def on_item_picked_up(item)
     Game.player_stats.add_item(item)
+    @effects << ItemPickUpEffect.new(item)
   end
 
   def update
@@ -164,6 +167,11 @@ class Screen
     end
 
     @doors.each { |d| d.update(@man) }
+
+    @effects.reverse_each do |e|
+      e.update
+      @effects.delete(e) if e.destroyed
+    end
   end
 
   def draw
@@ -179,6 +187,7 @@ class Screen
     @man.draw(@map)
     @npcs.each { |n| n.draw(@map) }
     @items.each { |i| i.draw(@map) }
+    @effects.each(&:draw)
     if @overlay_alpha > 0
       color = @overlay_alpha.round << 24
       G.window.draw_quad(0, 0, color, Graphics::SCR_W, 0, color, 0, Graphics::SCR_H, color, Graphics::SCR_W, Graphics::SCR_H, color, 10000)
