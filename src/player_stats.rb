@@ -8,7 +8,5 @@ class PlayerStats
   def add_item(item)
     @items[item.type] ||= 0
     @items[item.type] += 1
-
-    puts @items
   end
 end

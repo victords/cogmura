@@ -3,6 +3,7 @@ require_relative 'graphic'
 require_relative 'npc'
 require_relative 'door'
 require_relative 'screen_item'
+require_relative 'screen_enemy'
 require_relative 'character'
 require_relative 'effect'
 
@@ -44,6 +45,7 @@ class Screen
     @graphics = []
     @npcs = []
     @items = []
+    @enemies = []
     @effects = []
 
     File.open("#{Res.prefix}map/#{id}") do |f|
@@ -96,6 +98,9 @@ class Screen
         when 'i' # item
           @items << (item = ScreenItem.new(d[3].to_i, i, j))
           item.on_picked_up = method(:on_item_picked_up)
+        when 'e' # enemy
+          @enemies << (enemy = ScreenEnemy.new(d[3].to_i, i, j))
+          enemy.on_encounter = method(:on_enemy_encounter)
         end
         i, j = next_tile(i, j)
       end
@@ -126,6 +131,10 @@ class Screen
   def on_item_picked_up(item)
     Game.player_stats.add_item(item)
     @effects << ItemPickUpEffect.new(item)
+  end
+
+  def on_enemy_encounter(enemy)
+    puts "fight with #{enemy.name}"
   end
 
   def update
@@ -164,6 +173,8 @@ class Screen
         item.update(@man)
         @items.delete(item) if item.destroyed
       end
+
+      @enemies.each { |e| e.update(@man) }
     end
 
     @doors.each { |d| d.update(@man) }
@@ -187,6 +198,7 @@ class Screen
     @man.draw(@map)
     @npcs.each { |n| n.draw(@map) }
     @items.each { |i| i.draw(@map) }
+    @enemies.each { |e| e.draw(@map) }
     @effects.each(&:draw)
     if @overlay_alpha > 0
       color = @overlay_alpha.round << 24
