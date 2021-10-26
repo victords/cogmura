@@ -7,9 +7,6 @@ class IsoBlock
   FADE_DURATION = 15.0
 
   TYPE_MAP = [
-    [20, 1, 999, nil, 0, 0, true],
-    [1, 20, 999, nil, 0, 0, true],
-    [1, 1, 999, nil, 0, 0, false],
     [1, 1, 1, :block1, 0, 0, false],
     [4, 6, 7, :house1, -8, -20, false],
     [3, 1, 3, :wall1, 0, 0, true],
@@ -18,9 +15,9 @@ class IsoBlock
 
   attr_reader :x, :y, :w, :h, :height, :ramps, :z_index
 
-  def initialize(type, col, row, x_tiles = nil, y_tiles = nil, height = nil)
+  def initialize(type, col, row, x_tiles = 1, y_tiles = 1, height = 999, angled = false)
     x_tiles, y_tiles, height, img_id, img_gap_x, img_gap_y, angled =
-      type ? TYPE_MAP[type] : [x_tiles, y_tiles, height || 99, nil, 0, 0, false]
+      type ? TYPE_MAP[type] : [x_tiles, y_tiles, height, nil, 0, 0, angled]
 
     unit = Physics::UNIT
     # in case of angled blocks, collision will be checked against the ramps

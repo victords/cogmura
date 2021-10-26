@@ -34,14 +34,14 @@ class Screen
 
     @tiles = Array.new(M_S) { Array.new(M_S) }
     @blocks = [
-      IsoBlock.new(0, -1, M_S / 2 - 2),
-      IsoBlock.new(0, M_S / 2, M_S - 1),
-      IsoBlock.new(1, -1, M_S / 2),
-      IsoBlock.new(1, M_S / 2, -1),
-      IsoBlock.new(2, -0.5, M_S / 2 - 0.5),
-      IsoBlock.new(2, M_S / 2 - 0.5, -0.5),
-      IsoBlock.new(2, M_S / 2 - 0.5, M_S - 0.5),
-      IsoBlock.new(2, M_S - 0.5, M_S / 2 - 0.5)
+      IsoBlock.new(nil, -1, M_S / 2 - 2, 16, 1, 999, true),
+      IsoBlock.new(nil, M_S / 2, M_S - 1, 16, 1, 999, true),
+      IsoBlock.new(nil, -1, M_S / 2, 1, 16, 999, true),
+      IsoBlock.new(nil, M_S / 2, -1, 1, 16, 999, true),
+      IsoBlock.new(nil, -0.5, M_S / 2 - 0.5),
+      IsoBlock.new(nil, M_S / 2 - 0.5, -0.5),
+      IsoBlock.new(nil, M_S / 2 - 0.5, M_S - 0.5),
+      IsoBlock.new(nil, M_S - 0.5, M_S / 2 - 0.5)
     ]
     @doors = []
     @graphics = []
