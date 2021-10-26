@@ -45,9 +45,6 @@ class Cogmura < GameWindow
     toggle_fullscreen if KB.key_pressed?(Gosu::KB_F4)
     close if KB.key_pressed?(Gosu::KB_ESCAPE)
 
-    Game.activate_switch(1) if KB.key_pressed?(Gosu::KB_A)
-    Game.activate_switch(2) if KB.key_pressed?(Gosu::KB_S)
-
     @screen.update
   end
 

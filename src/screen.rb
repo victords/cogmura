@@ -31,6 +31,7 @@ class Screen
     t_h = Graphics::TILE_HEIGHT
     @map = Map.new(t_w, t_h, M_S, M_S, Graphics::SCR_W, Graphics::SCR_H, true)
     @map.set_camera(M_S / 4 * t_w, M_S / 4 * t_h)
+
     @tiles = Array.new(M_S) { Array.new(M_S) }
     @blocks = [
       IsoBlock.new(0, -1, M_S / 2 - 2),
@@ -42,6 +43,7 @@ class Screen
       IsoBlock.new(2, M_S / 2 - 0.5, M_S - 0.5),
       IsoBlock.new(2, M_S - 0.5, M_S / 2 - 0.5)
     ]
+    @doors = []
     @graphics = []
     @npcs = []
     @items = []
@@ -49,7 +51,7 @@ class Screen
     @effects = []
 
     File.open("#{Res.prefix}map/#{id}") do |f|
-      info, entrances, exits, doors, data = f.read.split('#')
+      info, entrances, exits, objects, tiles = f.read.split('#')
       info = info.split(',')
       @tileset = Res.tileset(info[0], t_w / Graphics::SCALE, t_h / Graphics::SCALE)
       fill = info[1]
@@ -59,50 +61,45 @@ class Screen
         d = e.split(',')
         Exit.new(d[0].to_i, d[1].to_i, d[2].to_f, d[3].to_f, d[4].to_i)
       end
-      @doors = doors.split(';').map do |d|
-        d = d.split(',')
-        Door.new(d[0].to_i, d[1].to_i, d[2].to_i, d[3].to_f, d[4].to_f, d[5].to_i)
-      end
-      @doors.each do |d|
-        d.on_open = method(:on_player_leave)
+
+      objects.split(';').each do |o|
+        d = o[1..].split(',')
+        d = d.map(&:to_i) unless o[0] == 'd'
+        case o[0]
+        when 'b' # textured block
+          @blocks << IsoBlock.new(d[0], d[1], d[2])
+        when 'w' # invisible block
+          @blocks << IsoBlock.new(nil, d[0], d[1], d[2], d[3])
+        when 'd'
+          @doors << (door = Door.new(d[0].to_i, d[1].to_i, d[2].to_i, d[3].to_f, d[4].to_f, d[5].to_i))
+          door.on_open = method(:on_player_leave)
+        when 'g'
+          @graphics << Graphic.new(d[0], d[1], d[2])
+        when 'n'
+          @npcs << Npc.new(d[0], d[1], d[2])
+        when 'i'
+          @items << (item = ScreenItem.new(d[0], d[1], d[2]))
+          item.on_picked_up = method(:on_item_picked_up)
+        when 'e'
+          @enemies << (enemy = ScreenEnemy.new(d[0], d[1], d[2]))
+          enemy.on_encounter = method(:on_enemy_encounter)
+        end
       end
 
       i = M_S / 2 - 1; j = 0
-      data.split(';').each do |d|
-        if d[0] == '_' && d[1] != '_'
-          d[1..-1].to_i.times { i, j = next_tile(i, j) }
+      tiles.split(';').each do |d|
+        if d[0] == '_'
+          d[1..].to_i.times { i, j = next_tile(i, j) }
           next
         end
 
-        if d[0] != '_'
-          tile_type = d[0..1].to_i
+        tile_type = d.to_i
+        index = d.index('*')
+        num_tiles = index ? d[(index + 1)..].to_i : 1
+        num_tiles.times do
           @tiles[i][j] = tile_type
+          i, j = next_tile(i, j)
         end
-
-        case d[2]
-        when '*'
-          num_tiles = d[3..-1].to_i - 1
-          num_tiles.times do
-            i, j = next_tile(i, j)
-            @tiles[i][j] = tile_type
-          end
-        when 'b' # textured block
-          @blocks << IsoBlock.new(d[3].to_i, i, j)
-        when 'w' # invisible block
-          values = d[3..-1].split(',').map(&:to_f)
-          @blocks << IsoBlock.new(nil, i, j, values[0], values[1], values[2])
-        when 'g' # graphic (no collision)
-          @graphics << Graphic.new(d[3].to_i, i, j)
-        when 'n' # NPC
-          @npcs << Npc.new(d[3].to_i, i, j)
-        when 'i' # item
-          @items << (item = ScreenItem.new(d[3].to_i, i, j))
-          item.on_picked_up = method(:on_item_picked_up)
-        when 'e' # enemy
-          @enemies << (enemy = ScreenEnemy.new(d[3].to_i, i, j))
-          enemy.on_encounter = method(:on_enemy_encounter)
-        end
-        i, j = next_tile(i, j)
       end
       next unless fill
 

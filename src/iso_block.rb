@@ -20,7 +20,7 @@ class IsoBlock
 
   def initialize(type, col, row, x_tiles = nil, y_tiles = nil, height = nil)
     x_tiles, y_tiles, height, img_id, img_gap_x, img_gap_y, angled =
-      type ? TYPE_MAP[type] : [x_tiles, y_tiles, height, nil, 0, 0, false]
+      type ? TYPE_MAP[type] : [x_tiles, y_tiles, height || 99, nil, 0, 0, false]
 
     unit = Physics::UNIT
     # in case of angled blocks, collision will be checked against the ramps
