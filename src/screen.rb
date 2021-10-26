@@ -34,14 +34,14 @@ class Screen
 
     @tiles = Array.new(M_S) { Array.new(M_S) }
     @blocks = [
-      IsoBlock.new(nil, -1, M_S / 2 - 2, 16, 1, 999, true),
-      IsoBlock.new(nil, M_S / 2, M_S - 1, 16, 1, 999, true),
-      IsoBlock.new(nil, -1, M_S / 2, 1, 16, 999, true),
-      IsoBlock.new(nil, M_S / 2, -1, 1, 16, 999, true),
-      IsoBlock.new(nil, -0.5, M_S / 2 - 0.5),
-      IsoBlock.new(nil, M_S / 2 - 0.5, -0.5),
-      IsoBlock.new(nil, M_S / 2 - 0.5, M_S - 0.5),
-      IsoBlock.new(nil, M_S - 0.5, M_S / 2 - 0.5)
+      IsoBlock.new(nil, -1, M_S / 2 - 2, -999, 16, 1, 999, true),
+      IsoBlock.new(nil, M_S / 2, M_S - 1, -999, 16, 1, 999, true),
+      IsoBlock.new(nil, -1, M_S / 2, -999, 1, 16, 999, true),
+      IsoBlock.new(nil, M_S / 2, -1, -999, 1, 16, 999, true),
+      IsoBlock.new(nil, -0.5, M_S / 2 - 0.5, -999),
+      IsoBlock.new(nil, M_S / 2 - 0.5, -0.5, -999),
+      IsoBlock.new(nil, M_S / 2 - 0.5, M_S - 0.5, -999),
+      IsoBlock.new(nil, M_S - 0.5, M_S / 2 - 0.5, -999)
     ]
     @doors = []
     @graphics = []
@@ -67,9 +67,9 @@ class Screen
         d = d.map(&:to_i) unless o[0] == 'd'
         case o[0]
         when 'b' # textured block
-          @blocks << IsoBlock.new(d[0], d[1], d[2])
+          @blocks << IsoBlock.new(d[0], d[1], d[2], d[3] || 0)
         when 'w' # invisible block
-          @blocks << IsoBlock.new(nil, d[0], d[1], d[2], d[3])
+          @blocks << IsoBlock.new(nil, d[0], d[1], 0, d[2], d[3])
         when 'd'
           @doors << (door = Door.new(d[0].to_i, d[1].to_i, d[2].to_i, d[3].to_f, d[4].to_f, d[5].to_i))
           door.on_open = method(:on_player_leave)
@@ -150,12 +150,14 @@ class Screen
     end
 
     unless @fading == :out || @fading == :in && @overlay_alpha > 127
-      base_collide_level = @man.grounded ? @man.height_level + 1 : @man.height_level
-      obstacles = (@blocks + @npcs).select { |b| b.height > base_collide_level }
+      obstacles = (@blocks + @npcs).select do |b|
+        b.z + b.height > @man.z && @man.z + @man.height > b.z
+      end
       @man.update(
         obstacles,
-        @blocks.select { |b| b.height == @man.height_level },
-        @man.grounded ? @blocks.select { |b| b.height == base_collide_level } : [],
+        @blocks.select { |b| b.height_level == @man.height_level },
+        @blocks.select { |b| b.z >= @man.z + @man.height },
+        @man.grounded ? @blocks.select { |b| b.height_level == @man.height_level + 1 } : [],
         obstacles.map(&:ramps).compact.flatten,
         @exits.select { |e| e.z == @man.height_level }
       )

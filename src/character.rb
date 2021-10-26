@@ -8,7 +8,7 @@ class Character < IsoGameObject
   JUMP_SPEED = 9
   DIR_KEYS = [Gosu::KB_UP, Gosu::KB_RIGHT, Gosu::KB_DOWN, Gosu::KB_LEFT].freeze
 
-  attr_reader :grounded
+  attr_reader :grounded, :height
   attr_writer :on_exit
 
   def initialize(i, j, z)
@@ -16,9 +16,10 @@ class Character < IsoGameObject
 
     @z = z * Physics::V_UNIT
     @speed_z = 0
+    @height = 3 * Physics::V_UNIT
   end
 
-  def update(obstacles, floors, steps, ramps, exits)
+  def update(obstacles, floors, ceilings, steps, ramps, exits)
     up, rt, dn, lf = DIR_KEYS.map { |k| KB.key_down?(k) }
     p_up, p_rt, p_dn, p_lf = DIR_KEYS.map { |k| KB.key_pressed?(k) || KB.key_down?(k) && @indices.nil? }
     r_up, r_rt, r_dn, r_lf = DIR_KEYS.map { |k| KB.key_released?(k) }
@@ -62,9 +63,13 @@ class Character < IsoGameObject
       @speed_z -= G.gravity.y
     end
 
+    ceiling = ceilings.select { |c| c.intersect?(bounds) }.min_by(&:z)
     if @floor && @speed_z < 0 && @z + @speed_z < floor_z
       @speed_z = 0
-      @z = height_level * Physics::V_UNIT
+      @z = @floor.z
+    elsif ceiling && @speed_z > 0 && @z + @height + @speed_z > ceiling.z
+      @speed_z = 0
+      @z = ceiling.z - @height
     else
       @z += @speed_z
     end

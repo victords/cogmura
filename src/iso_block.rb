@@ -13,9 +13,9 @@ class IsoBlock
     [1, 1, 15, :tree1, -64, 0, false]
   ].freeze
 
-  attr_reader :x, :y, :w, :h, :height, :ramps, :z_index
+  attr_reader :x, :y, :z, :w, :h, :height, :ramps, :z_index
 
-  def initialize(type, col, row, x_tiles = 1, y_tiles = 1, height = 999, angled = false)
+  def initialize(type, col, row, z = 0, x_tiles = 1, y_tiles = 1, height = 999, angled = false)
     x_tiles, y_tiles, height, img_id, img_gap_x, img_gap_y, angled =
       type ? TYPE_MAP[type] : [x_tiles, y_tiles, height, nil, 0, 0, angled]
 
@@ -23,19 +23,19 @@ class IsoBlock
     # in case of angled blocks, collision will be checked against the ramps
     @x = angled ? -10000 : col * unit
     @y = row * unit
+    @z = z * Physics::V_UNIT
     @w = x_tiles * unit
     @h = y_tiles * unit
     @col = col
     @row = row
-    @height = height
-    @z_index = col + row + (angled ? 3 : 1)
+    @height = height * Physics::V_UNIT
     @x_tiles = x_tiles
     @y_tiles = y_tiles
 
     image = img_id && Res.img("block_#{img_id}")
     if angled
       @img = image
-      @z_index = col + row + 3
+      @z_index = col + row + (z / 3) + 3
       @ramps = []
       x = col * unit
       (0...x_tiles).each do |i|
@@ -54,7 +54,7 @@ class IsoBlock
               (i == x_tiles - 1 ? 2 : 1) * IMG_SLICE_OFFSET + (i == 0 ? -img_gap_x / Graphics::SCALE : 0)
         image.subimage(x, 0, w, image.height)
       end
-      @z_index = @col + @row + @x_tiles + @y_tiles - 1
+      @z_index = col + row + (z / 3) + x_tiles + y_tiles - 1
     end
     @img_gap = Vector.new(img_gap_x, img_gap_y)
 
@@ -65,6 +65,10 @@ class IsoBlock
 
   def bounds
     Rectangle.new(@x, @y, @w, @h)
+  end
+
+  def height_level
+    ((@z + @height) / Physics::V_UNIT).floor
   end
 
   def intersect?(obj)
@@ -79,14 +83,14 @@ class IsoBlock
     pos = map.get_screen_pos(@col, @row)
     if @img
       x = pos.x + @img_gap.x
-      y = pos.y + Graphics::TILE_HEIGHT / 2 - @height * Physics::V_UNIT + @img_gap.y
+      y = pos.y + Graphics::TILE_HEIGHT / 2 - @z - @height + @img_gap.y
       behind = man_behind(man, x, x + @img.width * Graphics::SCALE, y, @z_index)
       update_alpha(behind)
       color = (@alpha << 24) | 0xffffff
       @img.draw(x, y, @z_index, Graphics::SCALE, Graphics::SCALE, color)
     elsif @imgs
       x = pos.x - ((@y_tiles - 1) * Graphics::TILE_WIDTH / 2)
-      y = pos.y - @height * Physics::V_UNIT + @img_gap.y
+      y = pos.y - @z - @height + @img_gap.y
       behind =
         (0...@imgs.size).any? do |i|
           x1 = x + (i >= @x_tiles ? (i + 1) : i) * Graphics::TILE_WIDTH / 2 + (i == 0 ? @img_gap.x : 0)
@@ -105,8 +109,8 @@ class IsoBlock
   private
 
   def man_behind(man, x1, x2, y, z_index)
-    man.screen_x + man.w > x1 && man.screen_x < x2 && man.screen_y + man.h - 12 > y && man.z_index < z_index &&
-      man.height_level < @height
+    man.screen_x + man.w > x1 && man.screen_x < x2 && man.screen_y + man.h - 10 > y && man.z_index < z_index &&
+      man.z < @z + @height
   end
 
   def update_alpha(behind)
