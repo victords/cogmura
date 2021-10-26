@@ -66,7 +66,7 @@ class Character < IsoGameObject
     ceiling = ceilings.select { |c| c.intersect?(bounds) }.min_by(&:z)
     if @floor && @speed_z < 0 && @z + @speed_z < floor_z
       @speed_z = 0
-      @z = @floor.z
+      @z = height_level * Physics::V_UNIT
     elsif ceiling && @speed_z > 0 && @z + @height + @speed_z > ceiling.z
       @speed_z = 0
       @z = ceiling.z - @height
