@@ -151,8 +151,7 @@ class Screen
 
     unless @fading == :out || @fading == :in && @overlay_alpha > 127
       obstacles = (@blocks + @npcs).select do |b|
-        b.z + b.height > @man.z && @man.z + @man.height > b.z &&
-          !(@man.grounded && b.height_level == @man.height_level + 1)
+        @man.vert_intersect?(b) && !(@man.grounded && b.height_level == @man.height_level + 1)
       end
       @man.update(
         obstacles,

@@ -3,17 +3,22 @@ require_relative 'constants'
 include MiniGL
 
 class IsoGameObject < GameObject
-  attr_reader :z, :screen_x, :screen_y, :z_index
+  attr_reader :z, :height, :screen_x, :screen_y, :z_index
 
-  def initialize(i, j, w, h, img, img_gap = nil, sprite_cols = nil, sprite_rows = nil)
+  def initialize(i, j, w, h, img, img_gap, sprite_cols, sprite_rows, height = 1)
     super((i + 0.5) * Physics::UNIT - w / 2, (j + 0.5) * Physics::UNIT - h / 2, w, h, img, img_gap, sprite_cols, sprite_rows)
     @screen_x = @screen_y = -10000
     @z = 0
+    @height = height * Physics::V_UNIT
     @z_index = i + j + 1
   end
 
   def height_level
     (@z / Physics::V_UNIT).floor
+  end
+
+  def vert_intersect?(obj)
+    obj.z + obj.height > @z && @z + @height > obj.z
   end
 
   def draw(map, flip = nil, z_index = nil)
