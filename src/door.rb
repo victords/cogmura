@@ -8,13 +8,13 @@ class Door < IsoGameObject
   # type 0: along iso y-axis
   # type 1: along iso x-axis
   # type 2: angled (facing front)
-  def initialize(type, dest_scr, dest_entr, i, j, z)
-    super(i, j, Physics::UNIT, Physics::UNIT, type == 2 ? :obj_door1a : :obj_door1, Vector.new(-4, type == 2 ? -24 : -36), 5, 1)
+  def initialize(type, dest_scr, dest_entr, col, row, layer)
+    layer ||= 0
+    super(col, row, layer, Physics::UNIT, Physics::UNIT, type == 2 ? :obj_door1a : :obj_door1, Vector.new(-4, type == 2 ? -24 : -36), 5, 1)
     @type = type
     @dest_scr = dest_scr
     @dest_entr = dest_entr
-    @z = z
-    @z_index = i.floor + j.floor + 1
+    @z_index = col.floor + row.floor + 1
 
     if type != 2
       @sub_img = @img.map { |img| img.subimage(0, 0, img.width / 2, img.height) }

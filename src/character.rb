@@ -11,10 +11,9 @@ class Character < IsoGameObject
   attr_reader :grounded
   attr_writer :on_exit
 
-  def initialize(i, j, z)
-    super(i, j, 20, 20, :char_cogmura, Vector.new(-22, -52), 3, 5, 2.8)
+  def initialize(col, row, layer)
+    super(col, row, layer, 20, 20, :char_cogmura, Vector.new(-22, -52), 3, 5, 2.8)
 
-    @z = z * Physics::V_UNIT
     @speed_z = 0
   end
 

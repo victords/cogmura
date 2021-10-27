@@ -74,14 +74,14 @@ class Screen
           @doors << (door = Door.new(d[0].to_i, d[1].to_i, d[2].to_i, d[3].to_f, d[4].to_f, d[5].to_i))
           door.on_open = method(:on_player_leave)
         when 'g'
-          @graphics << Graphic.new(d[0], d[1], d[2])
+          @graphics << Graphic.new(d[0], d[1], d[2], d[3])
         when 'n'
-          @npcs << Npc.new(d[0], d[1], d[2])
+          @npcs << Npc.new(d[0], d[1], d[2], d[3])
         when 'i'
-          @items << (item = ScreenItem.new(d[0], d[1], d[2]))
+          @items << (item = ScreenItem.new(d[0], d[1], d[2], d[3]))
           item.on_picked_up = method(:on_item_picked_up)
         when 'e'
-          @enemies << (enemy = ScreenEnemy.new(d[0], d[1], d[2]))
+          @enemies << (enemy = ScreenEnemy.new(d[0], d[1], d[2], d[3]))
           enemy.on_encounter = method(:on_enemy_encounter)
         end
       end

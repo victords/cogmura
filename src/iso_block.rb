@@ -15,7 +15,7 @@ class IsoBlock
 
   attr_reader :x, :y, :z, :w, :h, :height, :ramps, :z_index
 
-  def initialize(type, col, row, z = 0, x_tiles = 1, y_tiles = 1, height = 999, angled = false)
+  def initialize(type, col, row, layer = 0, x_tiles = 1, y_tiles = 1, height = 999, angled = false)
     x_tiles, y_tiles, height, img_id, img_gap_x, img_gap_y, angled =
       type ? TYPE_MAP[type] : [x_tiles, y_tiles, height, nil, 0, 0, angled]
 
@@ -23,7 +23,7 @@ class IsoBlock
     # in case of angled blocks, collision will be checked against the ramps
     @x = angled ? -10000 : col * unit
     @y = row * unit
-    @z = z * Physics::V_UNIT
+    @z = layer * Physics::V_UNIT
     @w = x_tiles * unit
     @h = y_tiles * unit
     @col = col
@@ -35,7 +35,7 @@ class IsoBlock
     image = img_id && Res.img("block_#{img_id}")
     if angled
       @img = image
-      @z_index = col + row + (z / 3) + 3
+      @z_index = col + row + (layer / 3) + 3
       @ramps = []
       x = col * unit
       (0...x_tiles).each do |i|
@@ -54,7 +54,7 @@ class IsoBlock
               (i == x_tiles - 1 ? 2 : 1) * IMG_SLICE_OFFSET + (i == 0 ? -img_gap_x / Graphics::SCALE : 0)
         image.subimage(x, 0, w, image.height)
       end
-      @z_index = col + row + (z / 3) + x_tiles + y_tiles - 1
+      @z_index = col + row + (layer / 3) + x_tiles + y_tiles - 1
     end
     @img_gap = Vector.new(img_gap_x, img_gap_y)
 

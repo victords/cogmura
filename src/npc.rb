@@ -10,9 +10,10 @@ class Npc < IsoGameObject
 
   attr_reader :ramps, :man_in_range
 
-  def initialize(id, col, row)
+  def initialize(id, col, row, layer)
+    layer ||= 0
     data = ID_MAP[id]
-    super(col, row, 20, 20, "char_#{data[0]}", Vector.new(data[1], data[2]), 5, 1, 3)
+    super(col, row, layer, 20, 20, "char_#{data[0]}", Vector.new(data[1], data[2]), 5, 1, 3)
     @ramps = nil
     @balloon = Res.img(:fx_balloon)
 
