@@ -12,6 +12,7 @@ class Door < IsoGameObject
     layer ||= 0
     super(col, row, layer, Physics::UNIT, Physics::UNIT, type == 2 ? :obj_door1a : :obj_door1, Vector.new(-4, type == 2 ? -24 : -36), 5, 1)
     @type = type
+    @flip = type == 1
     @dest_scr = dest_scr
     @dest_entr = dest_entr
     @z_index = col.floor + row.floor + 1
@@ -38,7 +39,7 @@ class Door < IsoGameObject
   end
 
   def draw(map)
-    super(map, @type == 1 ? :horiz : nil, @z_index)
+    super(map, @z_index)
 
     if @can_open && !@opening
       @alert.draw(@screen_x + @img_gap.x + @img[0].width / 2 * Graphics::SCALE - 4, @screen_y + @img_gap.y - 28,

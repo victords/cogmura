@@ -93,6 +93,6 @@ class Character < IsoGameObject
   end
 
   def draw(map)
-    super(map, @flip ? :horiz : nil, @floor&.is_a?(IsoBlock) && @floor.z_index)
+    super(map, @floor&.is_a?(IsoBlock) && @floor.z_index)
   end
 end

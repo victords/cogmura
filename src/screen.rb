@@ -34,14 +34,14 @@ class Screen
 
     @tiles = Array.new(M_S) { Array.new(M_S) }
     @blocks = [
-      IsoBlock.new(nil, -1, M_S / 2 - 2, -999, 16, 1, 999, true),
-      IsoBlock.new(nil, M_S / 2, M_S - 1, -999, 16, 1, 999, true),
-      IsoBlock.new(nil, -1, M_S / 2, -999, 1, 16, 999, true),
-      IsoBlock.new(nil, M_S / 2, -1, -999, 1, 16, 999, true),
-      IsoBlock.new(nil, -0.5, M_S / 2 - 0.5, -999),
-      IsoBlock.new(nil, M_S / 2 - 0.5, -0.5, -999),
-      IsoBlock.new(nil, M_S / 2 - 0.5, M_S - 0.5, -999),
-      IsoBlock.new(nil, M_S - 0.5, M_S / 2 - 0.5, -999)
+      IsoBlock.new(nil, -1, M_S / 2 - 2, -100, 16, 1, 999, true),
+      IsoBlock.new(nil, M_S / 2, M_S - 1, -100, 16, 1, 999, true),
+      IsoBlock.new(nil, -1, M_S / 2, -100, 1, 16, 999, true),
+      IsoBlock.new(nil, M_S / 2, -1, -100, 1, 16, 999, true),
+      IsoBlock.new(nil, -0.5, M_S / 2 - 0.5, -100),
+      IsoBlock.new(nil, M_S / 2 - 0.5, -0.5, -100),
+      IsoBlock.new(nil, M_S / 2 - 0.5, M_S - 0.5, -100),
+      IsoBlock.new(nil, M_S - 0.5, M_S / 2 - 0.5, -100)
     ]
     @doors = []
     @graphics = []
@@ -173,7 +173,12 @@ class Screen
         @items.delete(item) if item.destroyed
       end
 
-      @enemies.each { |e| e.update(@man) }
+      @enemies.each do |e|
+        floors = @blocks.select { |b| b.height_level == e.height_level }
+        obstacles = @blocks.select { |b| e.vert_intersect?(b) }
+        ramps = obstacles.map(&:ramps).compact.flatten
+        e.update(@man, floors, obstacles, ramps)
+      end
     end
 
     @doors.each { |d| d.update(@man) }

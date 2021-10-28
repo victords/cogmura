@@ -92,7 +92,7 @@ class Npc < IsoGameObject
   end
 
   def draw(map)
-    super(map, @flip ? :horiz : nil)
+    super
 
     pos = map.get_screen_pos((@x + @w / 2) / Physics::UNIT, (@y + @h / 2) / Physics::UNIT)
     if @talking
