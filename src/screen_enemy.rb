@@ -2,9 +2,6 @@ require_relative 'iso_game_object'
 require_relative 'constants'
 
 class ScreenEnemy < IsoGameObject
-  TYPE_MAP = [
-    [:bruk, 20, -8, -4, 1, 5, 2]
-  ]
   FOLLOW_RANGE = 3 * Physics::UNIT
   MOVE_WAIT = 30
   MOVE_DURATION = 60
@@ -19,7 +16,7 @@ class ScreenEnemy < IsoGameObject
 
   def initialize(type, col, row, layer)
     layer ||= 0
-    id, size, img_gap_x, img_gap_y, sprite_cols, sprite_rows, @speed_m = TYPE_MAP[type]
+    id, size, img_gap_x, img_gap_y, sprite_cols, sprite_rows, @speed_m = Enemy::TYPE_MAP[type]
     super(col, row, layer, size, size, "char_#{id}", Vector.new(img_gap_x, img_gap_y), sprite_cols, sprite_rows)
     @type = id
     @name = id.to_s.split('_').map(&:capitalize).join(' ')
@@ -51,6 +48,10 @@ class ScreenEnemy < IsoGameObject
         @img_index = 2; @flip = true
       else
         @img_index = 0; @flip = true
+      end
+      if @speed_s
+        @speed_s = nil
+        @timer = MOVE_WAIT
       end
     elsif @speed_s
       move(@speed_s, obstacles, ramps, true)

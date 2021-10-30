@@ -13,8 +13,6 @@ class Character < IsoGameObject
 
   def initialize(col, row, layer)
     super(col, row, layer, 20, 20, :char_cogmura, Vector.new(-22, -52), 3, 5, 2.8)
-
-    @speed_z = 0
   end
 
   def update(obstacles, floors, ceilings, steps, ramps, exits)

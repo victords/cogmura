@@ -1,10 +1,11 @@
 require_relative 'stats'
 
-class BattleEnemy
+class BattleEnemy < IsoGameObject
   attr_reader :money, :xp, :spawns
 
-  def initialize(type, first = false)
-    @type = type
+  def initialize(type, col, row, first = false)
+    _, size, img_gap_x, img_gap_y, sprite_cols, sprite_rows, _ = Enemy::TYPE_MAP.find { |a| a[0] == type }
+    super(col, row, 0, size, size, "char_#{type}", Vector.new(img_gap_x, img_gap_y), sprite_cols, sprite_rows)
 
     data = Game.enemies[type] || File.open("#{Res.prefix}enemy/#{type}") do |f|
       content = f.read.chomp.split(',')

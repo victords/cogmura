@@ -8,6 +8,7 @@ class IsoGameObject < GameObject
   def initialize(col, row, layer, w, h, img, img_gap, sprite_cols, sprite_rows, height = 1)
     super((col + 0.5) * Physics::UNIT - w / 2, (row + 0.5) * Physics::UNIT - h / 2, w, h, img, img_gap, sprite_cols, sprite_rows)
     @z = layer * Physics::V_UNIT
+    @speed_z = 0
     @height = height * Physics::V_UNIT
     @z_index = col + row + (layer / 3) + 1
     @screen_x = @screen_y = -10000
@@ -23,6 +24,14 @@ class IsoGameObject < GameObject
 
   def plane_distance(obj)
     Math.sqrt((@x - obj.x) ** 2 + (@y - obj.y) ** 2)
+  end
+
+  def move_to(col, row, layer)
+    @x = (col + 0.5) * Physics::UNIT - @w / 2
+    @y = (row + 0.5) * Physics::UNIT - @h / 2
+    @z = layer * Physics::V_UNIT
+    @speed = Vector.new
+    @speed_z = 0
   end
 
   def draw(map, z_index = nil)

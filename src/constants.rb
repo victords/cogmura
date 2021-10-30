@@ -14,3 +14,9 @@ module Physics
   UNIT = 40
   V_UNIT = 16
 end
+
+module Enemy
+  TYPE_MAP = [
+    [:bruk, 20, -8, -4, 1, 5, 2]
+  ].freeze
+end

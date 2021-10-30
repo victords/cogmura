@@ -52,7 +52,7 @@ class Screen
     @effects = []
 
     File.open("#{Res.prefix}map/#{id}") do |f|
-      info, entrances, exits, objects, tiles = f.read.split('#')
+      info, entrances, exits, spawn_points, objects, tiles = f.read.split('#')
       info = info.split(',')
       @tileset = Res.tileset(info[0], t_w / Graphics::SCALE, t_h / Graphics::SCALE)
       fill = info[1]
@@ -62,6 +62,7 @@ class Screen
         d = e.split(',')
         Exit.new(d[0].to_i, d[1].to_i, d[2].to_f, d[3].to_f, d[4].to_i)
       end
+      @spawn_points = spawn_points.split(';').map { |p| p.split(',').map(&:to_i) }
 
       objects.split(';').each do |o|
         d = o[1..].split(',')
@@ -132,7 +133,9 @@ class Screen
   end
 
   def on_enemy_encounter(enemy)
-    @battle = Battle.new(enemy.type)
+    @battle = Battle.new(enemy.type, @spawn_points[1..])
+    @man.move_to(@spawn_points[0][0], @spawn_points[0][1], 0)
+    @man.set_animation(0)
   end
 
   def update
@@ -206,6 +209,12 @@ class Screen
     @doors.each { |d| d.draw(@map) }
     @graphics.each { |g| g.draw(@map) }
     @man.draw(@map)
+
+    if @battle
+      @battle.draw(@map)
+      return
+    end
+
     @npcs.each { |n| n.draw(@map) }
     @items.each { |i| i.draw(@map) }
     @enemies.each { |e| e.draw(@map) }
