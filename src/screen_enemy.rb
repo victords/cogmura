@@ -6,8 +6,8 @@ class ScreenEnemy < IsoGameObject
     [:bruk, 20, -8, -4, 1, 5, 2]
   ]
   FOLLOW_RANGE = 3 * Physics::UNIT
-  MOVE_WAIT = 60
-  MOVE_DURATION = 120
+  MOVE_WAIT = 30
+  MOVE_DURATION = 60
   SQRT2_2 = 0.7071
   DIRECTIONS = [
     [-SQRT2_2, SQRT2_2], [0, 1], [-1, 0], [SQRT2_2, SQRT2_2], [-SQRT2_2, -SQRT2_2],
@@ -28,7 +28,31 @@ class ScreenEnemy < IsoGameObject
   end
 
   def update(man, floors, obstacles, ramps)
-    if @speed_s
+    d = plane_distance(man)
+    if d <= FOLLOW_RANGE
+      d_x = man.x - @x; d_y = man.y - @y
+      speed_x = @speed_m * d_x / d
+      speed_y = @speed_m * d_y / d
+      move(Vector.new(speed_x, speed_y), obstacles, ramps, true)
+      angle = 180 * Math.atan2(d_y, d_x) / Math::PI
+      if angle >= -22.5 && angle < 22.5
+        @img_index = 1; @flip = true
+      elsif angle >= 22.5 && angle < 67.5
+        @img_index = 3; @flip = false
+      elsif angle >= 67.5 && angle < 112.5
+        @img_index = 1; @flip = false
+      elsif angle >= 112.5 && angle < 157.5
+        @img_index = 0; @flip = false
+      elsif angle >= 157.5 || angle < -157.5
+        @img_index = 2; @flip = false
+      elsif angle >= -157.5 && angle < -112.5
+        @img_index = 4; @flip = false
+      elsif angle >= -112.5 && angle < -67.5
+        @img_index = 2; @flip = true
+      else
+        @img_index = 0; @flip = true
+      end
+    elsif @speed_s
       move(@speed_s, obstacles, ramps, true)
       @timer += 1
       if @timer >= MOVE_DURATION
