@@ -5,7 +5,7 @@ include MiniGL
 
 class Game
   class << self
-    attr_reader :npc_texts, :on_switch_activated, :player_stats
+    attr_reader :npc_texts, :on_switch_activated, :player_stats, :enemies
 
     def init
       @language = 'en'
@@ -25,6 +25,7 @@ class Game
       @on_switch_activated = []
 
       @player_stats = PlayerStats.new
+      @enemies = {}
     end
 
     def text(category, id)

@@ -6,6 +6,7 @@ require_relative 'screen_item'
 require_relative 'screen_enemy'
 require_relative 'character'
 require_relative 'effect'
+require_relative 'battle'
 
 include MiniGL
 
@@ -131,10 +132,15 @@ class Screen
   end
 
   def on_enemy_encounter(enemy)
-    puts "fight with #{enemy.name}"
+    @battle = Battle.new(enemy.type)
   end
 
   def update
+    if @battle
+      @battle.update
+      return
+    end
+
     if @fading == :in
       @overlay_alpha -= 255 / FADE_DURATION
       if @overlay_alpha <= 0

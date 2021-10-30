@@ -1,6 +1,11 @@
-class PlayerStats
+require_relative 'stats'
+
+class PlayerStats < Stats
   def initialize
-    @hp = 10
+    super(10, 5, 2, 0)
+
+    @level = 1
+    @xp = 0
     @money = 0
     @items = {}
   end
