@@ -1,7 +1,7 @@
 require_relative 'stats'
 
 class BattleEnemy < IsoGameObject
-  attr_reader :money, :xp, :spawns
+  attr_reader :stats, :money, :xp, :spawns
 
   def initialize(type, col, row, first = false)
     _, size, img_gap_x, img_gap_y, sprite_cols, sprite_rows, _ = Enemy::TYPE_MAP.find { |a| a[0] == type }
@@ -32,5 +32,9 @@ class BattleEnemy < IsoGameObject
       amount = rand(v + 1)
       amount.times { @spawns << k }
     end
+  end
+
+  def take_damage(damage)
+    @stats.change_hp(-damage)
   end
 end

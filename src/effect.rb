@@ -29,12 +29,29 @@ class TextEffect < ScreenEffect
 end
 
 class ItemPickUpEffect < TextEffect
-  attr_reader :destroyed
-
   def initialize(item)
     super(:item_pick_up)
     article = %w(a e i o u).any? { |v| item.type.to_s.start_with?(v) } ? 'an' : 'a'
     @text = @text.sub('$', article).sub('$', item.name)
     @width = Game.font.text_width(@text) * Graphics::SCALE + 40
+  end
+end
+
+class StatChangeEffect < ScreenEffect
+  def initialize(stat, delta, x, y)
+    super(120)
+    @icon = Res.img("icon_#{stat}")
+    @text = delta < 0 ? delta.to_s : "+#{delta}"
+    @color = case stat
+             when :hp
+               delta < 0 ? 0xff0000 : 0xff9999
+             end
+    @x = x + Game.font.text_width(@text) - @icon.width - 2
+    @y = y - Game.font.height * 2 - 10
+  end
+
+  def draw
+    Game.text_helper.write_line(@text, @x, @y, :right, @color, 255, :border, 0, 2, 255, Graphics::UI_Z_INDEX)
+    @icon.draw(@x + 4, @y, Graphics::UI_Z_INDEX, Graphics::SCALE, Graphics::SCALE)
   end
 end

@@ -14,6 +14,6 @@ class Stats
 
   def change_hp(delta)
     @hp = [[@hp + delta, 0].max, @max_hp].min
-    @on_hp_change.each { |c| c.call(@hp) }
+    @on_hp_change.each { |c| c.call(@hp, delta) }
   end
 end
