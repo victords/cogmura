@@ -6,8 +6,6 @@ require_relative 'game'
 include MiniGL
 
 class Cogmura < GameWindow
-  attr_reader :font
-
   def initialize
     super(Graphics::SCR_W, Graphics::SCR_H, false)
 
@@ -18,16 +16,6 @@ class Cogmura < GameWindow
 
     @screen = Screen.new(1)
     @screen.on_exit = method(:change_screen)
-
-    @font = TextHelper.new(
-      ImageFont.new(:font, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÁÉÍÓÚÀÃÕÂÊÔÑÇáéíóúàãõâêôñç0123456789.,:;!?¡¿/\\()[]+-%'\"←→∞$ĞğİıÖöŞşÜü",
-                    [6, 6, 6, 6, 6, 6, 6, 6, 2, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
-                     6, 6, 6, 6, 6, 4, 6, 6, 2, 4, 5, 3, 8, 6, 6, 6, 6, 5, 6, 4, 6, 6, 8, 6, 6, 6,
-                     6, 6, 2, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 2, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
-                     6, 4, 6, 6, 6, 6, 6, 6, 6, 6, 2, 3, 2, 3, 2, 6, 2, 6, 5, 5, 3, 3, 3, 3, 6, 4, 6, 2, 4, 8, 8,
-                     10, 6, 6, 6, 2, 2, 6, 6, 6, 6, 6, 6], 11, 4),
-      1, 2, 2
-    )
   end
 
   def change_screen(exit_obj)

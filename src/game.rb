@@ -5,9 +5,17 @@ include MiniGL
 
 class Game
   class << self
-    attr_reader :npc_texts, :on_switch_activated, :player_stats, :enemies
+    attr_reader :font, :text_helper, :npc_texts, :on_switch_activated, :player_stats, :enemies
 
     def init
+      @font = ImageFont.new(:font, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÁÉÍÓÚÀÃÕÂÊÔÑÇáéíóúàãõâêôñç0123456789.,:;!?¡¿/\\()[]+-%'\"←→∞$ĞğİıÖöŞşÜü",
+                            [6, 6, 6, 6, 6, 6, 6, 6, 2, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+                             6, 6, 6, 6, 6, 4, 6, 6, 2, 4, 5, 3, 8, 6, 6, 6, 6, 5, 6, 4, 6, 6, 8, 6, 6, 6,
+                             6, 6, 2, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 2, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+                             6, 4, 6, 6, 6, 6, 6, 6, 6, 6, 2, 3, 2, 3, 2, 6, 2, 6, 5, 5, 3, 3, 3, 3, 6, 4, 6, 2, 4, 8, 8,
+                             10, 6, 6, 6, 2, 2, 6, 6, 6, 6, 6, 6], 11, 4)
+      @text_helper = TextHelper.new(@font, 1, 2, 2)
+
       @language = 'en'
       @texts = {}
       Dir["#{Res.prefix}text/#{@language}/*"].each do |path|
