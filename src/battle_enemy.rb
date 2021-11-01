@@ -34,7 +34,7 @@ class BattleEnemy < IsoGameObject
     end
   end
 
-  def take_damage(damage)
-    @stats.change_hp(-damage)
+  def choose_action
+    :attack
   end
 end

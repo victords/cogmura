@@ -133,9 +133,7 @@ class Screen
   end
 
   def on_enemy_encounter(enemy)
-    @battle = Battle.new(enemy.type, @spawn_points[1..])
-    @man.move_to(@spawn_points[0][0], @spawn_points[0][1], 0)
-    @man.set_animation(0)
+    @battle = Battle.new(@spawn_points[0], enemy.type, @spawn_points[1..])
   end
 
   def update
@@ -208,13 +206,13 @@ class Screen
     @blocks.each { |b| b.draw(@map, @man) }
     @doors.each { |d| d.draw(@map) }
     @graphics.each { |g| g.draw(@map) }
-    @man.draw(@map)
 
     if @battle
       @battle.draw(@map)
       return
     end
 
+    @man.draw(@map)
     @npcs.each { |n| n.draw(@map) }
     @items.each { |i| i.draw(@map) }
     @enemies.each { |e| e.draw(@map) }

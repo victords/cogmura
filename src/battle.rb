@@ -1,19 +1,21 @@
+require_relative 'battle_player'
 require_relative 'battle_enemy'
 require_relative 'effect'
 
 include MiniGL
 
 class Battle
-  def initialize(enemy_type, spawn_points)
-    @enemies = [BattleEnemy.new(enemy_type, spawn_points[0][0], spawn_points[0][1], true)]
+  def initialize(player_spawn_point, enemy_type, enemy_spawn_points)
+    @player = BattlePlayer.new(player_spawn_point[0], player_spawn_point[1])
+    @enemies = [BattleEnemy.new(enemy_type, enemy_spawn_points[0][0], enemy_spawn_points[0][1], true)]
     @enemies[0].spawns.each do |e|
-      break if @enemies.size >= spawn_points.size
+      break if @enemies.size >= enemy_spawn_points.size
 
-      spawn_point = spawn_points[@enemies.size]
+      spawn_point = enemy_spawn_points[@enemies.size]
       @enemies << BattleEnemy.new(e, spawn_point[0], spawn_point[1])
     end
 
-    Game.player_stats.on_hp_change << method(:on_player_hp_change)
+    @player.stats.on_hp_change << method(:on_player_hp_change)
     @enemies.each do |e|
       e.stats.on_hp_change << lambda { |_, delta|
         on_enemy_hp_change(e, delta)
@@ -28,22 +30,31 @@ class Battle
       Label.new(10, 5 + 3 * 27, Game.font, 'Flee', 0, 0, 2, 2),
     ], :ui_panel, :tiled, true, Graphics::SCALE, Graphics::SCALE)
     @target_arrow = Res.img(:ui_arrowDown)
-    @action_index = 0
     @effects = []
 
     @state = :choosing_action
+    @action_index = 0
+    @enemy_index = 0
   end
 
-  def on_player_hp_change(delta)
-
+  def on_player_hp_change(_, delta)
+    @effects << StatChangeEffect.new(:hp, delta, @player.screen_x + @player.w / 2, @player.screen_y - 40)
   end
 
   def on_enemy_hp_change(enemy, delta)
     @effects << StatChangeEffect.new(:hp, delta, enemy.screen_x + enemy.w / 2, enemy.screen_y)
   end
 
+  def player_attack(enemy)
+    enemy.stats.take_damage([@player.stats.strength - enemy.stats.defense, 0].max)
+  end
+
+  def enemy_attack(enemy)
+    @player.stats.take_damage([enemy.stats.strength - @player.stats.defense, 0].max)
+  end
+
   def finish
-    Game.player_stats.on_hp_change.delete(method(:on_player_hp_change))
+    @player.stats.on_hp_change.delete(method(:on_player_hp_change))
   end
 
   def update
@@ -60,7 +71,7 @@ class Battle
           @state = :choosing_target
           @action_index = 0
         when 1 # technique
-          if Game.player_stats.techniques.any?
+          if @player.stats.techniques.any?
             @state = :choosing_technique
             @action_index = 0
           else
@@ -77,9 +88,8 @@ class Battle
       end
     when :choosing_target
       if KB.key_pressed?(Gosu::KB_SPACE) || KB.key_pressed?(Gosu::KB_RETURN)
-        enemy = @enemies[@action_index]
-        enemy.take_damage([Game.player_stats.strength - enemy.stats.defense, 0].max)
-        @state = :choosing_action
+        player_attack(@enemies[@action_index])
+        @state = :enemy_turn
       elsif KB.key_pressed?(Gosu::KB_RIGHT) || KB.key_held?(Gosu::KB_RIGHT) ||
             KB.key_pressed?(Gosu::KB_DOWN) || KB.key_held?(Gosu::KB_DOWN)
         @action_index += 1
@@ -89,10 +99,22 @@ class Battle
         @action_index -= 1
         @action_index = @enemies.size - 1 if @action_index < 0
       end
+    when :enemy_turn
+      enemy = @enemies[@enemy_index]
+      case enemy.choose_action
+      when :attack
+        enemy_attack(enemy)
+      end
+      @enemy_index += 1
+      if @enemy_index >= @enemies.size
+        @enemy_index = 0
+        @state = :choosing_action
+      end
     end
   end
 
   def draw(map)
+    @player.draw(map)
     @enemies.each { |e| e.draw(map) }
     @effects.each(&:draw)
     return if @state == :showing_message
