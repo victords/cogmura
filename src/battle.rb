@@ -53,9 +53,6 @@ class Battle
     end
 
     case @state
-    when :showing_message
-      @timer -= 1
-      @state = :choosing_action if @timer == 0
     when :choosing_action
       if KB.key_pressed?(Gosu::KB_SPACE) || KB.key_pressed?(Gosu::KB_RETURN)
         case @action_index
@@ -67,9 +64,8 @@ class Battle
             @state = :choosing_technique
             @action_index = 0
           else
-            @effects << TextEffect.new(:no_techniques)
+            @effects << TextEffect.new(:no_techniques) { @state = :choosing_action }
             @state = :showing_message
-            @timer = 120
           end
         end
       elsif KB.key_pressed?(Gosu::KB_DOWN) || KB.key_held?(Gosu::KB_DOWN)

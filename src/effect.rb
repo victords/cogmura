@@ -5,13 +5,17 @@ include MiniGL
 class ScreenEffect
   attr_reader :destroyed
 
-  def initialize(lifetime)
+  def initialize(lifetime, &on_destroyed)
     @lifetime = lifetime
+    @on_destroyed = on_destroyed
   end
 
   def update
     @lifetime -= 1
-    @destroyed = true if @lifetime <= 0
+    return if @lifetime > 0
+
+    @on_destroyed&.call
+    @destroyed = true
   end
 end
 
