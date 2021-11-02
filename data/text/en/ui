@@ -1,2 +1,4 @@
 item_pick_up	Got $ $
 no_techniques	You haven't learned any techniques yet
+no_items		You don't have any items
+flee_fail		Unable to flee!

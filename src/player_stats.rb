@@ -19,4 +19,13 @@ class PlayerStats < Stats
     @items[item.type] ||= 0
     @items[item.type] += 1
   end
+
+  def xp_to_next_level
+    # level 2: 10
+    # level 3: 20
+    # level 4: 40
+    # level 5: 80
+    # ...
+    10 * 2**(@level - 1)
+  end
 end

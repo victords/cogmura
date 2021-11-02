@@ -5,7 +5,7 @@ require_relative 'effect'
 include MiniGL
 
 class Battle
-  def initialize(player_spawn_point, enemy_type, enemy_spawn_points)
+  def initialize(player_spawn_point, enemy_type, enemy_spawn_points, &on_finish)
     @player = BattlePlayer.new(player_spawn_point[0], player_spawn_point[1])
     @enemies = [BattleEnemy.new(enemy_type, enemy_spawn_points[0][0], enemy_spawn_points[0][1], true)]
     @enemies[0].spawns.each do |e|
@@ -35,6 +35,8 @@ class Battle
     @state = :choosing_action
     @action_index = 0
     @enemy_index = 0
+
+    @on_finish = on_finish
   end
 
   def on_player_hp_change(_, delta)
@@ -55,6 +57,7 @@ class Battle
 
   def finish
     @player.stats.on_hp_change.delete(method(:on_player_hp_change))
+    @on_finish.call
   end
 
   def update
@@ -76,6 +79,25 @@ class Battle
             @action_index = 0
           else
             @effects << TextEffect.new(:no_techniques) { @state = :choosing_action }
+            @state = :showing_message
+          end
+        when 2 # item
+          if @player.stats.items.any?
+            @state = :choosing_item
+            @action_index = 0
+          else
+            @effects << TextEffect.new(:no_items) { @state = :choosing_action }
+            @state = :showing_message
+          end
+        when 3 # flee
+          enemy_xp_sum = @enemies.map(&:xp).sum
+          # probability of success starts at 100% and drops according to how much the XP
+          # from the enemies represent from the amount needed to level up
+          prob = (1 - (enemy_xp_sum.to_f / @player.stats.xp_to_next_level)).clamp(0, 1)
+          if rand <= prob
+            finish
+          else
+            @effects << TextEffect.new(:flee_fail) { @state = :enemy_turn }
             @state = :showing_message
           end
         end
@@ -117,7 +139,6 @@ class Battle
     @player.draw(map)
     @enemies.each { |e| e.draw(map) }
     @effects.each(&:draw)
-    return if @state == :showing_message
 
     ui_z = Graphics::UI_Z_INDEX
     case @state

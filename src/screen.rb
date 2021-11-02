@@ -133,7 +133,11 @@ class Screen
   end
 
   def on_enemy_encounter(enemy)
-    @battle = Battle.new(@spawn_points[0], enemy.type, @spawn_points[1..])
+    enemy.set_inactive
+    @battle = Battle.new(@spawn_points[0], enemy.type, @spawn_points[1..]) do
+      @battle = nil
+      enemy.set_active(120)
+    end
   end
 
   def update

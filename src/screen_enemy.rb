@@ -22,9 +22,22 @@ class ScreenEnemy < IsoGameObject
     @name = id.to_s.split('_').map(&:capitalize).join(' ')
 
     @timer = 0
+    @active_timer = 0
+  end
+
+  def set_inactive
+    @active = false
+  end
+
+  def set_active(delay = 0)
+    @active_timer = delay
   end
 
   def update(man, floors, obstacles, ramps)
+    @active_timer -= 1 if @active_timer > 0
+    @active = true if @active_timer <= 0
+    return unless @active
+
     d = plane_distance(man)
     if d <= FOLLOW_RANGE
       d_x = man.x - @x; d_y = man.y - @y
@@ -74,5 +87,10 @@ class ScreenEnemy < IsoGameObject
     return unless man.bounds.intersect?(bounds) && man.vert_intersect?(self)
 
     @on_encounter.call(self)
+  end
+
+  def draw(map)
+    alpha = @active_timer > 0 ? (@active_timer / 10) % 2 * 255 : 255
+    super(map, nil, alpha)
   end
 end

@@ -34,7 +34,7 @@ class IsoGameObject < GameObject
     @speed_z = 0
   end
 
-  def draw(map, z_index = nil)
+  def draw(map, z_index = nil, alpha = 255)
     i = (@x + @w / 2).to_f / Physics::UNIT
     j = (@y + @h / 2).to_f / Physics::UNIT
     phys_x = @x; phys_y = @y
@@ -43,7 +43,7 @@ class IsoGameObject < GameObject
     @z_index = z_index || (i.floor + j.floor + (height_level / 3) + 1)
     @screen_x = @x - map.cam.x
     @screen_y = @y - map.cam.y
-    super(map, Graphics::SCALE, Graphics::SCALE, 255, 0xffffff, nil, @flip ? :horiz : nil, @z_index)
+    super(map, Graphics::SCALE, Graphics::SCALE, alpha, 0xffffff, nil, @flip ? :horiz : nil, @z_index)
     @x = phys_x; @y = phys_y
   end
 end
