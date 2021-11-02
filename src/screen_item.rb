@@ -15,7 +15,7 @@ class ScreenItem < IsoGameObject
     id, img_gap_x, img_gap_y, sprite_cols, sprite_rows = TYPE_MAP[type]
     super(col, row, layer, 16, 16, "item_#{id}", Vector.new(img_gap_x, img_gap_y), sprite_cols, sprite_rows)
     @type = id
-    @name = id.to_s.split('_').map(&:capitalize).join(' ')
+    @name = Game.text(:ui, "item_#{id}")
   end
 
   def update(man)

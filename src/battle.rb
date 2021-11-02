@@ -24,10 +24,10 @@ class Battle
 
     # UI
     @panel = Panel.new(50, 50, 150, 22 * 4 + 5 * 5, @labels = [
-      Label.new(10, 5, Game.font, 'Attack', 0, 0, 2, 2),
-      Label.new(10, 5 + 27, Game.font, 'Technique', 0, 0, 2, 2),
-      Label.new(10, 5 + 2 * 27, Game.font, 'Item', 0, 0, 2, 2),
-      Label.new(10, 5 + 3 * 27, Game.font, 'Flee', 0, 0, 2, 2),
+      Label.new(10, 5, Game.font, 'Attack', 0, 0, Graphics::SCALE, Graphics::SCALE),
+      Label.new(10, 5 + 27, Game.font, 'Technique', 0, 0, Graphics::SCALE, Graphics::SCALE),
+      Label.new(10, 5 + 2 * 27, Game.font, 'Item', 0, 0, Graphics::SCALE, Graphics::SCALE),
+      Label.new(10, 5 + 3 * 27, Game.font, 'Flee', 0, 0, Graphics::SCALE, Graphics::SCALE),
     ], :ui_panel, :tiled, true, Graphics::SCALE, Graphics::SCALE)
     @target_arrow = Res.img(:ui_arrowDown)
     @effects = []
@@ -53,6 +53,20 @@ class Battle
 
   def enemy_attack(enemy)
     @player.stats.take_damage([enemy.stats.strength - @player.stats.defense, 0].max)
+  end
+
+  def build_item_menu
+    y = -22
+    controls = @player.stats.items.map do |(item_type, amount)|
+      y += 27
+      [
+        PanelImage.new(10, y, "icon_#{item_type}"),
+        Label.new(39, y, Game.font, Game.text(:ui, "item_#{item_type}"), 0, 0, Graphics::SCALE, Graphics::SCALE),
+        Label.new(10, y, Game.font, amount.to_s, 0, 0, Graphics::SCALE, Graphics::SCALE, :top_right)
+      ]
+    end.flatten
+    @item_panel = Panel.new(@panel.x + @panel.w, @labels[2].y - 5, 180, 5 + @player.stats.items.size * 27, controls,
+                            :ui_panel, :tiled, true, Graphics::SCALE, Graphics::SCALE)
   end
 
   def finish
@@ -83,6 +97,7 @@ class Battle
           end
         when 2 # item
           if @player.stats.items.any?
+            build_item_menu
             @state = :choosing_item
             @action_index = 0
           else
@@ -121,6 +136,8 @@ class Battle
         @action_index -= 1
         @action_index = @enemies.size - 1 if @action_index < 0
       end
+    when :choosing_item
+
     when :enemy_turn
       enemy = @enemies[@enemy_index]
       case enemy.choose_action
@@ -149,6 +166,9 @@ class Battle
     when :choosing_target
       enemy = @enemies[@action_index]
       @target_arrow.draw(enemy.screen_x + enemy.w / 2 - 12, enemy.screen_y - 34, ui_z, Graphics::SCALE, Graphics::SCALE)
+    when :choosing_item
+      @panel.draw(255, ui_z)
+      @item_panel.draw(255, ui_z)
     end
   end
 end

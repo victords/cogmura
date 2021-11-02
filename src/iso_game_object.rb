@@ -23,7 +23,7 @@ class IsoGameObject < GameObject
   end
 
   def plane_distance(obj)
-    Math.sqrt((@x - obj.x) ** 2 + (@y - obj.y) ** 2)
+    Math.sqrt((@x - obj.x)**2 + (@y - obj.y)**2)
   end
 
   def move_to(col, row, layer)
