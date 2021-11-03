@@ -23,11 +23,11 @@ class Battle
     end
 
     # UI
-    @panel = Panel.new(50, 50, 150, 22 * 4 + 5 * 5, @labels = [
-      Label.new(10, 5, Game.font, 'Attack', 0, 0, Graphics::SCALE, Graphics::SCALE),
-      Label.new(10, 5 + 27, Game.font, 'Technique', 0, 0, Graphics::SCALE, Graphics::SCALE),
-      Label.new(10, 5 + 2 * 27, Game.font, 'Item', 0, 0, Graphics::SCALE, Graphics::SCALE),
-      Label.new(10, 5 + 3 * 27, Game.font, 'Flee', 0, 0, Graphics::SCALE, Graphics::SCALE),
+    @panel = Panel.new(50, 50, 150, 24 * 4 + 5 * 5, @labels = [
+      Label.new(10, 6, Game.font, 'Attack', 0, 0, Graphics::SCALE, Graphics::SCALE),
+      Label.new(10, 6 + 29, Game.font, 'Technique', 0, 0, Graphics::SCALE, Graphics::SCALE),
+      Label.new(10, 6 + 2 * 29, Game.font, 'Item', 0, 0, Graphics::SCALE, Graphics::SCALE),
+      Label.new(10, 6 + 3 * 29, Game.font, 'Flee', 0, 0, Graphics::SCALE, Graphics::SCALE),
     ], :ui_panel, :tiled, true, Graphics::SCALE, Graphics::SCALE)
     @target_arrow = Res.img(:ui_arrowDown)
     @effects = []
@@ -56,16 +56,16 @@ class Battle
   end
 
   def build_item_menu
-    y = -22
+    y = -24
     controls = @player.stats.items.map do |(item_type, amount)|
-      y += 27
+      y += 29
       [
         PanelImage.new(10, y, "icon_#{item_type}"),
-        Label.new(39, y, Game.font, Game.text(:ui, "item_#{item_type}"), 0, 0, Graphics::SCALE, Graphics::SCALE),
-        Label.new(10, y, Game.font, amount.to_s, 0, 0, Graphics::SCALE, Graphics::SCALE, :top_right)
+        Label.new(39, y + 1, Game.font, Game.text(:ui, "item_#{item_type}"), 0, 0, Graphics::SCALE, Graphics::SCALE),
+        Label.new(10, y + 1, Game.font, amount.to_s, 0, 0, Graphics::SCALE, Graphics::SCALE, :top_right)
       ]
     end.flatten
-    @item_panel = Panel.new(@panel.x + @panel.w, @labels[2].y - 5, 180, 5 + @player.stats.items.size * 27, controls,
+    @item_panel = Panel.new(@panel.x + @panel.w, @panel.y + 2 * 29, 180, 5 + @player.stats.items.size * 29, controls,
                             :ui_panel, :tiled, true, Graphics::SCALE, Graphics::SCALE)
   end
 
@@ -137,7 +137,18 @@ class Battle
         @action_index = @enemies.size - 1 if @action_index < 0
       end
     when :choosing_item
-
+      if KB.key_pressed?(Gosu::KB_SPACE) || KB.key_pressed?(Gosu::KB_RETURN)
+        puts "use item #{@player.stats.items.keys[@action_index]}"
+      elsif KB.key_pressed?(Gosu::KB_DOWN) || KB.key_held?(Gosu::KB_DOWN)
+        @action_index += 1
+        @action_index = 0 if @action_index >= @player.stats.items.size
+      elsif KB.key_pressed?(Gosu::KB_UP) || KB.key_held?(Gosu::KB_UP)
+        @action_index -= 1
+        @action_index = @player.stats.items.size - 1 if @action_index < 0
+      elsif KB.key_pressed?(Gosu::KB_ESCAPE) || KB.key_pressed?(Gosu::KB_BACKSPACE)
+        @state = :choosing_action
+        @action_index = 2
+      end
     when :enemy_turn
       enemy = @enemies[@enemy_index]
       case enemy.choose_action
@@ -161,14 +172,16 @@ class Battle
     case @state
     when :choosing_action
       @panel.draw(255, ui_z)
-      label = @labels[@action_index]
-      G.window.draw_rect(@panel.x + 5, label.y, @panel.w - 10, label.h, 0x33000000, ui_z)
+      y = @panel.y + 5 + @action_index * 29
+      G.window.draw_rect(@panel.x + 5, y, @panel.w - 10, 24, 0x33000000, ui_z)
     when :choosing_target
       enemy = @enemies[@action_index]
       @target_arrow.draw(enemy.screen_x + enemy.w / 2 - 12, enemy.screen_y - 34, ui_z, Graphics::SCALE, Graphics::SCALE)
     when :choosing_item
       @panel.draw(255, ui_z)
       @item_panel.draw(255, ui_z)
+      y = @item_panel.y + 5 + @action_index * 29
+      G.window.draw_rect(@item_panel.x + 5, y, @item_panel.w - 10, 24, 0x33000000, ui_z)
     end
   end
 end

@@ -35,7 +35,7 @@ end
 class ItemPickUpEffect < TextEffect
   def initialize(item)
     super(:item_pick_up)
-    article = %w(a e i o u).any? { |v| item.type.to_s.start_with?(v) } ? 'an' : 'a'
+    article = %w(a e i o u).any? { |v| item.name.downcase.start_with?(v) } ? 'an' : 'a'
     @text = @text.sub('$', article).sub('$', item.name)
     @width = Game.font.text_width(@text) * Graphics::SCALE + 40
   end
