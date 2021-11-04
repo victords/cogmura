@@ -43,10 +43,13 @@ class Battle
 
   def on_player_hp_change(_, delta)
     @effects << StatChangeEffect.new(:hp, delta, @player.screen_x + @player.img_size.x / 2, @player.screen_y - 30)
+    finish(:defeat) if @player.stats.hp.zero?
   end
 
   def on_enemy_hp_change(enemy, delta)
     @effects << StatChangeEffect.new(:hp, delta, enemy.screen_x + enemy.img_size.x / 2, enemy.screen_y - 30)
+    @enemies.delete(enemy) if enemy.stats.hp.zero?
+    finish(:victory) if @enemies.empty?
   end
 
   def player_attack(enemy)
@@ -71,9 +74,9 @@ class Battle
                             :ui_panel, :tiled, true, Graphics::SCALE, Graphics::SCALE)
   end
 
-  def finish
+  def finish(result)
     @player.stats.on_hp_change.delete(method(:on_player_hp_change))
-    @on_finish.call
+    @on_finish.call(result)
   end
 
   def update
@@ -116,7 +119,7 @@ class Battle
           # from the enemies represent from the amount needed to level up
           prob = (1 - (enemy_xp_sum.to_f / @player.stats.xp_to_next_level)).clamp(0, 1)
           if rand <= prob
-            finish
+            finish(:fled)
           else
             @effects << TextEffect.new(:flee_fail) { @state = :enemy_turn }
             @state = :showing_message

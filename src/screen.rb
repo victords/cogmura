@@ -134,9 +134,15 @@ class Screen
 
   def on_enemy_encounter(enemy)
     enemy.set_inactive
-    @battle = Battle.new(@spawn_points[0], enemy.type, @spawn_points[1..]) do
+    @battle = Battle.new(@spawn_points[0], enemy.type, @spawn_points[1..]) do |result|
       @battle = nil
-      enemy.set_active(120)
+      if result == :fled
+        enemy.set_active(120)
+      elsif result == :victory
+        @enemies.delete(enemy)
+      elsif result == :defeat
+        Game.game_over
+      end
     end
   end
 

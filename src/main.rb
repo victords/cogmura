@@ -38,11 +38,15 @@ class Cogmura < GameWindow
     close if KB.key_pressed?(Gosu::KB_ESCAPE)
     start if KB.key_pressed?(Gosu::KB_R)
 
-    @screen.update
+    @screen.update unless Game.over?
   end
 
   def draw
-    @screen.draw
+    if Game.over?
+      Game.text_helper.write_line('Game Over', Graphics::SCR_W / 2, Graphics::SCR_H / 2 - 22, :center, 0xffffff, 255, nil, 0, 0, 0, 0, 4, 4)
+    else
+      @screen.draw
+    end
   end
 end
 

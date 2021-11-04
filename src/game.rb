@@ -36,6 +36,8 @@ class Game
       @player_stats = PlayerStats.new
       @enemies = {}
       @items = {}
+
+      @game_over = false
     end
 
     def text(category, id)
@@ -49,6 +51,14 @@ class Game
     def activate_switch(id)
       @switches << id
       @on_switch_activated.each { |callback| callback.call(id) }
+    end
+
+    def game_over
+      @game_over = true
+    end
+
+    def over?
+      @game_over
     end
   end
 end
