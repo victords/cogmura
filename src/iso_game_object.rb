@@ -3,7 +3,7 @@ require_relative 'constants'
 include MiniGL
 
 class IsoGameObject < GameObject
-  attr_reader :z, :height, :screen_x, :screen_y, :z_index
+  attr_reader :z, :height, :screen_x, :screen_y, :img_size, :z_index
 
   def initialize(col, row, layer, w, h, img, img_gap, sprite_cols, sprite_rows, height = 1)
     super((col + 0.5) * Physics::UNIT - w / 2, (row + 0.5) * Physics::UNIT - h / 2, w, h, img, img_gap, sprite_cols, sprite_rows)
@@ -12,6 +12,7 @@ class IsoGameObject < GameObject
     @height = height * Physics::V_UNIT
     @z_index = col + row + (layer / 3) + 1
     @screen_x = @screen_y = -10000
+    @img_size = Vector.new(@img[0].width * Graphics::SCALE, @img[0].height * Graphics::SCALE)
   end
 
   def height_level
@@ -41,8 +42,8 @@ class IsoGameObject < GameObject
     @x = (map.size.y + i - j) * map.tile_size.x / 2 - @w / 2
     @y = (i + j) * map.tile_size.y / 2 - @z - @h
     @z_index = z_index || (i.floor + j.floor + (height_level / 3) + 1)
-    @screen_x = @x - map.cam.x
-    @screen_y = @y - map.cam.y
+    @screen_x = @x - map.cam.x + @img_gap.x
+    @screen_y = @y - map.cam.y + @img_gap.y
     super(map, Graphics::SCALE, Graphics::SCALE, alpha, 0xffffff, nil, @flip ? :horiz : nil, @z_index)
     @x = phys_x; @y = phys_y
   end

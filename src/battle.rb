@@ -1,5 +1,6 @@
 require_relative 'battle_player'
 require_relative 'battle_enemy'
+require_relative 'item'
 require_relative 'effect'
 
 include MiniGL
@@ -7,6 +8,7 @@ include MiniGL
 class Battle
   def initialize(player_spawn_point, enemy_type, enemy_spawn_points, &on_finish)
     @player = BattlePlayer.new(player_spawn_point[0], player_spawn_point[1])
+    @allies = [@player]
     @enemies = [BattleEnemy.new(enemy_type, enemy_spawn_points[0][0], enemy_spawn_points[0][1], true)]
     @enemies[0].spawns.each do |e|
       break if @enemies.size >= enemy_spawn_points.size
@@ -40,11 +42,11 @@ class Battle
   end
 
   def on_player_hp_change(_, delta)
-    @effects << StatChangeEffect.new(:hp, delta, @player.screen_x + @player.w / 2, @player.screen_y - 40)
+    @effects << StatChangeEffect.new(:hp, delta, @player.screen_x + @player.img_size.x / 2, @player.screen_y - 30)
   end
 
   def on_enemy_hp_change(enemy, delta)
-    @effects << StatChangeEffect.new(:hp, delta, enemy.screen_x + enemy.w / 2, enemy.screen_y)
+    @effects << StatChangeEffect.new(:hp, delta, enemy.screen_x + enemy.img_size.x / 2, enemy.screen_y - 30)
   end
 
   def player_attack(enemy)
@@ -85,6 +87,10 @@ class Battle
       if KB.key_pressed?(Gosu::KB_SPACE) || KB.key_pressed?(Gosu::KB_RETURN)
         case @action_index
         when 0 # attack
+          @targets = @enemies
+          @target_callback = lambda { |target|
+            player_attack(target)
+          }
           @state = :choosing_target
           @action_index = 0
         when 1 # technique
@@ -125,20 +131,25 @@ class Battle
       end
     when :choosing_target
       if KB.key_pressed?(Gosu::KB_SPACE) || KB.key_pressed?(Gosu::KB_RETURN)
-        player_attack(@enemies[@action_index])
+        @target_callback.call(@targets[@action_index])
         @state = :enemy_turn
       elsif KB.key_pressed?(Gosu::KB_RIGHT) || KB.key_held?(Gosu::KB_RIGHT) ||
             KB.key_pressed?(Gosu::KB_DOWN) || KB.key_held?(Gosu::KB_DOWN)
         @action_index += 1
-        @action_index = 0 if @action_index >= @enemies.size
+        @action_index = 0 if @action_index >= @targets.size
       elsif KB.key_pressed?(Gosu::KB_LEFT) || KB.key_held?(Gosu::KB_LEFT) ||
             KB.key_pressed?(Gosu::KB_UP) || KB.key_held?(Gosu::KB_UP)
         @action_index -= 1
-        @action_index = @enemies.size - 1 if @action_index < 0
+        @action_index = @targets.size - 1 if @action_index < 0
       end
     when :choosing_item
       if KB.key_pressed?(Gosu::KB_SPACE) || KB.key_pressed?(Gosu::KB_RETURN)
-        puts "use item #{@player.stats.items.keys[@action_index]}"
+        item = Item.new(@player.stats.items.keys[@action_index])
+        @targets = item.target_type == :ally ? @allies : @enemies
+        @target_callback = lambda { |target|
+          Game.player_stats.use_item(item, target.stats)
+        }
+        @state = :choosing_target
       elsif KB.key_pressed?(Gosu::KB_DOWN) || KB.key_held?(Gosu::KB_DOWN)
         @action_index += 1
         @action_index = 0 if @action_index >= @player.stats.items.size
@@ -175,8 +186,8 @@ class Battle
       y = @panel.y + 5 + @action_index * 29
       G.window.draw_rect(@panel.x + 5, y, @panel.w - 10, 24, 0x33000000, ui_z)
     when :choosing_target
-      enemy = @enemies[@action_index]
-      @target_arrow.draw(enemy.screen_x + enemy.w / 2 - 12, enemy.screen_y - 34, ui_z, Graphics::SCALE, Graphics::SCALE)
+      target = @targets[@action_index]
+      @target_arrow.draw(target.screen_x + target.img_size.x / 2 - 12, target.screen_y - 34, ui_z, Graphics::SCALE, Graphics::SCALE)
     when :choosing_item
       @panel.draw(255, ui_z)
       @item_panel.draw(255, ui_z)

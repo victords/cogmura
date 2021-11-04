@@ -42,14 +42,14 @@ class Door < IsoGameObject
     super(map, @z_index)
 
     if @can_open && !@opening
-      @alert.draw(@screen_x + @img_gap.x + @img[0].width / 2 * Graphics::SCALE - 4, @screen_y + @img_gap.y - 28,
+      @alert.draw(@screen_x + @img[0].width / 2 * Graphics::SCALE - 4, @screen_y - 28,
                   @z_index + 1, Graphics::SCALE, Graphics::SCALE)
     end
 
     return unless @sub_img
 
     x_offset = @type == 0 ? 0 : @img[0].width * Graphics::SCALE
-    @sub_img[@img_index].draw(@screen_x + @img_gap.x + x_offset, @screen_y + @img_gap.y, @z_index + 1,
+    @sub_img[@img_index].draw(@screen_x + x_offset, @screen_y, @z_index + 1,
                               Graphics::SCALE * (@type == 0 ? 1 : -1), Graphics::SCALE)
   end
 end

@@ -15,9 +15,19 @@ class PlayerStats < Stats
     @abilities = []
   end
 
-  def add_item(item)
-    @items[item.type] ||= 0
-    @items[item.type] += 1
+  def add_item(item_type)
+    @items[item_type] ||= 0
+    @items[item_type] += 1
+  end
+
+  def remove_item(item_type)
+    @items[item_type] -= 1
+    @items.delete(item_type) if @items[item_type] <= 0
+  end
+
+  def use_item(item, target)
+    remove_item(item.type)
+    item.use(target)
   end
 
   def xp_to_next_level

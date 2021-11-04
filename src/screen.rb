@@ -128,7 +128,7 @@ class Screen
   end
 
   def on_item_picked_up(item)
-    Game.player_stats.add_item(item)
+    Game.player_stats.add_item(item.type)
     @effects << ItemPickUpEffect.new(item)
   end
 
