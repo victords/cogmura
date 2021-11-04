@@ -12,6 +12,10 @@ class Cogmura < GameWindow
     Res.prefix = File.expand_path(__FILE__).split('/')[0..-3].join('/') + '/data'
     Res.retro_images = true
 
+    start
+  end
+
+  def start
     Game.init
 
     @screen = Screen.new(1)
@@ -32,6 +36,7 @@ class Cogmura < GameWindow
 
     toggle_fullscreen if KB.key_pressed?(Gosu::KB_F4)
     close if KB.key_pressed?(Gosu::KB_ESCAPE)
+    start if KB.key_pressed?(Gosu::KB_R)
 
     @screen.update
   end
