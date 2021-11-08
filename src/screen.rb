@@ -134,19 +134,29 @@ class Screen
 
   def on_enemy_encounter(enemy)
     enemy.set_inactive
-    @battle = Battle.new(@spawn_points[0], enemy.type, @spawn_points[1..]) do |result|
-      @battle = nil
-      if result == :fled
-        enemy.set_active(120)
-      elsif result == :victory
-        @enemies.delete(enemy)
-      elsif result == :defeat
-        Game.game_over
+    @effects << BattleSplash.new do
+      @battle = Battle.new(@spawn_points[0], enemy.type, @spawn_points[1..]) do |result|
+        @battle = nil
+        if result == :fled
+          enemy.set_active(120)
+        elsif result == :victory
+          @enemies.delete(enemy)
+        elsif result == :defeat
+          Game.game_over
+        end
       end
     end
   end
 
   def update
+    battle_start = false
+    @effects.reverse_each do |e|
+      e.update
+      @effects.delete(e) if e.destroyed
+      battle_start = true if e.is_a?(BattleSplash) && !e.destroyed
+    end
+    return if battle_start
+    
     if @battle
       @battle.update
       return
@@ -199,11 +209,6 @@ class Screen
     end
 
     @doors.each { |d| d.update(@man) }
-
-    @effects.reverse_each do |e|
-      e.update
-      @effects.delete(e) if e.destroyed
-    end
   end
 
   def draw

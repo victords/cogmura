@@ -22,20 +22,25 @@ class ScreenEnemy < IsoGameObject
     @name = id.to_s.split('_').map(&:capitalize).join(' ')
 
     @timer = 0
+    @active = true
     @active_timer = 0
   end
 
   def set_inactive
     @active = false
+    @blink = false
   end
 
   def set_active(delay = 0)
     @active_timer = delay
+    @blink = true
   end
 
   def update(man, floors, obstacles, ramps)
-    @active_timer -= 1 if @active_timer > 0
-    @active = true if @active_timer <= 0
+    if @blink
+      @active_timer -= 1 if @active_timer > 0
+      @active = true if @active_timer <= 0
+    end
     return unless @active
 
     d = plane_distance(man)

@@ -41,6 +41,31 @@ class ItemPickUpEffect < TextEffect
   end
 end
 
+class BattleSplash < ScreenEffect
+  def initialize(&on_destroyed)
+    super(180, &on_destroyed)
+    @scale = 0
+    @angle = 0
+    @img = Res.img(:fx_splash)
+  end
+  
+  def update
+    super
+    
+    @scale += 0.03333 if @scale < Graphics::SCALE
+    @angle += @lifetime >= 120 ? 6 : 1
+  end
+  
+  def draw
+    x = Graphics::SCR_W / 2
+    y = Graphics::SCR_H / 2
+    z = Graphics::UI_Z_INDEX
+    @img.draw_rot(x, y, z, @angle, 0.5, 0.5, @scale, @scale, 0xffffffff)
+    Game.text_helper.write_breaking(Game.text(:ui, :battle_start),x, y - (@scale / Graphics::SCALE) * 46,
+                                    Graphics::SCR_W, :center, 0, 255, z, 2 * @scale, 2 * @scale)
+  end
+end
+
 class StatChangeEffect < ScreenEffect
   def initialize(stat, delta, x, y)
     super(120)

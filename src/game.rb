@@ -23,7 +23,7 @@ class Game
         next if path.end_with?('npcs')
 
         @texts[path.split('/')[-1].to_sym] = File.open(path) do |f|
-          f.read.split("\n").map { |s| p = s.split("\t"); [p[0], p[-1]] }.to_h
+          f.read.split("\n").map { |s| p = s.split("\t"); [p[0], p[-1].gsub("\\n", "\n")] }.to_h
         end
       end
       @npc_texts = File.open("#{Res.prefix}text/#{@language}/npcs") do |f|
