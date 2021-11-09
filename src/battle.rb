@@ -53,7 +53,12 @@ class Battle
   end
 
   def player_attack(enemy)
-    enemy.stats.take_damage([@player.stats.strength - enemy.stats.defense, 0].max)
+    @state = :animating
+    @player.attack_animation(Vector.new(enemy.x - Physics::UNIT, enemy.y + Physics::UNIT), ->{
+      enemy.stats.take_damage([@player.stats.strength - enemy.stats.defense, 0].max)
+    }, ->{
+      @state = :enemy_turn
+    })
   end
 
   def enemy_attack(enemy)
@@ -86,6 +91,8 @@ class Battle
     end
 
     case @state
+    when :animating
+      @player.update
     when :choosing_action
       if KB.key_pressed?(Gosu::KB_SPACE) || KB.key_pressed?(Gosu::KB_RETURN)
         case @action_index
@@ -135,7 +142,6 @@ class Battle
     when :choosing_target
       if KB.key_pressed?(Gosu::KB_SPACE) || KB.key_pressed?(Gosu::KB_RETURN)
         @target_callback.call(@targets[@action_index])
-        @state = :enemy_turn
       elsif KB.key_pressed?(Gosu::KB_RIGHT) || KB.key_held?(Gosu::KB_RIGHT) ||
             KB.key_pressed?(Gosu::KB_DOWN) || KB.key_held?(Gosu::KB_DOWN)
         @action_index += 1
@@ -151,6 +157,7 @@ class Battle
         @targets = item.target_type == :ally ? @allies : @enemies
         @target_callback = lambda { |target|
           Game.player_stats.use_item(item, target.stats)
+          @state = :enemy_turn
         }
         @state = :choosing_target
       elsif KB.key_pressed?(Gosu::KB_DOWN) || KB.key_held?(Gosu::KB_DOWN)
