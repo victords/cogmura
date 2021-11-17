@@ -1,11 +1,17 @@
 require_relative 'stats'
+require_relative 'animation'
 
 class BattleEnemy < IsoGameObject
+  include Animation
+
+  SPEED = 4
+
   attr_reader :stats, :money, :xp, :spawns
 
   def initialize(type, col, row, first = false)
     _, size, img_gap_x, img_gap_y, sprite_cols, sprite_rows, _ = Enemy::TYPE_MAP.find { |a| a[0] == type }
     super(col, row, 0, size, size, "char_#{type}", Vector.new(img_gap_x, img_gap_y), sprite_cols, sprite_rows)
+    @start_pos = Vector.new(@x, @y)
 
     data = Game.enemies[type] || File.open("#{Res.prefix}enemy/#{type}") do |f|
       content = f.read.chomp.split(',')
@@ -36,5 +42,27 @@ class BattleEnemy < IsoGameObject
 
   def choose_action
     :attack
+  end
+
+  def attack_animation(target, on_attack, on_finish)
+    start_sequence([
+                     {
+                       target: target,
+                       speed: SPEED
+                     },
+                     {
+                       timer: 30,
+                       callback: on_attack
+                     },
+                     {
+                       target: @start_pos,
+                       speed: SPEED * 1.5,
+                       callback: on_finish
+                     }
+                   ])
+  end
+
+  def update
+    update_sequence
   end
 end

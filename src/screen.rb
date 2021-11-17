@@ -119,7 +119,7 @@ class Screen
     @overlay_alpha = 255
 
     # TODO remove later
-    @grid = Res.img(:grid)
+    # @grid = Res.img(:grid)
   end
 
   def on_player_leave(exit_obj)
@@ -216,7 +216,7 @@ class Screen
       next unless @tiles[i][j]
 
       @tileset[@tiles[i][j]].draw(x, y, 0, Graphics::SCALE, Graphics::SCALE)
-      @grid.draw(x, y, 0, Graphics::SCALE, Graphics::SCALE)
+      @grid.draw(x, y, 0, Graphics::SCALE, Graphics::SCALE) if @grid
     end
     @blocks.each { |b| b.draw(@map, @man) }
     @doors.each { |d| d.draw(@map) }

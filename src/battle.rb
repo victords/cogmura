@@ -54,15 +54,26 @@ class Battle
 
   def player_attack(enemy)
     @state = :animating
-    @player.attack_animation(Vector.new(enemy.x - Physics::UNIT, enemy.y + Physics::UNIT), ->{
+    @player.attack_animation(Vector.new(enemy.x - Physics::UNIT, enemy.y + Physics::UNIT), lambda {
       enemy.stats.take_damage([@player.stats.strength - enemy.stats.defense, 0].max)
-    }, ->{
+    }, lambda {
       @state = :enemy_turn
     })
   end
 
   def enemy_attack(enemy)
-    @player.stats.take_damage([enemy.stats.strength - @player.stats.defense, 0].max)
+    @state = :animating
+    enemy.attack_animation(Vector.new(@player.x + Physics::UNIT, @player.y - Physics::UNIT), lambda {
+      @player.stats.take_damage([enemy.stats.strength - @player.stats.defense, 0].max)
+    }, lambda {
+      @enemy_index += 1
+      if @enemy_index >= @enemies.size
+        @enemy_index = 0
+        @state = :choosing_action
+      else
+        @state = :enemy_turn
+      end
+    })
   end
 
   def build_item_menu
@@ -80,7 +91,6 @@ class Battle
   end
 
   def finish(result)
-    @player.stats.on_hp_change.delete(method(:on_player_hp_change))
     @on_finish.call(result)
   end
 
@@ -93,6 +103,7 @@ class Battle
     case @state
     when :animating
       @player.update
+      @enemies.each(&:update)
     when :choosing_action
       if KB.key_pressed?(Gosu::KB_SPACE) || KB.key_pressed?(Gosu::KB_RETURN)
         case @action_index
@@ -175,11 +186,6 @@ class Battle
       case enemy.choose_action
       when :attack
         enemy_attack(enemy)
-      end
-      @enemy_index += 1
-      if @enemy_index >= @enemies.size
-        @enemy_index = 0
-        @state = :choosing_action
       end
     end
   end
