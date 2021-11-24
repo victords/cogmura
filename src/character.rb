@@ -10,9 +10,11 @@ class Character < IsoGameObject
 
   attr_reader :grounded
   attr_writer :on_exit
+  attr_accessor :active
 
   def initialize(col, row, layer)
-    super(col, row, layer, 20, 20, :char_cogmura, Vector.new(-14, -52), 6, 3, 2.8)
+    super(col, row, layer, 20, 20, :char_cogmura, Vector.new(-14, -52), 5, 4, 2.8)
+    @active = true
   end
 
   def update(obstacles, floors, ceilings, steps, ramps, exits)

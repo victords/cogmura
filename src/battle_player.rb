@@ -10,7 +10,7 @@ class BattlePlayer < IsoGameObject
   attr_reader :stats
 
   def initialize(col, row)
-    super(col, row, 0, 20, 20, :char_cogmura, Vector.new(-14, -52), 6, 3, 2.8)
+    super(col, row, 0, 20, 20, :char_cogmura, Vector.new(-14, -52), 5, 4, 2.8)
     @stats = Game.player_stats
     @img_index = 6
     @flip = true
@@ -46,6 +46,10 @@ class BattlePlayer < IsoGameObject
         }
       }
     ])
+  end
+
+  def victory_animation
+    @img_index = 18
   end
 
   def update

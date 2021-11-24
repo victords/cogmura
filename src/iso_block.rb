@@ -109,6 +109,7 @@ class IsoBlock
   private
 
   def man_behind(man, x1, x2, y, z_index)
+    return false unless man.active
     man.screen_x + man.img_size.x > x1 && man.screen_x < x2 && man.screen_y + man.img_size.y - 10 > y && man.z_index < z_index &&
       man.z < @z + @height
   end

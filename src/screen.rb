@@ -134,9 +134,11 @@ class Screen
 
   def on_enemy_encounter(enemy)
     enemy.set_inactive
+    @man.active = false
     @effects << BattleSplash.new do
       @battle = Battle.new(@spawn_points[0], enemy.type, @spawn_points[1..]) do |result|
         @battle = nil
+        @man.active = true
         if result == :fled
           enemy.set_active(120)
         elsif result == :victory
@@ -156,7 +158,7 @@ class Screen
       battle_start = true if e.is_a?(BattleSplash) && !e.destroyed
     end
     return if battle_start
-    
+
     if @battle
       @battle.update
       return

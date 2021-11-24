@@ -43,13 +43,11 @@ class Battle
 
   def on_player_hp_change(_, delta)
     @effects << StatChangeEffect.new(:hp, delta, @player.screen_x + @player.img_size.x / 2, @player.screen_y)
-    finish(:defeat) if @player.stats.hp.zero?
   end
 
   def on_enemy_hp_change(enemy, delta)
     @effects << StatChangeEffect.new(:hp, delta, enemy.screen_x + enemy.img_size.x / 2, enemy.screen_y)
     @enemies.delete(enemy) if enemy.stats.hp.zero?
-    finish(:victory) if @enemies.empty?
   end
 
   def player_attack(enemy)
@@ -100,10 +98,21 @@ class Battle
       @effects.delete(e) if e.destroyed
     end
 
-    case @state
-    when :animating
+    if @state == :animating || @state == :end
       @player.update
       @enemies.each(&:update)
+      return
+    elsif @player.stats.hp.zero?
+      finish(:defeat)
+      return
+    elsif @enemies.empty?
+      @player.victory_animation
+      @effects << BattleVictory.new { finish(:victory) }
+      @state = :end
+      return
+    end
+
+    case @state
     when :choosing_action
       if KB.key_pressed?(Gosu::KB_SPACE) || KB.key_pressed?(Gosu::KB_RETURN)
         case @action_index

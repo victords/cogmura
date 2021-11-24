@@ -4,3 +4,4 @@ no_items		You don't have any items
 flee_fail		Unable to flee!
 item_pakia		Pakia
 battle_start	BATTLE\nTIME!
+battle_won		VICTORY!
