@@ -1,29 +1,27 @@
-require_relative 'game'
+require_relative 'iso_game_object'
 
-class Item
-  attr_reader :type
+include MiniGL
 
-  def initialize(type)
-    @type = type
-    @data = Game.items[type] || File.open("#{Res.prefix}item/#{type}") do |f|
-      content = f.read.chomp.split(',')
-      Game.items[type] = {
-        type: content[0].to_sym,
-        target: content[1].to_sym,
-        amount: content[2].to_i
-      }
-    end
+class Item < IsoGameObject
+  TYPE_MAP = [
+    [:pakia, -2, -4, 1, 1]
+  ].freeze
+
+  attr_reader :type, :name, :destroyed
+  attr_writer :on_picked_up
+
+  def initialize(type, col, row, layer)
+    layer ||= 0
+    id, img_gap_x, img_gap_y, sprite_cols, sprite_rows = TYPE_MAP[type]
+    super(col, row, layer, 16, 16, "item_#{id}", Vector.new(img_gap_x, img_gap_y), sprite_cols, sprite_rows)
+    @type = id
+    @name = Game.text(:ui, "item_#{id}")
   end
 
-  def target_type
-    @data[:target]
-  end
+  def update(man)
+    return unless man.bounds.intersect?(bounds) && man.vert_intersect?(self)
 
-  # target is a Stats
-  def use(target)
-    case @data[:type]
-    when :heal
-      target.change_hp(@data[:amount])
-    end
+    @on_picked_up.call(self)
+    @destroyed = true
   end
 end

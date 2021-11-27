@@ -1,5 +1,5 @@
 module Animation
-  def start_sequence(steps)
+  def start_sequence(*steps)
     @sequence = steps
     @sequence_step = 0
     @sequence_timer = @sequence[0][:timer] || 0

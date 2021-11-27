@@ -1,5 +1,5 @@
-require_relative 'iso_game_object'
-require_relative 'constants'
+require_relative '../iso_game_object'
+require_relative '../constants'
 
 class Door < IsoGameObject
   attr_reader :dest_scr, :dest_entr

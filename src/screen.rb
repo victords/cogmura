@@ -1,12 +1,12 @@
 require_relative 'iso_block'
-require_relative 'graphic'
 require_relative 'npc'
-require_relative 'door'
-require_relative 'screen_item'
-require_relative 'screen_enemy'
+require_relative 'item'
+require_relative 'enemy'
 require_relative 'character'
 require_relative 'effect'
-require_relative 'battle'
+require_relative 'battle/battle'
+require_relative 'objects/door'
+require_relative 'objects/graphic'
 
 include MiniGL
 
@@ -80,10 +80,10 @@ class Screen
         when 'n'
           @npcs << Npc.new(d[0], d[1], d[2], d[3])
         when 'i'
-          @items << (item = ScreenItem.new(d[0], d[1], d[2], d[3]))
+          @items << (item = Item.new(d[0], d[1], d[2], d[3]))
           item.on_picked_up = method(:on_item_picked_up)
         when 'e'
-          @enemies << (enemy = ScreenEnemy.new(d[0], d[1], d[2], d[3]))
+          @enemies << (enemy = Enemy.new(d[0], d[1], d[2], d[3]))
           enemy.on_encounter = method(:on_enemy_encounter)
         end
       end
@@ -136,14 +136,15 @@ class Screen
     enemy.set_inactive
     @man.active = false
     @effects << BattleSplash.new do
-      @battle = Battle.new(@spawn_points[0], enemy.type, @spawn_points[1..]) do |result|
+      @battle = Battle.start(@spawn_points[0], enemy.type, @spawn_points[1..]) do |result|
         @battle = nil
         @man.active = true
-        if result == :fled
+        case result
+        when :fled
           enemy.set_active(120)
-        elsif result == :victory
+        when :victory
           @enemies.delete(enemy)
-        elsif result == :defeat
+        when :defeat
           Game.game_over
         end
       end
@@ -164,13 +165,14 @@ class Screen
       return
     end
 
-    if @fading == :in
+    case @fading
+    when :in
       @overlay_alpha -= 255 / FADE_DURATION
       if @overlay_alpha <= 0
         @overlay_alpha = 0
         @fading = nil
       end
-    elsif @fading == :out
+    when :out
       @overlay_alpha += 255 / FADE_DURATION
       if @overlay_alpha >= 255
         @overlay_alpha = 255
