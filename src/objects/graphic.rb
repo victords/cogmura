@@ -16,6 +16,12 @@ class Graphic
     @z_index = col + row + (layer / 3) + 2
   end
 
+  def collide?
+    false
+  end
+
+  def update(_); end
+
   def draw(map)
     pos = map.get_screen_pos(@col, @row)
     @img.draw(pos.x + @img_gap.x, pos.y + @img_gap.y - @z, @z_index, Graphics::SCALE, Graphics::SCALE)

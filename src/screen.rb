@@ -7,6 +7,7 @@ require_relative 'effect'
 require_relative 'battle/battle'
 require_relative 'objects/door'
 require_relative 'objects/graphic'
+require_relative 'objects/box'
 
 include MiniGL
 
@@ -44,8 +45,7 @@ class Screen
       IsoBlock.new(nil, M_S / 2 - 0.5, M_S - 0.5, -100),
       IsoBlock.new(nil, M_S - 0.5, M_S / 2 - 0.5, -100)
     ]
-    @doors = []
-    @graphics = []
+    @objects = []
     @npcs = []
     @items = []
     @enemies = []
@@ -73,10 +73,12 @@ class Screen
         when 'w' # invisible block
           @blocks << IsoBlock.new(nil, d[0], d[1], 0, d[2], d[3])
         when 'd'
-          @doors << (door = Door.new(d[0].to_i, d[1].to_i, d[2].to_i, d[3].to_f, d[4].to_f, d[5].to_i))
+          @objects << (door = Door.new(d[0].to_i, d[1].to_i, d[2].to_i, d[3].to_f, d[4].to_f, d[5].to_i))
           door.on_open = method(:on_player_leave)
         when 'g'
-          @graphics << Graphic.new(d[0], d[1], d[2], d[3])
+          @objects << Graphic.new(d[0], d[1], d[2], d[3])
+        when 'x'
+          @objects << Box.new(d[0], d[1], d[2] || 0)
         when 'n'
           @npcs << Npc.new(d[0], d[1], d[2], d[3])
         when 'i'
@@ -181,7 +183,7 @@ class Screen
     end
 
     unless @fading == :out || @fading == :in && @overlay_alpha > 127
-      obstacles = (@blocks + @npcs).select do |b|
+      obstacles = (@blocks + @npcs + @objects.select(&:collide?)).select do |b|
         @man.vert_intersect?(b) && !(@man.grounded && b.height_level == @man.height_level + 1)
       end
       @man.update(
@@ -212,7 +214,7 @@ class Screen
       end
     end
 
-    @doors.each { |d| d.update(@man) }
+    @objects.each { |d| d.update(@man) }
   end
 
   def draw
@@ -223,8 +225,7 @@ class Screen
       @grid.draw(x, y, 0, Graphics::SCALE, Graphics::SCALE) if @grid
     end
     @blocks.each { |b| b.draw(@map, @man) }
-    @doors.each { |d| d.draw(@map) }
-    @graphics.each { |g| g.draw(@map) }
+    @objects.each { |d| d.draw(@map) }
 
     if @battle
       @battle.draw(@map)

@@ -24,6 +24,10 @@ class Door < IsoGameObject
     @alert = Res.img(:fx_alert)
   end
 
+  def collide?
+    false
+  end
+
   def update(man)
     if @opening
       animate_once([1, 2, 3, 4], 7)

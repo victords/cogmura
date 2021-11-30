@@ -8,13 +8,12 @@ class Npc < IsoGameObject
   ].freeze
   SQ_RANGE = (1.5 * Physics::UNIT) ** 2
 
-  attr_reader :ramps, :man_in_range
+  attr_reader :man_in_range
 
   def initialize(id, col, row, layer)
     layer ||= 0
     data = ID_MAP[id]
     super(col, row, layer, 20, 20, "char_#{data[0]}", Vector.new(data[1], data[2]), 5, 1, 3)
-    @ramps = nil
     @balloon = Res.img(:fx_balloon)
 
     @texts = Game.npc_texts[id].map { |t| t.split(' ', 2) }
@@ -34,12 +33,6 @@ class Npc < IsoGameObject
         break
       end
     end
-  end
-
-  def passable; false; end
-
-  def intersect?(obj)
-    bounds.intersect?(obj)
   end
 
   def in_range?(obj)

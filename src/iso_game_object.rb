@@ -1,9 +1,9 @@
 require_relative 'constants'
 
-include MiniGL
+class IsoGameObject < MiniGL::GameObject
+  include MiniGL
 
-class IsoGameObject < GameObject
-  attr_reader :z, :height, :screen_x, :screen_y, :img_size, :z_index
+  attr_reader :z, :height, :screen_x, :screen_y, :img_size, :z_index, :ramps
 
   def initialize(col, row, layer, w, h, img, img_gap, sprite_cols, sprite_rows, height = 1)
     super((col + 0.5) * Physics::UNIT - w / 2, (row + 0.5) * Physics::UNIT - h / 2, w, h, img, img_gap, sprite_cols, sprite_rows)
@@ -11,12 +11,16 @@ class IsoGameObject < GameObject
     @speed_z = 0
     @height = height * Physics::V_UNIT
     @z_index = col + row + (layer / 3) + 1
-    @screen_x = @screen_y = -10000
+    @screen_x = @screen_y = -10_000
     @img_size = Vector.new(@img[0].width * Graphics::SCALE, @img[0].height * Graphics::SCALE)
   end
 
   def height_level
     (@z / Physics::V_UNIT).floor
+  end
+
+  def intersect?(obj)
+    bounds.intersect?(obj)
   end
 
   def vert_intersect?(obj)
