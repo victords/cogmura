@@ -3,6 +3,7 @@ require_relative 'enemy'
 require_relative 'item'
 require_relative '../effect'
 require_relative '../ui/panel_image'
+require_relative '../ui/balloon'
 
 include MiniGL
 
@@ -31,14 +32,18 @@ module Battle
       end
 
       # UI
-      @panel = Panel.new(50, 50, 150, 24 * 4 + 5 * 5, @labels = [
+      @panel = Panel.new(50, 50, 150, 24 * 4 + 5 * 5, (@labels = [
         Label.new(10, 6, Game.font, 'Attack', 0, 0, Graphics::SCALE, Graphics::SCALE),
         Label.new(10, 6 + 29, Game.font, 'Technique', 0, 0, Graphics::SCALE, Graphics::SCALE),
         Label.new(10, 6 + 2 * 29, Game.font, 'Item', 0, 0, Graphics::SCALE, Graphics::SCALE),
-        Label.new(10, 6 + 3 * 29, Game.font, 'Flee', 0, 0, Graphics::SCALE, Graphics::SCALE),
+        Label.new(10, 6 + 3 * 29, Game.font, 'Flee', 0, 0, Graphics::SCALE, Graphics::SCALE)
+      ]) + [
+        @flee_balloon = Balloon.new(150, 3 + 3 * 29, '')
       ], :ui_panel, :tiled, true, Graphics::SCALE, Graphics::SCALE)
+      @flee_balloon.visible = false
       @target_arrow = Res.img(:ui_arrowDown)
       @effects = []
+      set_flee_probability
 
       @state = :choosing_action
       @action_index = 0
@@ -59,7 +64,16 @@ module Battle
         @xp_earned += enemy.xp
         @money_earned += enemy.money
         @enemies.delete(enemy)
+        set_flee_probability
       end
+    end
+
+    def set_flee_probability
+      enemy_xp_sum = @enemies.map(&:xp).sum
+      # probability of success starts at 100% and drops according to how much the XP
+      # from the enemies represent from the amount needed to level up
+      @flee_probability = (1 - (enemy_xp_sum.to_f / @player.stats.xp_to_next_level)).clamp(0, 1)
+      @flee_balloon.text = Game.text(:ui, :flee_prob, "#{(@flee_probability * 100).round}%")
     end
 
     def player_attack(enemy)
@@ -155,11 +169,7 @@ module Battle
               @state = :showing_message
             end
           when 3 # flee
-            enemy_xp_sum = @enemies.map(&:xp).sum
-            # probability of success starts at 100% and drops according to how much the XP
-            # from the enemies represent from the amount needed to level up
-            prob = (1 - (enemy_xp_sum.to_f / @player.stats.xp_to_next_level)).clamp(0, 1)
-            if rand <= prob
+            if rand <= @flee_probability
               finish(:fled)
             else
               @effects << TextEffect.new(:flee_fail) { @state = :enemy_turn }
@@ -169,9 +179,11 @@ module Battle
         elsif KB.key_pressed?(Gosu::KB_DOWN) || KB.key_held?(Gosu::KB_DOWN)
           @action_index += 1
           @action_index = 0 if @action_index >= @labels.size
+          @flee_balloon.visible = @action_index == 3
         elsif KB.key_pressed?(Gosu::KB_UP) || KB.key_held?(Gosu::KB_UP)
           @action_index -= 1
           @action_index = @labels.size - 1 if @action_index < 0
+          @flee_balloon.visible = @action_index == 3
         end
       when :choosing_target
         if KB.key_pressed?(Gosu::KB_SPACE) || KB.key_pressed?(Gosu::KB_RETURN)

@@ -9,3 +9,4 @@ stats			Stats
 level			Level
 xp				Exp
 xp_to_next		($ to next)
+flee_prob		$ chance
