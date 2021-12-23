@@ -1,18 +1,24 @@
 require_relative 'stats'
 
 class PlayerStats < Stats
-  attr_reader :level, :xp, :items, :techniques, :abilities
+  attr_reader :level, :xp, :money, :items, :techniques, :abilities,
+              :on_xp_change, :on_level_change, :on_money_change
 
   def initialize
     super(10, 5, 2, 0)
 
-    @level = 1
     @xp = 0
+    @level = 1
     @money = 0
 
     @items = {}
     @techniques = []
     @abilities = []
+
+    # events
+    @on_xp_change = []
+    @on_level_change = []
+    @on_money_change = []
   end
 
   def add_item(item_type)
@@ -31,11 +37,31 @@ class PlayerStats < Stats
   end
 
   def xp_to_next_level
+    total_xp_to_next_level - @xp
+  end
+
+  def xp=(value)
+    @xp = value
+    @on_xp_change.each { |c| c.call(@xp) }
+    return unless @xp >= total_xp_to_next_level
+
+    @level += 1
+    @on_level_change.each { |c| c.call(@level) }
+  end
+
+  def money=(value)
+    @money = value
+    @on_money_change.each { |c| c.call(@money) }
+  end
+
+  private
+
+  def total_xp_to_next_level
     # level 2: 10
-    # level 3: 20
-    # level 4: 40
-    # level 5: 80
+    # level 3: 30 (10 + 20)
+    # level 4: 70 (10 + 20 + 40)
+    # level 5: 150 (10 + 20 + 40 + 80)
     # ...
-    10 * 2**(@level - 1)
+    10 * (2**@level - 1)
   end
 end

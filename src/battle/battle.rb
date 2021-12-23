@@ -43,6 +43,8 @@ module Battle
       @state = :choosing_action
       @action_index = 0
       @enemy_index = 0
+      @xp_earned = 0
+      @money_earned = 0
 
       @on_finish = on_finish
     end
@@ -53,7 +55,11 @@ module Battle
 
     def on_enemy_hp_change(enemy, delta)
       @effects << StatChangeEffect.new(:hp, delta, enemy.screen_x + enemy.img_size.x / 2, enemy.screen_y)
-      @enemies.delete(enemy) if enemy.stats.hp.zero?
+      if enemy.stats.hp.zero?
+        @xp_earned += enemy.xp
+        @money_earned += enemy.money
+        @enemies.delete(enemy)
+      end
     end
 
     def player_attack(enemy)
@@ -95,6 +101,8 @@ module Battle
     end
 
     def finish(result)
+      @player.stats.xp += @xp_earned
+      @player.stats.money += @money_earned
       @on_finish.call(result)
     end
 

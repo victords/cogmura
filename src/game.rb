@@ -40,8 +40,12 @@ class Game
       @game_over = false
     end
 
-    def text(category, id)
-      @texts[category][id.to_s]
+    def text(category, id, *args)
+      txt = @texts[category][id.to_s]
+      args.each do |arg|
+        txt = txt.sub('$', arg.to_s)
+      end
+      txt
     end
 
     def switch_active?(id)

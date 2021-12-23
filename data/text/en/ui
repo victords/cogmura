@@ -5,3 +5,7 @@ flee_fail		Unable to flee!
 item_pakia		Pakia
 battle_start	BATTLE\nTIME!
 battle_won		VICTORY!
+stats			Stats
+level			Level
+xp				Exp
+xp_to_next		($ to next)

@@ -8,6 +8,7 @@ class Stats
     @strength = strength
     @defense = defense
 
+    # events
     @on_hp_change = []
     @on_mp_change = []
   end

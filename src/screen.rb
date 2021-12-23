@@ -8,6 +8,7 @@ require_relative 'battle/battle'
 require_relative 'objects/door'
 require_relative 'objects/graphic'
 require_relative 'objects/box'
+require_relative 'ui/hud'
 
 include MiniGL
 
@@ -119,6 +120,7 @@ class Screen
 
     @fading = :in
     @overlay_alpha = 255
+    @hud = Hud.new
 
     # TODO remove later
     # @grid = Res.img(:grid)
@@ -153,6 +155,11 @@ class Screen
     end
   end
 
+  def toggle_pause
+    @hud.toggle
+    @paused = !@paused
+  end
+
   def update
     battle_start = false
     @effects.reverse_each do |e|
@@ -164,6 +171,10 @@ class Screen
 
     if @battle
       @battle.update
+      return
+    elsif @paused
+      @hud.update
+      toggle_pause if KB.key_pressed?(Gosu::KB_RETURN)
       return
     end
 
@@ -212,6 +223,8 @@ class Screen
         ramps = obstacles.map(&:ramps).compact.flatten
         e.update(@man, floors, obstacles, ramps)
       end
+
+      toggle_pause if KB.key_pressed?(Gosu::KB_RETURN)
     end
 
     @objects.each { |d| d.update(@man) }
@@ -237,6 +250,7 @@ class Screen
     @items.each { |i| i.draw(@map) }
     @enemies.each { |e| e.draw(@map) }
     @effects.each(&:draw)
+    @hud.draw
     if @overlay_alpha > 0
       color = @overlay_alpha.round << 24
       G.window.draw_quad(0, 0, color, Graphics::SCR_W, 0, color, 0, Graphics::SCR_H, color, Graphics::SCR_W, Graphics::SCR_H, color, 10000)
