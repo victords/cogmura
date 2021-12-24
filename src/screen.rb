@@ -67,7 +67,7 @@ class Screen
 
       objects.split(';').each do |o|
         d = o[1..].split(',')
-        d = d.map(&:to_i) unless o[0] == 'd'
+        d = d.map(&:to_i) unless o[0] == 'd' || o[0] == 'x'
         case o[0]
         when 'b' # textured block
           @blocks << IsoBlock.new(d[0], d[1], d[2], d[3] || 0)
@@ -79,7 +79,7 @@ class Screen
         when 'g'
           @objects << Graphic.new(d[0], d[1], d[2], d[3])
         when 'x'
-          @objects << Box.new(d[0], d[1], d[2] || 0)
+          @objects << Box.new(d[0].to_i, d[1].to_i, (d[2] || 0).to_i, d[3], self)
         when 'n'
           @npcs << Npc.new(d[0], d[1], d[2], d[3])
         when 'i'
@@ -131,9 +131,14 @@ class Screen
     @fading = :out
   end
 
-  def on_item_picked_up(item)
-    Game.player_stats.add_item(item.type)
-    @effects << ItemPickUpEffect.new(item)
+  def on_item_picked_up(item_type)
+    Game.player_stats.add_item(item_type)
+    @effects << ItemPickUpEffect.new(item_type)
+  end
+
+  def on_money_picked_up(amount)
+    Game.player_stats.money += amount
+    @effects << MoneyPickUpEffect.new(amount)
   end
 
   def on_enemy_encounter(enemy)

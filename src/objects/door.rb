@@ -20,8 +20,6 @@ class Door < IsoGameObject
     if type != 2
       @sub_img = @img.map { |img| img.subimage(0, 0, img.width / 2, img.height) }
     end
-
-    @alert = Res.img(:fx_alert)
   end
 
   def collide?
@@ -46,8 +44,8 @@ class Door < IsoGameObject
     super(map, @z_index)
 
     if @can_open && !@opening
-      @alert.draw(@screen_x + @img[0].width / 2 * Graphics::SCALE - 4, @screen_y - 28,
-                  @z_index + 1, Graphics::SCALE, Graphics::SCALE)
+      Res.img(:fx_alert).draw(@screen_x + @img[0].width / 2 * Graphics::SCALE - 4, @screen_y - 28,
+                              @z_index + 1, Graphics::SCALE, Graphics::SCALE)
     end
 
     return unless @sub_img

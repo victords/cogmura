@@ -20,9 +20,9 @@ class ScreenEffect
 end
 
 class TextEffect < ScreenEffect
-  def initialize(text_id)
+  def initialize(text_id, *args)
     super(120)
-    @text = Game.text(:ui, text_id)
+    @text = Game.text(:ui, text_id, *args)
     @width = Game.font.text_width(@text) * Graphics::SCALE + 40
   end
 
@@ -33,11 +33,16 @@ class TextEffect < ScreenEffect
 end
 
 class ItemPickUpEffect < TextEffect
-  def initialize(item)
-    super(:item_pick_up)
-    article = %w(a e i o u).any? { |v| item.name.downcase.start_with?(v) } ? 'an' : 'a'
-    @text = @text.sub('$', article).sub('$', item.name)
-    @width = Game.font.text_width(@text) * Graphics::SCALE + 40
+  def initialize(item_type)
+    name = Game.text(:ui, "item_#{item_type}")
+    article = %w(a e i o u).any? { |v| name.downcase.start_with?(v) } ? 'an' : 'a'
+    super(:item_pick_up, article, name)
+  end
+end
+
+class MoneyPickUpEffect < TextEffect
+  def initialize(amount)
+    super(:money_pick_up, amount)
   end
 end
 

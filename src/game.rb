@@ -43,7 +43,7 @@ class Game
     def text(category, id, *args)
       txt = @texts[category][id.to_s]
       args.each do |arg|
-        txt = txt.sub('$', arg.to_s)
+        txt = txt.sub('#', arg.to_s)
       end
       txt
     end
