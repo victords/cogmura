@@ -54,6 +54,13 @@ class PlayerStats < Stats
     @on_money_change.each { |c| c.call(@money) }
   end
 
+  def recover
+    @on_hp_change.each { |c| c.call(@max_hp, @max_hp - @hp) }
+    @on_mp_change.each { |c| c.call(@max_mp, @max_mp - @mp) }
+    @hp = @max_hp
+    @mp = @max_mp
+  end
+
   private
 
   def total_xp_to_next_level

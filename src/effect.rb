@@ -107,3 +107,37 @@ class StatChangeEffect < ScreenEffect
     @icon.draw(@x + 4, @y, Graphics::UI_Z_INDEX, Graphics::SCALE, Graphics::SCALE)
   end
 end
+
+class RecoverEffect < ScreenEffect
+  def initialize(x, y)
+    super(155)
+    @x = x
+    @y = y
+    @hp = Res.img(:icon_hp)
+    @mp = Res.img(:icon_mp)
+    @effects = []
+    @timer = 0
+  end
+
+  def update
+    super
+    @timer += 1
+    if @timer == 5 && @lifetime >= 35
+      y_offset = ((155 - @lifetime).to_f / 155 * 30).round
+      @effects << Effect.new(@x - 4 + rand(37), @y - 4 - y_offset + rand(37), :fx_glow, 3, 1, 7, [0, 1, 2, 1, 0])
+      @timer = 0
+    end
+    @effects.reverse_each do |e|
+      e.update
+      @effects.delete(e) if e.dead
+    end
+  end
+
+  def draw
+    color = @lifetime >= 35 ? 0xffffffff : ((@lifetime.to_f / 35 * 255).round << 24) | 0xffffff
+    y_offset = ((155 - @lifetime).to_f / 155 * 30).round
+    @hp.draw(@x, @y - 10 - y_offset, Graphics::UI_Z_INDEX, Graphics::SCALE, Graphics::SCALE, color)
+    @mp.draw(@x + 20, @y - y_offset, Graphics::UI_Z_INDEX, Graphics::SCALE, Graphics::SCALE, color)
+    @effects.each { |e| e.draw(nil, Graphics::SCALE, Graphics::SCALE, 255, 0xffffff, nil, Graphics::UI_Z_INDEX) }
+  end
+end

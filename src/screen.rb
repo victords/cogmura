@@ -8,6 +8,7 @@ require_relative 'battle/battle'
 require_relative 'objects/door'
 require_relative 'objects/graphic'
 require_relative 'objects/box'
+require_relative 'objects/arc'
 require_relative 'ui/hud'
 
 include MiniGL
@@ -80,6 +81,8 @@ class Screen
           @objects << Graphic.new(d[0], d[1], d[2], d[3])
         when 'x'
           @objects << Box.new(d[0].to_i, d[1].to_i, (d[2] || 0).to_i, d[3], self)
+        when 'a'
+          @objects << Arc.new(d[0], d[1], d[2], d[3], self)
         when 'n'
           @npcs << Npc.new(d[0], d[1], d[2], d[3])
         when 'i'
@@ -163,6 +166,14 @@ class Screen
   def toggle_pause
     @hud.toggle
     @paused = !@paused
+  end
+
+  def add_block(col, row, layer, x_tiles, y_tiles, height)
+    @blocks << IsoBlock.new(nil, col, row, layer, x_tiles, y_tiles, height)
+  end
+
+  def add_effect(effect)
+    @effects << effect
   end
 
   def update
