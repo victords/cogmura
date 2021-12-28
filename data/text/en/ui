@@ -2,6 +2,7 @@ item_pick_up	Got # #
 money_pick_up	Got $#
 no_techniques	You haven't learned any techniques yet
 no_items		You don't have any items
+flee_prob		# chance
 flee_fail		Unable to flee!
 item_pakia		Pakia
 battle_start	BATTLE\nTIME!
@@ -10,4 +11,4 @@ stats			Stats
 level			Level
 xp				Exp
 xp_to_next		(# to next)
-flee_prob		# chance
+items			Items

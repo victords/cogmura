@@ -4,7 +4,7 @@ include MiniGL
 
 class Item < IsoGameObject
   TYPE_MAP = [
-    [:pakia, -2, -4, 1, 1]
+    [:pakia, -2, -4, 1, 1],
   ].freeze
 
   attr_reader :type, :destroyed

@@ -41,7 +41,7 @@ module Battle
         @flee_balloon = Balloon.new(150, 3 + 3 * 29, '')
       ], :ui_panel, :tiled, true, Graphics::SCALE, Graphics::SCALE)
       @flee_balloon.visible = false
-      @target_arrow = Res.img(:ui_arrowDown)
+      @target_arrow = Res.imgs(:ui_arrow, 2, 2)[2]
       @effects = []
       set_flee_probability
 
@@ -72,8 +72,8 @@ module Battle
       enemy_xp_sum = @enemies.map(&:xp).sum
       # probability of success starts at 100% and drops according to how much the XP
       # from the enemies represent from the amount needed to level up
-      @flee_probability = (1 - (enemy_xp_sum.to_f / @player.stats.xp_to_next_level)).clamp(0, 1)
-      @flee_balloon.text = Game.text(:ui, :flee_prob, "#{(@flee_probability * 100).round}%")
+      @flee_probability = (1 - (enemy_xp_sum.to_f / @player.stats.xp_delta)).clamp(0, 1)
+      @flee_balloon.text = Game.text(:ui, :flee_prob, "#{(@flee_probability * 100).floor}%")
     end
 
     def player_attack(enemy)
