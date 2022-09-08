@@ -73,7 +73,7 @@ module Battle
       # probability of success starts at 100% and drops according to how much the XP
       # from the enemies represent from the amount needed to level up
       @flee_probability = (1 - (enemy_xp_sum.to_f / @player.stats.xp_delta)).clamp(0, 1)
-      @flee_balloon.text = Game.text(:ui, :flee_prob, "#{(@flee_probability * 100).floor}%")
+      @flee_balloon.text = Game.text(:ui, :flee_prob, "#{(@flee_probability * 100).round}%")
     end
 
     def player_attack(enemy)

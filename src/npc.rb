@@ -6,7 +6,7 @@ class Npc < IsoGameObject
   ID_MAP = [
     [:cogjian, -14, -52]
   ].freeze
-  SQ_RANGE = (1.5 * Physics::UNIT) ** 2
+  SQ_RANGE = (1.5 * Physics::UNIT)**2
 
   attr_reader :man_in_range
 
@@ -36,7 +36,7 @@ class Npc < IsoGameObject
   end
 
   def in_range?(obj)
-    (@x + @w / 2 - obj.x - obj.w / 2) ** 2 + (@y + @h / 2 - obj.y - obj.h / 2) ** 2 <= SQ_RANGE
+    (@x + @w / 2 - obj.x - obj.w / 2)**2 + (@y + @h / 2 - obj.y - obj.h / 2)**2 <= SQ_RANGE
   end
 
   def check_next_text
