@@ -1,7 +1,7 @@
 Vector = MiniGL::Vector
 
 module Graphics
-  SCALE = 2
+  SCALE = 1
   MAP_SIZE = 32
   TILE_WIDTH = 64
   TILE_HEIGHT = 32
