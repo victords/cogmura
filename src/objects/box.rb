@@ -8,7 +8,7 @@ class Box < IsoGameObject
   RANGE = Physics::UNIT
 
   def initialize(col, row, layer, content, screen)
-    super(col, row, layer, 28, 28, :obj_box, Vector.new(-6, -24), 2, 1)
+    super(col, row, layer, 28, 28, :obj_box, Vector.new(-12, -48), 2, 1)
     value = content[1..].to_i
     @on_open = lambda do
       case content[0]

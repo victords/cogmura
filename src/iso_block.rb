@@ -8,9 +8,9 @@ class IsoBlock
 
   TYPE_MAP = [
     [1, 1, 1, :block1, 0, 0, false],
-    [4, 6, 7, :house1, -8, -20, false],
+    [4, 6, 7, :house1, 0, -40, false],
     [3, 1, 3, :wall1, 0, 0, true],
-    [1, 1, 15, :tree1, -64, 0, false]
+    [1, 1, 15, :tree1, -128, 0, false]
   ].freeze
 
   attr_reader :x, :y, :z, :w, :h, :height, :ramps, :z_index

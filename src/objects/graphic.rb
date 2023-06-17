@@ -2,7 +2,7 @@ require_relative '../constants'
 
 class Graphic
   TYPE_MAP = [
-    [:bush1, 0, -8]
+    [:bush1, 0, -16]
   ]
 
   def initialize(type, col, row, layer)

@@ -5,7 +5,7 @@ include MiniGL
 class Character < IsoGameObject
   SPEED = 4
   SPEED_D = SPEED * 0.7071
-  JUMP_SPEED = 9
+  JUMP_SPEED = 15
   DIR_KEYS = [Gosu::KB_UP, Gosu::KB_RIGHT, Gosu::KB_DOWN, Gosu::KB_LEFT].freeze
 
   attr_reader :grounded
@@ -13,7 +13,7 @@ class Character < IsoGameObject
   attr_accessor :active
 
   def initialize(col, row, layer)
-    super(col, row, layer, 20, 20, :char_cogmura, Vector.new(-14, -52), 5, 4, 2.8)
+    super(col, row, layer, 20, 20, :char_cogmura, Vector.new(-28, -104), 5, 4, 2.8)
     @active = true
   end
 

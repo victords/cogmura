@@ -7,7 +7,7 @@ class Arc < IsoGameObject
   # type 2: along iso x-axis
   def initialize(type, col, row, layer, screen)
     layer ||= 0
-    super(col, row, layer, Physics::UNIT, Physics::UNIT, :obj_arc, Vector.new(-10, -34), 3, 1)
+    super(col, row, layer, Physics::UNIT, Physics::UNIT, :obj_arc, Vector.new(-20, -68), 3, 1)
     @img_index = type
     case type
     when 0

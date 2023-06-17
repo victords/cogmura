@@ -7,7 +7,7 @@ include MiniGL
 
 class Cogmura < GameWindow
   def initialize
-    super(Graphics::SCR_W, Graphics::SCR_H, false)
+    super(1920, 1080, true)
 
     Res.prefix = File.expand_path(__FILE__).split('/')[0..-3].join('/') + '/data'
     Res.retro_images = true
