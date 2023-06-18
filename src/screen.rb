@@ -250,8 +250,8 @@ class Screen
     @map.foreach do |i, j, x, y|
       next unless @tiles[i][j]
 
-      @tileset[@tiles[i][j]].draw(x, y, 0, Graphics::SCALE, Graphics::SCALE)
-      @grid.draw(x, y, 0, Graphics::SCALE, Graphics::SCALE) if @grid
+      @tileset[@tiles[i][j]].draw(x, y + Graphics::V_OFFSET, 0, Graphics::SCALE, Graphics::SCALE)
+      @grid.draw(x, y + Graphics::V_OFFSET, 0, Graphics::SCALE, Graphics::SCALE) if @grid
     end
     @blocks.each { |b| b.draw(@map, @man) }
     @objects.each { |d| d.draw(@map) }
@@ -267,9 +267,12 @@ class Screen
     @enemies.each { |e| e.draw(@map) }
     @effects.each(&:draw)
     @hud.draw
+
+    G.window.draw_rect(0, 0, G.window.width, Graphics::V_OFFSET, 0xff000000, 10000)
+    G.window.draw_rect(0, G.window.height - Graphics::V_OFFSET, G.window.width, Graphics::V_OFFSET, 0xff000000, 10000)
     if @overlay_alpha > 0
       color = @overlay_alpha.round << 24
-      G.window.draw_quad(0, 0, color, Graphics::SCR_W, 0, color, 0, Graphics::SCR_H, color, Graphics::SCR_W, Graphics::SCR_H, color, 10000)
+      G.window.draw_rect(0, 0, G.window.width, G.window.height, color, 10000)
     end
   end
 

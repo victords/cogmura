@@ -24,6 +24,6 @@ class Graphic
 
   def draw(map)
     pos = map.get_screen_pos(@col, @row)
-    @img.draw(pos.x + @img_gap.x, pos.y + @img_gap.y - @z, @z_index, Graphics::SCALE, Graphics::SCALE)
+    @img.draw(pos.x + @img_gap.x, pos.y + @img_gap.y - @z + Graphics::V_OFFSET, @z_index, Graphics::SCALE, Graphics::SCALE)
   end
 end

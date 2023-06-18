@@ -44,7 +44,7 @@ class IsoGameObject < MiniGL::GameObject
     j = (@y + @h / 2).to_f / Physics::UNIT
     phys_x = @x; phys_y = @y
     @x = (map.size.y + i - j) * map.tile_size.x / 2 - @w / 2
-    @y = (i + j) * map.tile_size.y / 2 - @z - @h
+    @y = (i + j) * map.tile_size.y / 2 - @z - @h + Graphics::V_OFFSET
     @z_index = z_index || (i.floor + j.floor + (height_level / 3) + 1)
     @screen_x = @x - map.cam.x + @img_gap.x
     @screen_y = @y - map.cam.y + @img_gap.y
