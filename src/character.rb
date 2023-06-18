@@ -13,7 +13,7 @@ class Character < IsoGameObject
   attr_accessor :active
 
   def initialize(col, row, layer)
-    super(col, row, layer, 20, 20, :char_cogmura, Vector.new(-28, -104), 5, 4, 2.8)
+    super(col, row, layer, 20, 20, :char_cogmura, Vector.new(-38, -128), 5, 4, 2.8)
     @active = true
   end
 

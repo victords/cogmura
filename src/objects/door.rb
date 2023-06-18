@@ -10,7 +10,7 @@ class Door < IsoGameObject
   # type 2: angled (facing front)
   def initialize(type, dest_scr, dest_entr, col, row, layer)
     layer ||= 0
-    super(col, row, layer, Physics::UNIT, Physics::UNIT, type == 2 ? :obj_door1a : :obj_door1, Vector.new(-8, type == 2 ? -48 : -72), 5, 1)
+    super(col, row, layer, Physics::UNIT, Physics::UNIT, type == 2 ? :obj_door1a : :obj_door1, Vector.new(-28, type == 2 ? -48 : -112), 5, 1)
     @type = type
     @flip = type == 1
     @dest_scr = dest_scr

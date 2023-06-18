@@ -4,7 +4,7 @@ include MiniGL
 
 class Npc < IsoGameObject
   ID_MAP = [
-    [:cogjian, -28, -104]
+    [:cogjian, -38, -128]
   ].freeze
   SQ_RANGE = (1.5 * Physics::UNIT)**2
 

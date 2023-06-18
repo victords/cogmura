@@ -34,7 +34,7 @@ class Screen
     t_w = Graphics::TILE_WIDTH
     t_h = Graphics::TILE_HEIGHT
     @map = Map.new(t_w, t_h, M_S, M_S, Graphics::SCR_W, Graphics::SCR_H, true)
-    @map.set_camera(M_S / 4 * t_w, M_S / 4 * t_h)
+    @map.set_camera(M_S / 4.0 * t_w, M_S / 4.0 * t_h)
 
     @tiles = Array.new(M_S) { Array.new(M_S) }
     @blocks = [

@@ -2,7 +2,7 @@ Vector = MiniGL::Vector
 
 module Graphics
   SCALE = 1
-  MAP_SIZE = 32
+  MAP_SIZE = 30
   TILE_WIDTH = 128
   TILE_HEIGHT = 64
   SCR_W = MAP_SIZE * TILE_WIDTH / 2
