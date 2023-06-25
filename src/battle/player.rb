@@ -11,7 +11,7 @@ module Battle
     attr_reader :stats
 
     def initialize(col, row)
-      super(col, row, 0, 20, 20, :char_cogmura, Vector.new(-14, -52), 5, 4, 2.8)
+      super(col, row, 0, 20, 20, :char_cogmura, Vector.new(-38, -128), 5, 4, 2.8)
       @stats = Game.player_stats
       @img_index = 6
       @flip = true

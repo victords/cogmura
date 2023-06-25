@@ -32,14 +32,14 @@ module Battle
       end
 
       # UI
-      @panel = Panel.new(50, 50, 150, 24 * 4 + 5 * 5, (@labels = [
-        Label.new(10, 6, Game.font, 'Attack', 0, 0, Graphics::SCALE, Graphics::SCALE),
-        Label.new(10, 6 + 29, Game.font, 'Technique', 0, 0, Graphics::SCALE, Graphics::SCALE),
-        Label.new(10, 6 + 2 * 29, Game.font, 'Item', 0, 0, Graphics::SCALE, Graphics::SCALE),
-        Label.new(10, 6 + 3 * 29, Game.font, 'Flee', 0, 0, Graphics::SCALE, Graphics::SCALE)
+      @panel = Panel.new(50, 50 + Graphics::V_OFFSET, 300, 44 * 4 + 10 * 5, (@labels = [
+        Label.new(10, 10, Game.font, 'Attack', 0, 0, 0.5 * Graphics::SCALE, 0.5 * Graphics::SCALE),
+        Label.new(10, 10 + 54, Game.font, 'Technique', 0, 0, 0.5 * Graphics::SCALE, 0.5 * Graphics::SCALE),
+        Label.new(10, 10 + 2 * 54, Game.font, 'Item', 0, 0, 0.5 * Graphics::SCALE, 0.5 * Graphics::SCALE),
+        Label.new(10, 10 + 3 * 54, Game.font, 'Flee', 0, 0, 0.5 * Graphics::SCALE, 0.5 * Graphics::SCALE)
       ]) + [
         @flee_balloon = Balloon.new(150, 3 + 3 * 29, '')
-      ], :ui_panel, :tiled, true, Graphics::SCALE, Graphics::SCALE)
+      ], :ui_panel, :tiled, false, Graphics::SCALE, Graphics::SCALE)
       @flee_balloon.visible = false
       @target_arrow = Res.imgs(:ui_arrow, 2, 2)[2]
       @effects = []
@@ -101,16 +101,16 @@ module Battle
     end
 
     def build_item_menu
-      y = -24
+      y = -44
       controls = @player.stats.items.map do |(item_type, amount)|
-        y += 29
+        y += 54
         [
           PanelImage.new(10, y, "icon_#{item_type}"),
-          Label.new(39, y + 1, Game.font, Game.text(:ui, "item_#{item_type}"), 0, 0, Graphics::SCALE, Graphics::SCALE),
-          Label.new(10, y + 1, Game.font, amount.to_s, 0, 0, Graphics::SCALE, Graphics::SCALE, :top_right)
+          Label.new(64, y, Game.font, Game.text(:ui, "item_#{item_type}"), 0, 0, 0.5 * Graphics::SCALE, 0.5 * Graphics::SCALE),
+          Label.new(10, y, Game.font, amount.to_s, 0, 0, 0.5 * Graphics::SCALE, 0.5 * Graphics::SCALE, :top_right)
         ]
       end.flatten
-      @item_panel = Panel.new(@panel.x + @panel.w, @panel.y + 2 * 29, 180, 5 + @player.stats.items.size * 29, controls,
+      @item_panel = Panel.new(@panel.x + @panel.w, @panel.y + 2 * 54, 300, 10 + @player.stats.items.size * 54, controls,
                               :ui_panel, :tiled, true, Graphics::SCALE, Graphics::SCALE)
     end
 
@@ -234,16 +234,16 @@ module Battle
       case @state
       when :choosing_action
         @panel.draw(255, ui_z)
-        y = @panel.y + 5 + @action_index * 29
-        G.window.draw_rect(@panel.x + 5, y, @panel.w - 10, 24, 0x33000000, ui_z)
+        y = @panel.y + 10 + @action_index * 54
+        G.window.draw_rect(@panel.x + 10, y, @panel.w - 20, 44, 0x33000000, ui_z)
       when :choosing_target
         target = @targets[@action_index]
         @target_arrow.draw(target.screen_x + target.img_size.x / 2 - 12, target.screen_y - 34, ui_z, Graphics::SCALE, Graphics::SCALE)
       when :choosing_item
         @panel.draw(255, ui_z)
         @item_panel.draw(255, ui_z)
-        y = @item_panel.y + 5 + @action_index * 29
-        G.window.draw_rect(@item_panel.x + 5, y, @item_panel.w - 10, 24, 0x33000000, ui_z)
+        y = @item_panel.y + 10 + @action_index * 54
+        G.window.draw_rect(@item_panel.x + 10, y, @item_panel.w - 20, 44, 0x33000000, ui_z)
       end
     end
   end

@@ -70,8 +70,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1"
-     inkscape:cx="2.2936625"
-     inkscape:cy="4.7197355"
+     inkscape:cx="10.773339"
+     inkscape:cy="10.445001"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -92,7 +92,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -111,15 +111,15 @@
        ry="1.4087075" />
     <path
        style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.0583334;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
-       d="m 0.88207415,296.10583 1.22040395,-1.1479 -0.024168,-1.98164 0.229581,-0.24174 1.9091468,-0.012 1.1962375,-1.18414 -0.6162435,-0.41084 -3.2745494,-0.012 -0.95457336,0.73708 -0.0362496,3.69746 z"
+       d="m 0.88207415,296.10583 1.23459255,-1.22251 4e-7,-2.11666 2.1166664,0 1.1799423,-1.22824 -0.6162435,-0.41084 -3.2745494,-0.012 -0.95457336,0.73708 -0.0362496,3.69746 z"
        id="path1738"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="ccccccccccc" />
+       sodipodi:nodetypes="cccccccccc" />
     <path
-       sodipodi:nodetypes="ccccccccccc"
+       sodipodi:nodetypes="cccccccccc"
        inkscape:connector-curvature="0"
        id="path1742"
-       d="m 5.447029,291.56015 -1.2204039,1.1479 0.024168,1.98164 -0.229581,0.24174 -1.9091468,0.012 -1.19623759,1.18414 0.61624359,0.41084 3.2745494,0.012 0.9545733,-0.73708 0.03625,-3.69746 z"
+       d="m 5.447029,291.56015 -1.2136955,1.20651 v 2.11666 H 2.1166667 l -1.20083899,1.24425 0.61624359,0.41084 3.2745494,0.012 0.9545733,-0.73708 0.03625,-3.69746 z"
        style="opacity:1;fill:#b3b3b3;fill-opacity:1;stroke:none;stroke-width:1.0583334;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
     <rect
        ry="1.4087075"
