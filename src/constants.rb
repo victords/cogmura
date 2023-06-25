@@ -1,14 +1,15 @@
 Vector = MiniGL::Vector
 
 module Graphics
+  SCR_W = 1920
+  SCR_H = 1080
   SCALE = 1
   MAP_SIZE = 30
   TILE_WIDTH = 128
   TILE_HEIGHT = 64
-  SCR_W = MAP_SIZE * TILE_WIDTH / 2
-  SCR_H = MAP_SIZE * TILE_HEIGHT / 2
+  V_OFFSET = (SCR_H - MAP_SIZE * TILE_HEIGHT / 2) / 2
   UI_Z_INDEX = 10000
-  V_OFFSET = 60
+  FONT_LINE_SPACING = 8
 end
 
 module Physics

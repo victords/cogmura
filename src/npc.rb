@@ -89,7 +89,7 @@ class Npc < IsoGameObject
 
     pos = map.get_screen_pos((@x + @w / 2) / Physics::UNIT, (@y + @h / 2) / Physics::UNIT)
     if @talking
-      y = pos.y - @height * Physics::V_UNIT >= Graphics::SCR_H / 2 ? 10 : Graphics::SCR_H - 90
+      y = pos.y - @height * Physics::V_UNIT >= Graphics::SCR_H / 2 ? 10 : Graphics::SCR_H - Graphics::V_OFFSET - 90
       G.window.draw_rect(10, y, Graphics::SCR_W - 20, 80, 0xccffffff, Graphics::UI_Z_INDEX)
       Game.text_helper.write_breaking(@texts[@text_index][1], 20, y + 5, Graphics::SCR_W - 40, :justified, 0, 255, Graphics::UI_Z_INDEX)
     elsif @man_in_range

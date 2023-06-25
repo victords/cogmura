@@ -23,12 +23,15 @@ class TextEffect < ScreenEffect
   def initialize(text_id, *args)
     super(120)
     @text = Game.text(:ui, text_id, *args)
-    @width = Game.font.text_width(@text) * Graphics::SCALE + 40
+    @width = Game.font.text_width(@text) * 0.5 * Graphics::SCALE + 40
+    @height = Game.font.height * 0.5 + 10
+    @x = (Graphics::SCR_W - @width) / 2
+    @y = (Graphics::SCR_H - @height) / 2
   end
 
   def draw
-    G.window.draw_rect((Graphics::SCR_W - @width) / 2, Graphics::SCR_H / 2 - 20, @width, 40, 0x80ffffff, Graphics::UI_Z_INDEX)
-    Game.text_helper.write_line(@text, Graphics::SCR_W / 2, Graphics::SCR_H / 2 - 11, :center, 0, 255, nil, 0, 0, 0, Graphics::UI_Z_INDEX)
+    G.window.draw_rect(@x, @y, @width, @height, 0x80ffffff, Graphics::UI_Z_INDEX)
+    Game.text_helper.write_line(@text, @x + 20, @y + 5, :left, 0, 255, nil, 0, 0, 0, Graphics::UI_Z_INDEX)
   end
 end
 
@@ -57,8 +60,8 @@ class BattleSplash < ScreenEffect
   def update
     super
 
-    @scale += 0.03333 if @scale < Graphics::SCALE
-    @angle += @lifetime >= 90 ? 6 : 1
+    @scale += 0.02 if @scale < Graphics::SCALE
+    @angle += @lifetime >= 90 ? 5 : 1
   end
 
   def draw
@@ -66,8 +69,10 @@ class BattleSplash < ScreenEffect
     y = Graphics::SCR_H / 2
     z = Graphics::UI_Z_INDEX
     @img.draw_rot(x, y, z, @angle, 0.5, 0.5, @scale, @scale, 0xffffffff)
-    Game.text_helper.write_breaking(Game.text(:ui, :battle_start), x, y - (@scale / Graphics::SCALE) * 46,
-                                    Graphics::SCR_W, :center, 0, 255, z, 2 * @scale, 2 * @scale)
+    Game.text_helper.write_breaking(
+      Game.text(:ui, :battle_start), x, y - (@scale / Graphics::SCALE) * (Game.font.height + Graphics::FONT_LINE_SPACING / 2),
+      Graphics::SCR_W, :center, 0, 255, z, @scale * Graphics::SCALE, @scale * Graphics::SCALE
+    )
   end
 end
 
