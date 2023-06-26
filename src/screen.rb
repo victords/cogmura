@@ -264,15 +264,15 @@ class Screen
       @items.each { |i| i.draw(@map) }
       @enemies.each { |e| e.draw(@map) }
       @effects.each(&:draw)
-      @hud.draw
     end
 
-    G.window.draw_rect(0, 0, G.window.width, Graphics::V_OFFSET, 0xff000000, 10000)
-    G.window.draw_rect(0, G.window.height - Graphics::V_OFFSET, G.window.width, Graphics::V_OFFSET, 0xff000000, 10000)
+    G.window.draw_rect(0, 0, G.window.width, Graphics::V_OFFSET, 0xff000000, Graphics::UI_Z_INDEX)
+    G.window.draw_rect(0, G.window.height - Graphics::V_OFFSET, G.window.width, Graphics::V_OFFSET, 0xff000000, Graphics::UI_Z_INDEX)
+    @hud.draw
     return unless @overlay_alpha > 0
 
     color = @overlay_alpha.round << 24
-    G.window.draw_rect(0, 0, G.window.width, G.window.height, color, 10000)
+    G.window.draw_rect(0, 0, G.window.width, G.window.height, color, Graphics::UI_Z_INDEX)
   end
 
   private

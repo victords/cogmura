@@ -12,20 +12,20 @@ class Hud
     controls = [
       # stats
       [
-        Label.new(0, 10, Game.font, "- #{Game.text(:ui, :stats)} -", 0, 0, 2 * scale, 2 * scale, :top),
-        PanelImage.new(50, 100, :icon_hp, 2 * scale, 2 * scale),
-        (@labels[:hp] = Label.new(114, 100, Game.font, "#{stats.hp}/#{stats.max_hp}", 0, 0, 2 * scale, 2 * scale)),
-        PanelImage.new(50, 200, :icon_mp, 2 * scale, 2 * scale),
-        (@labels[:mp] = Label.new(114, 200, Game.font, "#{stats.mp}/#{stats.max_mp}", 0, 0, 2 * scale, 2 * scale)),
-        PanelImage.new(50, 296, :icon_money, 2 * scale, 2 * scale),
-        (@labels[:money] = Label.new(114, 300, Game.font, stats.money.to_s, 0, 0, 2 * scale, 2 * scale)),
-        (@labels[:level] = Label.new(50, 100, Game.font, "#{Game.text(:ui, :level)} #{stats.level}", 0, 0, 2 * scale, 2 * scale, :top_right)),
-        (@labels[:xp] = Label.new(50, 200, Game.font, "#{Game.text(:ui, :xp)} #{stats.xp}", 0, 0, 2 * scale, 2 * scale, :top_right)),
-        (@labels[:xp_to_next] = Label.new(50, 280, Game.font, Game.text(:ui, :xp_to_next, stats.xp_to_next_level), 0, 0, scale, scale, :top_right)),
+        Label.new(0, 10, Game.font, "- #{Game.text(:ui, :stats)} -", 0, 0, scale, scale, :top),
+        PanelImage.new(50, 100, :icon_hp, scale, scale),
+        (@labels[:hp] = Label.new(114, 100, Game.font, "#{stats.hp}/#{stats.max_hp}", 0, 0, scale, scale)),
+        PanelImage.new(50, 200, :icon_mp, scale, scale),
+        (@labels[:mp] = Label.new(114, 200, Game.font, "#{stats.mp}/#{stats.max_mp}", 0, 0, scale, scale)),
+        PanelImage.new(50, 296, :icon_money, scale, scale),
+        (@labels[:money] = Label.new(114, 300, Game.font, stats.money.to_s, 0, 0, scale, scale)),
+        (@labels[:level] = Label.new(50, 100, Game.font, "#{Game.text(:ui, :level)} #{stats.level}", 0, 0, scale, scale, :top_right)),
+        (@labels[:xp] = Label.new(50, 200, Game.font, "#{Game.text(:ui, :xp)} #{stats.xp}", 0, 0, scale, scale, :top_right)),
+        (@labels[:xp_to_next] = Label.new(50, 280, Game.font, Game.text(:ui, :xp_to_next, stats.xp_to_next_level), 0, 0, 0.5 * scale, 0.5 * scale, :top_right)),
       ],
       # items
       [
-        Label.new(0, 10, Game.font, "- #{Game.text(:ui, :items)} -", 0, 0, 2 * scale, 2 * scale, :top)
+        Label.new(0, 10, Game.font, "- #{Game.text(:ui, :items)} -", 0, 0, scale, scale, :top)
       ]
     ]
     @panels = controls.map do |c|
@@ -80,7 +80,7 @@ class Hud
       half = @panels[1].w / 2
       y = 100 + i / 2 * 80
       name = Game.text(:ui, "item_#{k}")
-      scale = 2 * Graphics::SCALE
+      scale = Graphics::SCALE
       name_size = Game.font.text_width(name) * scale
       name_slot_size = @panels[1].w / 2 - 210
       name_scale = name_size > name_slot_size ? scale * name_slot_size.to_f / name_size : scale
@@ -104,7 +104,7 @@ class Hud
     return unless @panels[@panel_index].visible
 
     @panels[@panel_index].draw(255, Graphics::UI_Z_INDEX)
-    @arrow[3].draw(14, 14, Graphics::UI_Z_INDEX, Graphics::SCALE, Graphics::SCALE)
-    @arrow[1].draw(Graphics::SCR_W - 38, 14, Graphics::UI_Z_INDEX, Graphics::SCALE, Graphics::SCALE)
+    @arrow[3].draw(20, 20, Graphics::UI_Z_INDEX, Graphics::SCALE, Graphics::SCALE)
+    @arrow[1].draw(Graphics::SCR_W - 20 - @arrow[0].width, 20, Graphics::UI_Z_INDEX, Graphics::SCALE, Graphics::SCALE)
   end
 end
