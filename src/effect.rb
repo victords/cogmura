@@ -103,8 +103,8 @@ class StatChangeEffect < ScreenEffect
              when :hp
                delta < 0 ? 0xff0000 : 0xff9999
              end
-    @x = x + Game.font.text_width(@text) - @icon.width - 2
-    @y = y - Game.font.height * 2 - 10
+    @x = x + Game.font.text_width(@text) * 0.5 - @icon.width - 2
+    @y = y - Game.font.height * 0.5 - 10
   end
 
   def draw
