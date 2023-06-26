@@ -18,12 +18,12 @@ class Balloon < Component
   end
 
   def draw(alpha, z_index = Graphics::UI_Z_INDEX, color = 0xffffff)
-    c1 = ((alpha * 0.5).to_i << 24) | color
+    c1 = ((alpha * 0.75).to_i << 24) | color
     c2 = (alpha << 24) | @text_color
-    text_width = @scale_x * @font.text_width(@text)
+    text_width = @scale_x * 0.5 * @font.text_width(@text)
     @image[0].draw(@x, @y, z_index, @scale_x, @scale_y, c1)
-    G.window.draw_rect(@x + 5 * @scale_x, @y, text_width, 15 * @scale_y, c1, z_index)
-    @image[1].draw(@x + 5 * @scale_x + text_width, @y, z_index, @scale_x, @scale_y, c1)
-    @font.draw_text(@text, @x + 5 * @scale_x, @y + 2 * @scale_y, z_index, @scale_x, @scale_y, c2)
+    G.window.draw_rect(@x + @image[0].width * @scale_x, @y, text_width, @image[0].height * @scale_y, c1, z_index)
+    @image[1].draw(@x + @image[0].width * @scale_x + text_width, @y, z_index, @scale_x, @scale_y, c1)
+    @font.draw_text(@text, @x + @image[0].width * @scale_x, @y + (@image[0].height - 0.5 * @font.height) * 0.5 * @scale_y, z_index, 0.5 * @scale_x, 0.5 * @scale_y, c2)
   end
 end

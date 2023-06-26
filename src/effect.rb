@@ -84,17 +84,19 @@ class BattleVictory < ScreenEffect
 
   def update
     super
-    @scale += 0.2 if @scale < 2 * Graphics::SCALE
+    @scale += 0.1 if @scale < Graphics::SCALE
   end
 
   def draw
     Game.text_helper.write_line(Game.text(:ui, :battle_won), Graphics::SCR_W / 2,
-                                Graphics::SCR_H / 2 - (@scale / Graphics::SCALE) * 22,
-                                :center, 0xffffff, 255, :border, 0, @scale, 255, Graphics::UI_Z_INDEX, @scale, @scale)
+                                Graphics::SCR_H / 2 - (@scale / Graphics::SCALE) * Game.font.height,
+                                :center, 0xffffff, 255, :border, 0, 2 * @scale, 255, Graphics::UI_Z_INDEX, @scale, @scale)
   end
 end
 
 class StatChangeEffect < ScreenEffect
+  SPACING = 8
+
   def initialize(stat, delta, x, y)
     super(120)
     @icon = Res.img("icon_#{stat}")
@@ -103,13 +105,14 @@ class StatChangeEffect < ScreenEffect
              when :hp
                delta < 0 ? 0xff0000 : 0xff9999
              end
-    @x = x + Game.font.text_width(@text) * 0.5 - @icon.width - 2
+    width = Game.font.text_width(@text) * 0.5 + @icon.width + SPACING
+    @x = x + width / 2 - @icon.width
     @y = y - Game.font.height * 0.5 - 10
   end
 
   def draw
-    Game.text_helper.write_line(@text, @x, @y, :right, @color, 255, :border, 0, 2, 255, Graphics::UI_Z_INDEX)
-    @icon.draw(@x + 4, @y, Graphics::UI_Z_INDEX, Graphics::SCALE, Graphics::SCALE)
+    Game.text_helper.write_line(@text, @x - SPACING, @y, :right, @color, 255, :border, 0, 2, 255, Graphics::UI_Z_INDEX)
+    @icon.draw(@x, @y, Graphics::UI_Z_INDEX, Graphics::SCALE, Graphics::SCALE)
   end
 end
 

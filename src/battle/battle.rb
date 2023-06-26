@@ -32,13 +32,13 @@ module Battle
       end
 
       # UI
-      @panel = Panel.new(50, 50 + Graphics::V_OFFSET, 300, 44 * 4 + 10 * 5, (@labels = [
+      @panel = Panel.new(50, 50 + Graphics::V_OFFSET, 300, 10 + 4 * 54, (@labels = [
         Label.new(10, 10, Game.font, 'Attack', 0, 0, 0.5 * Graphics::SCALE, 0.5 * Graphics::SCALE),
         Label.new(10, 10 + 54, Game.font, 'Technique', 0, 0, 0.5 * Graphics::SCALE, 0.5 * Graphics::SCALE),
         Label.new(10, 10 + 2 * 54, Game.font, 'Item', 0, 0, 0.5 * Graphics::SCALE, 0.5 * Graphics::SCALE),
         Label.new(10, 10 + 3 * 54, Game.font, 'Flee', 0, 0, 0.5 * Graphics::SCALE, 0.5 * Graphics::SCALE)
       ]) + [
-        @flee_balloon = Balloon.new(150, 3 + 3 * 29, '')
+        @flee_balloon = Balloon.new(290, 6 + 3 * 54, '')
       ], :ui_panel, :tiled, false, Graphics::SCALE, Graphics::SCALE)
       @flee_balloon.visible = false
       @target_arrow = Res.imgs(:ui_arrow, 2, 2)[2]
