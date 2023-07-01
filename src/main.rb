@@ -27,10 +27,6 @@ class Cogmura < GameWindow
     @screen.on_exit = method(:change_screen)
   end
 
-  def draw_rect(x, y, w, h, color, z_index)
-    draw_quad(x, y, color, x + w, y, color, x, y + h, color, x + w, y + h, color, z_index)
-  end
-
   def update
     KB.update
 

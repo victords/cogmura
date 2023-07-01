@@ -7,7 +7,7 @@ class Arc < IsoGameObject
   # type 2: along iso x-axis
   def initialize(type, col, row, layer, screen)
     layer ||= 0
-    super(col, row, layer, Physics::UNIT, Physics::UNIT, :obj_arc, Vector.new(-20, -68), 3, 1)
+    super(col, row, layer, Physics::UNIT, Physics::UNIT, :obj_arc, Vector.new(-50, -98), 3, 1)
     @img_index = type
     case type
     when 0
@@ -31,7 +31,7 @@ class Arc < IsoGameObject
     if man.intersect?(bounds)
       unless @active
         Game.player_stats.recover
-        @screen.add_effect(RecoverEffect.new(@screen_x + @img[0].width / 2 * Graphics::SCALE - 21, @screen_y - 50))
+        @screen.add_effect(RecoverEffect.new(@screen_x + @img[0].width / 2 * Graphics::SCALE - 30, @screen_y - 50))
         @active = true
       end
     else
