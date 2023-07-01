@@ -8,7 +8,8 @@ class IsoBlock
 
   TYPE_MAP = [
     [1, 1, 1, :block1, 0, 0, false],
-    [4, 6, 7, :house1, 0, -40, false],
+    [4, 6, 7, :house1, -10, -40, false],
+    [3, 3, 7, :house2, -10, -64, false],
     [3, 1, 3, :wall1, 0, 0, true],
     [1, 1, 15, :tree1, -128, 0, false]
   ].freeze
