@@ -2,7 +2,7 @@ require_relative '../constants'
 
 class Graphic
   TYPE_MAP = [
-    [:bush1, 0, -16]
+    [:bush1, -64, -72]
   ]
 
   def initialize(type, col, row, layer)
@@ -13,7 +13,7 @@ class Graphic
     @z = layer * Physics::V_UNIT
     @img = Res.img("obj_#{img}")
     @img_gap = Vector.new(img_gap_x, img_gap_y)
-    @z_index = col + row + (layer / 3) + 2
+    @z_index = 100 * (col + row) + 10 * layer + 5
   end
 
   def collide?
@@ -24,6 +24,10 @@ class Graphic
 
   def draw(map)
     pos = map.get_screen_pos(@col, @row)
-    @img.draw(pos.x + @img_gap.x, pos.y + @img_gap.y - @z + Graphics::V_OFFSET, @z_index, Graphics::SCALE, Graphics::SCALE)
+    @img.draw(
+      pos.x + 0.5 * Graphics::TILE_WIDTH + @img_gap.x,
+      pos.y + 0.5 * Graphics::TILE_HEIGHT + @img_gap.y - @z + Graphics::V_OFFSET,
+      @z_index, Graphics::SCALE, Graphics::SCALE
+    )
   end
 end

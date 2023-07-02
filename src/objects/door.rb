@@ -15,7 +15,6 @@ class Door < IsoGameObject
     @flip = type == 1
     @dest_scr = dest_scr
     @dest_entr = dest_entr
-    @z_index = col.floor + row.floor + 1
 
     if type != 2
       @sub_img = @img.map { |img| img.subimage(0, 0, img.width / 2, img.height) }
@@ -41,17 +40,19 @@ class Door < IsoGameObject
   end
 
   def draw(map)
-    super(map, @z_index)
+    prev_z_index = @z_index
+    super(map, @z_index - 200)
+    @z_index = prev_z_index
 
     if @can_open && !@opening
       Res.img(:fx_alert).draw(@screen_x + @img[0].width / 2 * Graphics::SCALE - 4, @screen_y - 28,
-                              @z_index + 1, Graphics::SCALE, Graphics::SCALE)
+                              Graphics::UI_Z_INDEX, Graphics::SCALE, Graphics::SCALE)
     end
 
     return unless @sub_img
 
     x_offset = @type == 0 ? 0 : @img[0].width * Graphics::SCALE
-    @sub_img[@img_index].draw(@screen_x + x_offset, @screen_y, @z_index + 1,
+    @sub_img[@img_index].draw(@screen_x + x_offset, @screen_y, @z_index - 100,
                               Graphics::SCALE * (@type == 0 ? 1 : -1), Graphics::SCALE)
   end
 end

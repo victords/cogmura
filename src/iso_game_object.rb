@@ -10,7 +10,7 @@ class IsoGameObject < MiniGL::GameObject
     @z = layer * Physics::V_UNIT
     @speed_z = 0
     @height = height * Physics::V_UNIT
-    @z_index = col + row + (layer / 3) + 1
+    @z_index = calculate_z_index(col + 0.5, row + 0.5)
     @screen_x = @screen_y = -10_000
     @img_size = Vector.new(@img[0].width * Graphics::SCALE, @img[0].height * Graphics::SCALE)
   end
@@ -45,10 +45,16 @@ class IsoGameObject < MiniGL::GameObject
     phys_x = @x; phys_y = @y
     @x = (map.size.y + i - j) * map.tile_size.x / 2 - @w / 2
     @y = (i + j) * map.tile_size.y / 2 - @z - @h + Graphics::V_OFFSET
-    @z_index = z_index || (100 * (i.floor + j.floor) + 10 * height_level + 5 * (i - i.floor + j - j.floor)).floor
+    @z_index = z_index || calculate_z_index(i, j)
     @screen_x = @x - map.cam.x + @img_gap.x
     @screen_y = @y - map.cam.y + @img_gap.y
     super(map, Graphics::SCALE, Graphics::SCALE, alpha, 0xffffff, nil, @flip ? :horiz : nil, @z_index)
     @x = phys_x; @y = phys_y
+  end
+
+  private
+
+  def calculate_z_index(i, j)
+    (100 * (i.floor + j.floor) + 10 * height_level + 5 * (i - i.floor + j - j.floor)).floor
   end
 end
