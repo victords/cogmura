@@ -18,5 +18,5 @@ module Physics
 end
 
 ENEMY_TYPE_MAP = [
-  [:bruk, 20, -26, -36, 1, 5, 2]
+  [:bruk, 20, -26, -32, 1, 5, 2]
 ].freeze

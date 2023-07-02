@@ -37,8 +37,6 @@ class Enemy < IsoGameObject
   end
 
   def update(man, floors, obstacles, ramps)
-    return
-
     if @blink
       @active_timer -= 1 if @active_timer > 0
       @active = true if @active_timer <= 0
