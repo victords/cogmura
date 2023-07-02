@@ -93,6 +93,7 @@ class Character < IsoGameObject
   end
 
   def draw(map)
-    super(map, @floor&.is_a?(IsoBlock) && @floor.z_index)
+    super(map)
+    Game.font.draw_text(@z_index.to_s, @screen_x, @screen_y, 10000, 0.25, 0.25, 0xff000000)
   end
 end

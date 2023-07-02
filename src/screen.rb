@@ -126,7 +126,7 @@ class Screen
     @hud = Hud.new
 
     # TODO remove later
-    # @grid = Res.img(:grid)
+    @grid = Res.img(:grid)
   end
 
   def on_player_leave(exit_obj)

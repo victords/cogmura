@@ -54,7 +54,7 @@ class IsoBlock
               (i == x_tiles - 1 ? 2 : 1) * IMG_SLICE_OFFSET + (i == 0 ? -img_gap_x / Graphics::SCALE : 0)
         image.subimage(x, 0, w, image.height)
       end
-      @z_index = col + row + (layer / 3) + x_tiles + y_tiles - 1
+      @z_index = 100 * (col + row + x_tiles + y_tiles - 1)
     end
     @img_gap = Vector.new(img_gap_x, img_gap_y)
 
@@ -95,13 +95,15 @@ class IsoBlock
         (0...@imgs.size).any? do |i|
           x1 = x + (i >= @x_tiles ? (i + 1) : i) * Graphics::TILE_WIDTH / 2 + (i == 0 ? @img_gap.x : 0)
           x2 = x1 + @imgs[i].width * Graphics::SCALE
-          man_behind(man, x1, x2, y, @z_index - (i + 1 - @x_tiles).abs)
+          man_behind(man, x1, x2, y, @z_index - 100 * (i + 1 - @x_tiles).abs)
         end
       update_alpha(behind)
       color = (@alpha << 24) | 0xffffff
       @imgs.each_with_index do |img, i|
-        img.draw(x + (i >= @x_tiles ? (i + 1) : i) * Graphics::TILE_WIDTH / 2 + (i == 0 ? @img_gap.x : 0), y,
-                 @z_index - (i + 1 - @x_tiles).abs, Graphics::SCALE, Graphics::SCALE, color)
+        z_index = @z_index - 100 * (i + 1 - @x_tiles).abs
+        xx = x + (i >= @x_tiles ? (i + 1) : i) * Graphics::TILE_WIDTH / 2 + (i == 0 ? @img_gap.x : 0)
+        img.draw(xx, y, z_index, Graphics::SCALE, Graphics::SCALE, color)
+        Game.font.draw_text(z_index.to_s, xx, y + img.height - 22, 10000, 0.25, 0.25, 0xff000000)
       end
     end
   end
@@ -110,8 +112,8 @@ class IsoBlock
 
   def man_behind(man, x1, x2, y, z_index)
     return false unless man.active
-    man.screen_x + man.img_size.x > x1 && man.screen_x < x2 && man.screen_y + man.img_size.y - 10 > y && man.z_index < z_index &&
-      man.z < @z + @height
+    man.screen_x - man.img_gap.x + man.w > x1 && man.screen_x - man.img_gap.x < x2 && man.screen_y + man.img_size.y - 10 > y &&
+      man.z_index < z_index && man.z < @z + @height
   end
 
   def update_alpha(behind)

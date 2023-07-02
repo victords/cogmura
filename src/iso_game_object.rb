@@ -3,7 +3,7 @@ require_relative 'constants'
 class IsoGameObject < MiniGL::GameObject
   include MiniGL
 
-  attr_reader :z, :height, :screen_x, :screen_y, :img_size, :z_index, :ramps
+  attr_reader :z, :height, :screen_x, :screen_y, :img_size, :img_gap, :z_index, :ramps
 
   def initialize(col, row, layer, w, h, img, img_gap, sprite_cols, sprite_rows, height = 1)
     super((col + 0.5) * Physics::UNIT - w / 2, (row + 0.5) * Physics::UNIT - h / 2, w, h, img, img_gap, sprite_cols, sprite_rows)
@@ -45,7 +45,7 @@ class IsoGameObject < MiniGL::GameObject
     phys_x = @x; phys_y = @y
     @x = (map.size.y + i - j) * map.tile_size.x / 2 - @w / 2
     @y = (i + j) * map.tile_size.y / 2 - @z - @h + Graphics::V_OFFSET
-    @z_index = z_index || (i.floor + j.floor + (height_level / 3) + 1)
+    @z_index = z_index || (100 * (i + j)).round
     @screen_x = @x - map.cam.x + @img_gap.x
     @screen_y = @y - map.cam.y + @img_gap.y
     super(map, Graphics::SCALE, Graphics::SCALE, alpha, 0xffffff, nil, @flip ? :horiz : nil, @z_index)
