@@ -105,14 +105,14 @@ class StatChangeEffect < ScreenEffect
              when :hp
                delta < 0 ? 0xff0000 : 0xff9999
              end
-    width = Game.font.text_width(@text) * 0.5 + @icon.width + SPACING
-    @x = x + width / 2 - @icon.width
+    width = Game.font.text_width(@text) * 0.5 + @icon.width * 0.5 + SPACING
+    @x = x + 0.5 * (width - @icon.width)
     @y = y - Game.font.height * 0.5 - 10
   end
 
   def draw
     Game.text_helper.write_line(@text, @x - SPACING, @y, :right, @color, 255, :border, 0, 2, 255, Graphics::UI_Z_INDEX)
-    @icon.draw(@x, @y, Graphics::UI_Z_INDEX, Graphics::SCALE, Graphics::SCALE)
+    @icon.draw(@x, @y, Graphics::UI_Z_INDEX, Graphics::SCALE * 0.5, Graphics::SCALE * 0.5)
   end
 end
 
@@ -144,8 +144,8 @@ class RecoverEffect < ScreenEffect
   def draw
     color = @lifetime >= 35 ? 0xffffffff : ((@lifetime.to_f / 35 * 255).round << 24) | 0xffffff
     y_offset = ((155 - @lifetime).to_f / 155 * 30).round
-    @hp.draw(@x, @y - 10 - y_offset, Graphics::UI_Z_INDEX, Graphics::SCALE, Graphics::SCALE, color)
-    @mp.draw(@x + 20, @y - y_offset, Graphics::UI_Z_INDEX, Graphics::SCALE, Graphics::SCALE, color)
+    @hp.draw(@x, @y - 10 - y_offset, Graphics::UI_Z_INDEX, Graphics::SCALE * 0.5, Graphics::SCALE * 0.5, color)
+    @mp.draw(@x + 20, @y - y_offset, Graphics::UI_Z_INDEX, Graphics::SCALE * 0.5, Graphics::SCALE * 0.5, color)
     @effects.each { |e| e.draw(nil, Graphics::SCALE, Graphics::SCALE, 255, 0xffffff, nil, Graphics::UI_Z_INDEX) }
   end
 end

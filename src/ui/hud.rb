@@ -14,11 +14,11 @@ class Hud
       [
         Label.new(0, 10, Game.font, "- #{Game.text(:ui, :stats)} -", 0, 0, scale, scale, :top),
         PanelImage.new(50, 100, :icon_hp, scale, scale),
-        (@labels[:hp] = Label.new(114, 100, Game.font, "#{stats.hp}/#{stats.max_hp}", 0, 0, scale, scale)),
+        (@labels[:hp] = Label.new(158, 100, Game.font, "#{stats.hp}/#{stats.max_hp}", 0, 0, scale, scale)),
         PanelImage.new(50, 200, :icon_mp, scale, scale),
-        (@labels[:mp] = Label.new(114, 200, Game.font, "#{stats.mp}/#{stats.max_mp}", 0, 0, scale, scale)),
+        (@labels[:mp] = Label.new(158, 200, Game.font, "#{stats.mp}/#{stats.max_mp}", 0, 0, scale, scale)),
         PanelImage.new(50, 296, :icon_money, scale, scale),
-        (@labels[:money] = Label.new(114, 300, Game.font, stats.money.to_s, 0, 0, scale, scale)),
+        (@labels[:money] = Label.new(158, 300, Game.font, stats.money.to_s, 0, 0, scale, scale)),
         (@labels[:level] = Label.new(50, 100, Game.font, "#{Game.text(:ui, :level)} #{stats.level}", 0, 0, scale, scale, :top_right)),
         (@labels[:xp] = Label.new(50, 200, Game.font, "#{Game.text(:ui, :xp)} #{stats.xp}", 0, 0, scale, scale, :top_right)),
         (@labels[:xp_to_next] = Label.new(50, 280, Game.font, Game.text(:ui, :xp_to_next, stats.xp_to_next_level), 0, 0, 0.5 * scale, 0.5 * scale, :top_right)),
@@ -84,8 +84,8 @@ class Hud
       name_size = Game.font.text_width(name) * scale
       name_slot_size = @panels[1].w / 2 - 210
       name_scale = name_size > name_slot_size ? scale * name_slot_size.to_f / name_size : scale
-      @panels[1].add_component(PanelImage.new(even ? 50 : half + 25, y, "icon_#{k}", scale, scale))
-      @panels[1].add_component(Label.new(even ? 114 : half + 89, y + (scale - name_scale) * Game.font.height / 2, Game.font, name, 0, 0, name_scale, name_scale))
+      @panels[1].add_component(PanelImage.new(even ? 50 : half + 25, y, "icon_#{k}"))
+      @panels[1].add_component(Label.new(even ? 158 : half + 133, y + (scale - name_scale) * Game.font.height / 2, Game.font, name, 0, 0, name_scale, name_scale))
       @panels[1].add_component(Label.new(even ? half + 25 : 50, y, Game.font, v.to_s, 0, 0, scale, scale, :top_right))
     end
   end

@@ -105,7 +105,7 @@ module Battle
       controls = @player.stats.items.map do |(item_type, amount)|
         y += 54
         [
-          PanelImage.new(10, y, "icon_#{item_type}"),
+          PanelImage.new(10, y, "icon_#{item_type}", 0.5, 0.5),
           Label.new(64, y, Game.font, Game.text(:ui, "item_#{item_type}"), 0, 0, 0.5 * Graphics::SCALE, 0.5 * Graphics::SCALE),
           Label.new(10, y, Game.font, amount.to_s, 0, 0, 0.5 * Graphics::SCALE, 0.5 * Graphics::SCALE, :top_right)
         ]
@@ -238,7 +238,7 @@ module Battle
         G.window.draw_rect(@panel.x + 10, y, @panel.w - 20, 44, 0x33000000, ui_z)
       when :choosing_target
         target = @targets[@action_index]
-        @target_arrow.draw(target.screen_x + target.img_size.x / 2 - 12, target.screen_y - 34, ui_z, Graphics::SCALE, Graphics::SCALE)
+        @target_arrow.draw(target.screen_x + target.img_size.x / 2 - 24, target.screen_y - 58, ui_z, Graphics::SCALE, Graphics::SCALE)
       when :choosing_item
         @panel.draw(255, ui_z)
         @item_panel.draw(255, ui_z)
