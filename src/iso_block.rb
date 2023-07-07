@@ -12,7 +12,11 @@ class IsoBlock
     [3, 3, 7, :house2, -10, -64, false],
     [1, 1, 15, :tree1, -128, 0, false],
     [3, 2, 2, :bed1, 0, -16, false],
-    [1, 1, 10, :bedtable1, 0, 144, false],
+    [1, 1, 7, :bedtable1, 0, 48, false],
+    [1, 10, 7, :wall1, 0, -32, false],
+    [6, 1, 7, :wall2, 0, -32, false],
+    [4, 1, 7, :wall3, 0, 0, false],
+    [1, 1, 7, :wall4, 0, 0, false],
   ].freeze
 
   attr_reader :x, :y, :z, :w, :h, :height, :ramps, :z_index
