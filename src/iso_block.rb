@@ -17,6 +17,8 @@ class IsoBlock
     [6, 1, 7, :wall2, 0, -32, false],
     [4, 1, 7, :wall3, 0, 0, false],
     [1, 1, 7, :wall4, 0, 0, false],
+    [1, 2, 7, :rack1, -4, 96, false],
+    [2, 2, 2, :table1, 0, 0, false],
   ].freeze
 
   attr_reader :x, :y, :z, :w, :h, :height, :ramps, :z_index
