@@ -27,6 +27,7 @@ class IsoBlock
     x_tiles, y_tiles, height, img_id, img_gap_x, img_gap_y, angled =
       type ? TYPE_MAP[type] : [x_tiles, y_tiles, height, nil, 0, 0, angled]
 
+    layer ||= 0
     unit = Physics::UNIT
     # in case of angled blocks, collision will be checked against the ramps
     @x = angled ? -10000 : col * unit

@@ -7,7 +7,7 @@ class IsoGameObject < MiniGL::GameObject
 
   def initialize(col, row, layer, w, h, img, img_gap, sprite_cols, sprite_rows, height = 1)
     super((col + 0.5) * Physics::UNIT - w / 2, (row + 0.5) * Physics::UNIT - h / 2, w, h, img, img_gap, sprite_cols, sprite_rows)
-    @z = layer * Physics::V_UNIT
+    @z = (layer || 0) * Physics::V_UNIT
     @speed_z = 0
     @height = height * Physics::V_UNIT
     @z_index = calculate_z_index(col + 0.5, row + 0.5)

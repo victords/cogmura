@@ -10,11 +10,11 @@ class Item < IsoGameObject
   attr_reader :type, :destroyed
   attr_writer :on_picked_up
 
-  def initialize(type, col, row, layer)
-    layer ||= 0
+  def initialize(type, col, row, layer, on_picked_up)
     id, img_gap_x, img_gap_y, sprite_cols, sprite_rows = TYPE_MAP[type]
     super(col, row, layer, 16, 16, "item_#{id}", Vector.new(img_gap_x, img_gap_y), sprite_cols, sprite_rows)
     @type = id
+    @on_picked_up = on_picked_up
   end
 
   def update(man)

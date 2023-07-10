@@ -3,18 +3,17 @@ require_relative '../constants'
 
 class Door < IsoGameObject
   attr_reader :dest_scr, :dest_entr
-  attr_writer :on_open
 
   # type 0: along iso y-axis
   # type 1: along iso x-axis
   # type 2: angled (facing front)
-  def initialize(type, dest_scr, dest_entr, col, row, layer)
-    layer ||= 0
+  def initialize(type, dest_scr, dest_entr, col, row, layer, on_open)
     super(col, row, layer, Physics::UNIT, Physics::UNIT, type == 2 ? :obj_door1a : :obj_door1, Vector.new(-28, type == 2 ? -48 : -112), 5, 1)
     @type = type
     @flip = type == 1
     @dest_scr = dest_scr
     @dest_entr = dest_entr
+    @on_open = on_open
 
     if type != 2
       @sub_img = @img.map { |img| img.subimage(0, 0, img.width / 2, img.height) }

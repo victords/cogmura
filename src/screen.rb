@@ -5,10 +5,11 @@ require_relative 'enemy'
 require_relative 'character'
 require_relative 'effect'
 require_relative 'battle/battle'
+require_relative 'objects/arc'
+require_relative 'objects/box'
 require_relative 'objects/door'
 require_relative 'objects/graphic'
-require_relative 'objects/box'
-require_relative 'objects/arc'
+require_relative 'objects/letter'
 require_relative 'ui/hud'
 
 include MiniGL
@@ -70,27 +71,26 @@ class Screen
         d = o[1..].split(',')
         d = d.map(&:to_i) unless o[0] == 'd' || o[0] == 'x'
         case o[0]
-        when 'b' # textured block
-          @blocks << IsoBlock.new(d[0], d[1], d[2], d[3] || 0)
-        when 'w' # invisible block
-          @blocks << IsoBlock.new(nil, d[0], d[1], 0, d[2], d[3])
-        when 'd'
-          @objects << (door = Door.new(d[0].to_i, d[1].to_i, d[2].to_i, d[3].to_f, d[4].to_f, d[5].to_i))
-          door.on_open = method(:on_player_leave)
-        when 'g'
-          @objects << Graphic.new(d[0], d[1], d[2], d[3])
-        when 'x'
-          @objects << Box.new(d[0].to_i, d[1].to_i, (d[2] || 0).to_i, d[3], self)
         when 'a'
           @objects << Arc.new(d[0], d[1], d[2], d[3], self)
+        when 'b' # textured block
+          @blocks << IsoBlock.new(d[0], d[1], d[2], d[3])
+        when 'd'
+          @objects << Door.new(d[0].to_i, d[1].to_i, d[2].to_i, d[3].to_f, d[4].to_f, d[5].to_i, method(:on_player_leave))
+        when 'e'
+          @enemies << Enemy.new(d[0], d[1], d[2], d[3], method(:on_enemy_encounter))
+        when 'g'
+          @objects << Graphic.new(@map, d[0], d[1], d[2], d[3])
+        when 'i'
+          @items << Item.new(d[0], d[1], d[2], d[3], method(:on_item_picked_up))
+        when 'l'
+          @objects << Letter.new(@map, d[0], d[1], d[2])
         when 'n'
           @npcs << Npc.new(d[0], d[1], d[2], d[3])
-        when 'i'
-          @items << (item = Item.new(d[0], d[1], d[2], d[3]))
-          item.on_picked_up = method(:on_item_picked_up)
-        when 'e'
-          @enemies << (enemy = Enemy.new(d[0], d[1], d[2], d[3]))
-          enemy.on_encounter = method(:on_enemy_encounter)
+        when 'w' # invisible block
+          @blocks << IsoBlock.new(nil, d[0], d[1], 0, d[2], d[3])
+        when 'x'
+          @objects << Box.new(d[0].to_i, d[1].to_i, d[2].to_i, d[3], self)
         end
       end
 

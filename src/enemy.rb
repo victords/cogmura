@@ -12,14 +12,13 @@ class Enemy < IsoGameObject
   ]
 
   attr_reader :type, :name
-  attr_writer :on_encounter
 
-  def initialize(type, col, row, layer)
-    layer ||= 0
+  def initialize(type, col, row, layer, on_encounter)
     id, size, img_gap_x, img_gap_y, sprite_cols, sprite_rows, @speed_m = ENEMY_TYPE_MAP[type]
     super(col, row, layer, size, size, "char_#{id}", Vector.new(img_gap_x, img_gap_y), sprite_cols, sprite_rows)
     @type = id
     @name = id.to_s.split('_').map(&:capitalize).join(' ')
+    @on_encounter = on_encounter
 
     @timer = 0
     @active = true
