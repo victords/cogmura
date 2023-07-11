@@ -28,7 +28,11 @@ class IsoGameObject < MiniGL::GameObject
   end
 
   def plane_distance(obj)
-    Math.sqrt((@x - obj.x)**2 + (@y - obj.y)**2)
+    Math.sqrt((@x + @w / 2 - obj.x - obj.w / 2)**2 + (@y + @h / 2 - obj.y - obj.h / 2)**2)
+  end
+
+  def in_range?(obj, range)
+    plane_distance(obj) <= range
   end
 
   def move_to(col, row, layer)

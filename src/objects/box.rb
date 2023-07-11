@@ -27,7 +27,7 @@ class Box < IsoGameObject
   def update(man)
     return if @opened
 
-    if plane_distance(man) <= RANGE
+    if in_range?(man, RANGE)
       @in_range = true
       if KB.key_pressed?(Gosu::KB_Z)
         @on_open.call
