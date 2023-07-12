@@ -84,7 +84,7 @@ class Screen
         when 'i'
           @items << Item.new(d[0], d[1], d[2], d[3], method(:on_item_picked_up))
         when 'l'
-          @objects << Letter.new(@map, d[0], d[1], d[2])
+          @objects << Letter.new(@map, d[0], d[1], d[2], d[3], method(:on_message_read))
         when 'n'
           @npcs << Npc.new(d[0], d[1], d[2], d[3])
         when 'w' # invisible block
@@ -124,9 +124,10 @@ class Screen
     @fading = :in
     @overlay_alpha = 255
     @hud = Hud.new
+    @end_frame_callbacks = []
 
     # TODO remove later
-    @grid = Res.img(:grid)
+    # @grid = Res.img(:grid)
   end
 
   def on_player_leave(exit_obj)
@@ -163,9 +164,15 @@ class Screen
     end
   end
 
-  def toggle_pause
-    @hud.toggle
-    @paused = !@paused
+  def on_message_read(type, message)
+    return unless @man.active
+
+    @man.active = false
+    @hud.set_message(type, message) do
+      @end_frame_callbacks << lambda do
+        @man.active = true
+      end
+    end
   end
 
   def add_block(col, row, layer, x_tiles, y_tiles, height)
@@ -188,10 +195,6 @@ class Screen
     if @battle
       @battle.update
       return
-    elsif @paused
-      @hud.update
-      toggle_pause if KB.key_pressed?(Gosu::KB_RETURN)
-      return
     end
 
     case @fading
@@ -209,6 +212,7 @@ class Screen
       end
     end
 
+    @hud.update
     unless @fading == :out || @fading == :in && @overlay_alpha > 127
       obstacles = (@blocks + @npcs + @objects.select(&:collide?)).select do |b|
         @man.vert_intersect?(b) && !(@man.grounded && b.height_level == @man.height_level + 1)
@@ -239,11 +243,12 @@ class Screen
         ramps = obstacles.map(&:ramps).compact.flatten
         e.update(@man, floors, obstacles, ramps)
       end
-
-      toggle_pause if KB.key_pressed?(Gosu::KB_RETURN)
     end
 
     @objects.each { |d| d.update(@man) }
+
+    @end_frame_callbacks.each(&:call)
+    @end_frame_callbacks.clear
   end
 
   def draw

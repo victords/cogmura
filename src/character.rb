@@ -18,6 +18,8 @@ class Character < IsoGameObject
   end
 
   def update(obstacles, floors, ceilings, steps, ramps, exits)
+    return unless @active
+
     up, rt, dn, lf = DIR_KEYS.map { |k| KB.key_down?(k) }
     p_up, p_rt, p_dn, p_lf = DIR_KEYS.map { |k| KB.key_pressed?(k) || KB.key_down?(k) && @indices.nil? }
     r_up, r_rt, r_dn, r_lf = DIR_KEYS.map { |k| KB.key_released?(k) }
