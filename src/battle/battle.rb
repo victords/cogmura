@@ -1,6 +1,6 @@
 require_relative 'player'
 require_relative 'enemy'
-require_relative 'item'
+require_relative '../inventory_item'
 require_relative '../effect'
 require_relative '../ui/panel_image'
 require_relative '../ui/balloon'
@@ -104,9 +104,12 @@ module Battle
       y = -44
       controls = @player.stats.items.map do |(item_type, amount)|
         y += 54
+        name = Game.text(:ui, "item_#{item_type}")
+        name_size = Game.font.text_width(name) * 0.5 * Graphics::SCALE
+        name_scale = name_size > 200 ? 200.0 / name_size : 1
         [
           PanelImage.new(10, y, "icon_#{item_type}", 0.5, 0.5),
-          Label.new(64, y, Game.font, Game.text(:ui, "item_#{item_type}"), 0, 0, 0.5 * Graphics::SCALE, 0.5 * Graphics::SCALE),
+          Label.new(64, y, Game.font, name, 0, 0, 0.5 * Graphics::SCALE * name_scale, 0.5 * Graphics::SCALE * name_scale),
           Label.new(10, y, Game.font, amount.to_s, 0, 0, 0.5 * Graphics::SCALE, 0.5 * Graphics::SCALE, :top_right)
         ]
       end.flatten
@@ -199,7 +202,7 @@ module Battle
         end
       when :choosing_item
         if KB.key_pressed?(Gosu::KB_SPACE) || KB.key_pressed?(Gosu::KB_RETURN)
-          item = Item.new(@player.stats.items.keys[@action_index])
+          item = InventoryItem.new(@player.stats.items.keys[@action_index])
           @targets = item.target_type == :ally ? @allies : @enemies
           @target_callback = lambda { |target|
             Game.player_stats.use_item(item, target.stats)

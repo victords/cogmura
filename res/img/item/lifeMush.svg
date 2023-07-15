@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="48"
+   height="44"
+   viewBox="0 0 12.7 11.641668"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
+   sodipodi:docname="lifeMush.svg"
+   inkscape:export-filename="/home/victor/Projects/cogmura/data/img/item/lifeMush.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="3.9525416"
+     inkscape:cx="24.457589"
+     inkscape:cy="24.040669"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     units="px"
+     inkscape:pagecheckerboard="true"
+     inkscape:showpageshadow="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1015"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:snap-global="false" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-285.35831)">
+    <path
+       style="opacity:1;fill:#ffeeaa;fill-opacity:1;stroke:#000000;stroke-width:1.0583334;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       d="m 3.7968711,290.69158 0.095519,4.63266 c 0,0 0.3581953,1.12235 2.5073675,1.14623 2.1491725,0.0239 2.4834881,-1.17011 2.4834881,-1.17011 l 0.1432782,-4.7043 z"
+       id="path937"
+       inkscape:connector-curvature="0" />
+    <path
+       style="opacity:1;fill:#ff80b2;fill-opacity:1;stroke:#000000;stroke-width:1.0583334;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       d="m 0.52916541,290.61207 c 0,0 0.61042469,2.17708 5.73363169,2.15441 5.1232069,-0.0226 5.9080379,-2.17709 5.9080379,-2.17709 0,0 -0.697628,-4.70191 -5.7990335,-4.70191 -5.1014061,0 -5.84263609,4.72459 -5.84263609,4.72459 z"
+       id="path935"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccsc" />
+    <path
+       style="opacity:1;fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:1.99999999;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       d="M 18.296875 6.3183594 C 17.963766 6.3107579 17.610579 6.3237946 17.238281 6.3632812 C 11.281521 6.9950292 11.824219 13.132812 11.824219 13.132812 C 11.824219 13.132812 11.905971 19.359817 24 22.699219 C 36.094029 19.359817 36.175781 13.132812 36.175781 13.132812 C 36.175781 13.132812 36.718479 6.9950292 30.761719 6.3632812 C 24.804958 5.7314955 24 11.507812 24 11.507812 C 24 11.507812 23.293506 6.4323819 18.296875 6.3183594 z "
+       transform="matrix(0.26458335,0,0,0.26458335,0,285.35831)"
+       id="path939" />
+  </g>
+</svg>

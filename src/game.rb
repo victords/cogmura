@@ -31,12 +31,24 @@ class Game
         f.read.split('===').map { |s| s.chomp.split("\n") }
       end
 
+      @items = {}
+      File.open("#{Res.prefix}items") do |f|
+        f.read.each_line do |line|
+          parts = line.split("\t")
+          data = parts[-1].chomp.split(',')
+          @items[parts[0].to_sym] = {
+            type: data[0].to_sym,
+            target: data[1].to_sym,
+            amount: data[2]&.to_i
+          }
+        end
+      end
+
       @switches = Set.new
       @on_switch_activated = []
 
       @player_stats = PlayerStats.new
       @enemies = {}
-      @items = {}
 
       @game_over = false
     end
