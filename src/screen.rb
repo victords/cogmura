@@ -10,7 +10,7 @@ require_relative 'objects/box'
 require_relative 'objects/door'
 require_relative 'objects/graphic'
 require_relative 'objects/letter'
-require_relative 'ui/hud'
+require_relative 'ui/menu'
 
 include MiniGL
 
@@ -123,7 +123,7 @@ class Screen
 
     @fading = :in
     @overlay_alpha = 255
-    @hud = Hud.new
+    @menu = Menu.new
     @end_frame_callbacks = []
 
     # TODO remove later
@@ -168,7 +168,7 @@ class Screen
     return unless @man.active
 
     @man.active = false
-    @hud.set_message(type, message) do
+    @menu.set_message(type, message) do
       @end_frame_callbacks << lambda do
         @man.active = true
       end
@@ -212,7 +212,9 @@ class Screen
       end
     end
 
-    @hud.update
+    @menu.update
+    return if @menu.visible?
+
     unless @fading == :out || @fading == :in && @overlay_alpha > 127
       obstacles = (@blocks + @npcs + @objects.select(&:collide?)).select do |b|
         @man.vert_intersect?(b) && !(@man.grounded && b.height_level == @man.height_level + 1)
@@ -273,7 +275,7 @@ class Screen
 
     G.window.draw_rect(0, 0, G.window.width, Graphics::V_OFFSET, 0xff000000, Graphics::UI_Z_INDEX)
     G.window.draw_rect(0, G.window.height - Graphics::V_OFFSET, G.window.width, Graphics::V_OFFSET, 0xff000000, Graphics::UI_Z_INDEX)
-    @hud.draw
+    @menu.draw
     return unless @overlay_alpha > 0
 
     color = @overlay_alpha.round << 24

@@ -2,7 +2,7 @@ require 'minigl'
 require_relative 'panel_image'
 require_relative '../constants'
 
-class Hud
+class Menu
   include MiniGL
 
   def initialize
@@ -31,9 +31,11 @@ class Hud
     @panels = controls.map do |c|
       Panel.new(10, 10, Graphics::SCR_W - 20, Graphics::SCR_H - 20, c, :ui_panel, :tiled, true, scale, scale)
     end
-    set_item_slots
     @panels.each { |p| p.visible = false }
     @panel_index = 0
+    @select_index = 0
+    set_item_slots
+
     @arrow = Res.imgs(:ui_arrow, 2, 2)
 
     stats.on_hp_change << lambda do |hp, _|
@@ -65,6 +67,10 @@ class Hud
     end
   end
 
+  def visible?
+    @panels[@panel_index].visible
+  end
+
   def change_panel(delta = 1)
     @panels[@panel_index].visible = false
     @panel_index += delta
@@ -78,7 +84,7 @@ class Hud
     Game.player_stats.items.each_with_index do |(k, v), i|
       even = i % 2 == 0
       half = @panels[1].w / 2
-      y = 100 + i / 2 * 80
+      y = 100 + i / 2 * 98
       name = Game.text(:ui, "item_#{k}")
       scale = Graphics::SCALE
       name_size = Game.font.text_width(name) * scale
@@ -87,6 +93,9 @@ class Hud
       @panels[1].add_component(PanelImage.new(even ? 50 : half + 25, y, "icon_#{k}"))
       @panels[1].add_component(Label.new(even ? 158 : half + 133, y + (scale - name_scale) * Game.font.height / 2, Game.font, name, 0, 0, name_scale, name_scale))
       @panels[1].add_component(Label.new(even ? half + 25 : 50, y, Game.font, v.to_s, 0, 0, scale, scale, :top_right))
+    end
+    if @select_index >= Game.player_stats.items.size && @select_index > 0
+      @select_index = Game.player_stats.items.size - 1
     end
   end
 
@@ -106,10 +115,27 @@ class Hud
     toggle if KB.key_pressed?(Gosu::KB_RETURN)
     return unless @panels[@panel_index].visible
 
-    if KB.key_pressed?(Gosu::KB_LEFT)
+    if KB.key_pressed?(Gosu::KB_LEFT_SHIFT)
       change_panel(-1)
-    elsif KB.key_pressed?(Gosu::KB_RIGHT)
+    elsif KB.key_pressed?(Gosu::KB_RIGHT_SHIFT)
       change_panel
+    end
+
+    if @panel_index == 1 && @panels[1].controls.size > 1 # items
+      if KB.key_pressed?(Gosu::KB_LEFT) && @select_index % 2 == 1
+        @select_index -= 1
+      elsif KB.key_pressed?(Gosu::KB_RIGHT) && @select_index % 2 == 0 && @select_index < Game.player_stats.items.size - 1
+        @select_index += 1
+      elsif KB.key_pressed?(Gosu::KB_UP) && @select_index >= 2
+        @select_index -= 2
+      elsif KB.key_pressed?(Gosu::KB_DOWN) && @select_index < Game.player_stats.items.size - 2
+        @select_index += 2
+      elsif KB.key_pressed?(Gosu::KB_Z)
+        item_key = Game.player_stats.items.keys[@select_index]
+        if Game.items[item_key][:type] == :heal
+          Game.player_stats.use_item(InventoryItem.new(item_key), Game.player_stats)
+        end
+      end
     end
   end
 
@@ -127,5 +153,9 @@ class Hud
     @panels[@panel_index].draw(255, Graphics::UI_Z_INDEX)
     @arrow[3].draw(20, 20, Graphics::UI_Z_INDEX, Graphics::SCALE, Graphics::SCALE)
     @arrow[1].draw(Graphics::SCR_W - 20 - @arrow[0].width, 20, Graphics::UI_Z_INDEX, Graphics::SCALE, Graphics::SCALE)
+
+    if @panel_index == 1 && @panels[1].controls.size > 1 # items
+      G.window.draw_rect(55 + (@select_index % 2) * (Graphics::SCR_W / 2 - 35), 105 + @select_index / 2 * 98, Graphics::SCR_W / 2 - 75, 98, 0x33000000, Graphics::UI_Z_INDEX)
+    end
   end
 end
