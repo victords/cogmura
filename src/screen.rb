@@ -151,6 +151,7 @@ class Screen
 
   def on_enemy_encounter(enemy)
     enemy.set_inactive
+    @hud.hide
     @man.active = false
     @effects << BattleSplash.new do
       @battle = Battle.start(@spawn_points[0], enemy.type, @spawn_points[1..]) do |result|
