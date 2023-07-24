@@ -8,6 +8,8 @@ class PanelImage < MiniGL::Component
     @image = Res.img(image)
     @scale_x = scale_x * Graphics::SCALE
     @scale_y = scale_y * Graphics::SCALE
+    @w = @scale_x * @image.width
+    @h = @scale_y * @image.height
     @anchor = anchor
     @anchor_offset_x = x
     @anchor_offset_y = y
