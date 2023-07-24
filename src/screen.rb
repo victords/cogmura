@@ -11,6 +11,7 @@ require_relative 'objects/door'
 require_relative 'objects/graphic'
 require_relative 'objects/letter'
 require_relative 'ui/menu'
+require_relative 'ui/message'
 
 include MiniGL
 
@@ -124,6 +125,7 @@ class Screen
     @fading = :in
     @overlay_alpha = 255
     @menu = Menu.new
+    @message = Message.new(method(:on_message_close))
     @end_frame_callbacks = []
 
     # TODO remove later
@@ -164,14 +166,16 @@ class Screen
     end
   end
 
-  def on_message_read(type, message)
+  def on_message_read(type, text)
     return unless @man.active
 
     @man.active = false
-    @menu.set_message(type, message) do
-      @end_frame_callbacks << lambda do
-        @man.active = true
-      end
+    @message.set_message(type, text)
+  end
+
+  def on_message_close
+    @end_frame_callbacks << lambda do
+      @man.active = true
     end
   end
 
@@ -212,8 +216,9 @@ class Screen
       end
     end
 
-    @menu.update
-    return if @menu.visible?
+    @menu.update unless @message.visible?
+    @message.update
+    return if @menu.visible? || @message.visible?
 
     unless @fading == :out || @fading == :in && @overlay_alpha > 127
       obstacles = (@blocks + @npcs + @objects.select(&:collide?)).select do |b|
@@ -276,6 +281,7 @@ class Screen
     G.window.draw_rect(0, 0, G.window.width, Graphics::V_OFFSET, 0xff000000, Graphics::UI_Z_INDEX)
     G.window.draw_rect(0, G.window.height - Graphics::V_OFFSET, G.window.width, Graphics::V_OFFSET, 0xff000000, Graphics::UI_Z_INDEX)
     @menu.draw
+    @message.draw
     return unless @overlay_alpha > 0
 
     color = @overlay_alpha.round << 24

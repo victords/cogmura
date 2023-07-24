@@ -99,19 +99,7 @@ class Menu
     end
   end
 
-  def set_message(type, message, &block)
-    @message_bg = Res.img("ui_#{type}")
-    @message = message
-    @on_message_close = block
-  end
-
   def update
-    if @message && (KB.key_pressed?(Gosu::KB_RETURN) || KB.key_pressed?(Gosu::KB_Z))
-      @message = nil
-      @on_message_close.call
-      return
-    end
-
     toggle if KB.key_pressed?(Gosu::KB_RETURN)
     return unless @panels[@panel_index].visible
 
@@ -140,14 +128,6 @@ class Menu
   end
 
   def draw
-    if @message
-      G.window.draw_rect(0, 0, Graphics::SCR_W, Graphics::SCR_H, 0x80000000, Graphics::UI_Z_INDEX)
-      x = (Graphics::SCR_W - @message_bg.width) / 2
-      y = (Graphics::SCR_H - @message_bg.height) / 2
-      @message_bg.draw(x, y, Graphics::UI_Z_INDEX)
-      Game.text_helper.write_breaking(@message, x + 50, y + 50, @message_bg.width - 100, :left, 0, 255, Graphics::UI_Z_INDEX)
-    end
-
     return unless @panels[@panel_index].visible
 
     @panels[@panel_index].draw(255, Graphics::UI_Z_INDEX)
