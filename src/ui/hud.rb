@@ -3,7 +3,7 @@ class Hud
 
   def initialize
     scale = Graphics::SCALE
-    @panel = Panel.new(0, 20, 600, 90, [
+    @panel = Panel.new(0, Graphics::V_OFFSET + 20, 600, 90, [
       PanelImage.new(20, 0, :icon_hp, 0.5 * scale, 0.5 * scale, :left),
       Label.new(340, 0, Game.font, hp_text, 0, 0, 0.5 * scale, 0.5 * scale, :right),
       PanelImage.new(340, 0, :icon_mp, 0.5 * scale, 0.5 * scale, :left),
@@ -20,8 +20,9 @@ class Hud
     end
   end
 
-  def show
+  def show(fixed: false)
     @timer = 60
+    @alpha = 255 if fixed
   end
 
   def hide

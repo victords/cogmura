@@ -5,7 +5,10 @@ require_relative '../constants'
 class Menu
   include MiniGL
 
-  def initialize
+  ITEMS_PANEL_FIXED_CONTROLS = 5
+
+  def initialize(hud)
+    @hud = hud
     scale = Graphics::SCALE
     stats = Game.player_stats
     @labels = {}
@@ -13,7 +16,7 @@ class Menu
       # stats
       [
         Label.new(0, 10, Game.font, "- #{Game.text(:ui, :stats)} -", 0, 0, scale, scale, :top),
-        PanelImage.new(50, 100, :icon_hp, scale, scale),
+        PanelImage.new(50, 110, :icon_hp, scale, scale),
         (@labels[:hp] = Label.new(158, 100, Game.font, "#{stats.hp}/#{stats.max_hp}", 0, 0, scale, scale)),
         PanelImage.new(50, 200, :icon_mp, scale, scale),
         (@labels[:mp] = Label.new(158, 200, Game.font, "#{stats.mp}/#{stats.max_mp}", 0, 0, scale, scale)),
@@ -25,18 +28,22 @@ class Menu
       ],
       # items
       [
-        Label.new(0, 10, Game.font, "- #{Game.text(:ui, :items)} -", 0, 0, scale, scale, :top)
+        Label.new(0, 10, Game.font, "- #{Game.text(:ui, :items)} -", 0, 0, scale, scale, :top),
       ]
     ]
+    arrows = [
+      PanelImage.new(10, 10, :ui_arrow, scale, scale, :top_left, 2, 2, 3),
+      PanelImage.new(10, 10, :ui_arrow, scale, scale, :top_right, 2, 2, 1),
+      Label.new(10, 68, Game.font, Game.text(:ui, :left_shift), 0, 0, 0.25 * scale, 0.25 * scale, :top_left),
+      Label.new(10, 68, Game.font, Game.text(:ui, :right_shift), 0, 0, 0.25 * scale, 0.25 * scale, :top_right),
+    ]
     @panels = controls.map do |c|
-      Panel.new(10, 10, Graphics::SCR_W - 20, Graphics::SCR_H - 20, c, :ui_panel, :tiled, true, scale, scale)
+      Panel.new(0, Graphics::V_OFFSET + 130, 1000, 640, c + arrows, :ui_panel, :tiled, true, scale, scale, :top)
     end
     @panels.each { |p| p.visible = false }
     @panel_index = 0
     @select_index = 0
     set_item_slots
-
-    @arrow = Res.imgs(:ui_arrow, 2, 2)
 
     stats.on_hp_change << lambda do |hp, _|
       @labels[:hp].text = "#{hp}/#{stats.max_hp}"
@@ -61,42 +68,16 @@ class Menu
   def toggle
     if @panels[@panel_index].visible
       @panels[@panel_index].visible = false
+      @hud.hide
     else
       @panel_index = 0
       @panels[@panel_index].visible = true
+      @hud.show(fixed: true)
     end
   end
 
   def visible?
     @panels[@panel_index].visible
-  end
-
-  def change_panel(delta = 1)
-    @panels[@panel_index].visible = false
-    @panel_index += delta
-    @panel_index = 0 if @panel_index >= @panels.size
-    @panel_index = @panels.size - 1 if @panel_index < 0
-    @panels[@panel_index].visible = true
-  end
-
-  def set_item_slots
-    @panels[1].controls.slice!(1..-1)
-    Game.player_stats.items.each_with_index do |(k, v), i|
-      even = i % 2 == 0
-      half = @panels[1].w / 2
-      y = 100 + i / 2 * 98
-      name = Game.text(:ui, "item_#{k}")
-      scale = Graphics::SCALE
-      name_size = Game.font.text_width(name) * scale
-      name_slot_size = @panels[1].w / 2 - 210
-      name_scale = name_size > name_slot_size ? scale * name_slot_size.to_f / name_size : scale
-      @panels[1].add_component(PanelImage.new(even ? 50 : half + 25, y, "icon_#{k}"))
-      @panels[1].add_component(Label.new(even ? 158 : half + 133, y + (scale - name_scale) * Game.font.height / 2, Game.font, name, 0, 0, name_scale, name_scale))
-      @panels[1].add_component(Label.new(even ? half + 25 : 50, y, Game.font, v.to_s, 0, 0, scale, scale, :top_right))
-    end
-    if @select_index >= Game.player_stats.items.size && @select_index > 0
-      @select_index = Game.player_stats.items.size - 1
-    end
   end
 
   def update
@@ -109,7 +90,7 @@ class Menu
       change_panel
     end
 
-    if @panel_index == 1 && @panels[1].controls.size > 1 # items
+    if @panel_index == 1 && @panels[1].controls.size > ITEMS_PANEL_FIXED_CONTROLS # items
       if KB.key_pressed?(Gosu::KB_LEFT) && @select_index % 2 == 1
         @select_index -= 1
       elsif KB.key_pressed?(Gosu::KB_RIGHT) && @select_index % 2 == 0 && @select_index < Game.player_stats.items.size - 1
@@ -131,11 +112,41 @@ class Menu
     return unless @panels[@panel_index].visible
 
     @panels[@panel_index].draw(255, Graphics::UI_Z_INDEX)
-    @arrow[3].draw(20, 20, Graphics::UI_Z_INDEX, Graphics::SCALE, Graphics::SCALE)
-    @arrow[1].draw(Graphics::SCR_W - 20 - @arrow[0].width, 20, Graphics::UI_Z_INDEX, Graphics::SCALE, Graphics::SCALE)
 
-    if @panel_index == 1 && @panels[1].controls.size > 1 # items
-      G.window.draw_rect(55 + (@select_index % 2) * (Graphics::SCR_W / 2 - 35), 105 + @select_index / 2 * 98, Graphics::SCR_W / 2 - 75, 98, 0x33000000, Graphics::UI_Z_INDEX)
+    if @panel_index == 1 && @panels[1].controls.size > ITEMS_PANEL_FIXED_CONTROLS # items
+      G.window.draw_rect(@panels[1].x + 15 + (@select_index % 2) * (@panels[1].w / 2 - 10),
+                         @panels[1].y + 105 + @select_index / 2 * 54,
+                         @panels[1].w / 2 - 20, 54, 0x33000000, Graphics::UI_Z_INDEX)
+    end
+  end
+
+  private
+
+  def change_panel(delta = 1)
+    @panels[@panel_index].visible = false
+    @panel_index += delta
+    @panel_index = 0 if @panel_index >= @panels.size
+    @panel_index = @panels.size - 1 if @panel_index < 0
+    @panels[@panel_index].visible = true
+  end
+
+  def set_item_slots
+    @panels[1].controls.slice!(ITEMS_PANEL_FIXED_CONTROLS..-1)
+    Game.player_stats.items.each_with_index do |(k, v), i|
+      even = i % 2 == 0
+      half = @panels[1].w / 2
+      y = 110 + i / 2 * 54
+      name = Game.text(:ui, "item_#{k}")
+      scale = 0.5 * Graphics::SCALE
+      name_size = Game.font.text_width(name) * scale
+      name_slot_size = @panels[1].w / 2 - 210
+      name_scale = name_size > name_slot_size ? scale * name_slot_size.to_f / name_size : scale
+      @panels[1].add_component(PanelImage.new(even ? 20 : half + 10, y, "icon_#{k}"))
+      @panels[1].add_component(Label.new(even ? 74 : half + 64, y + (scale - name_scale) * Game.font.height / 2, Game.font, name, 0, 0, name_scale, name_scale))
+      @panels[1].add_component(Label.new(even ? half + 10 : 20, y, Game.font, v.to_s, 0, 0, scale, scale, :top_right))
+    end
+    if @select_index >= Game.player_stats.items.size && @select_index > 0
+      @select_index = Game.player_stats.items.size - 1
     end
   end
 end

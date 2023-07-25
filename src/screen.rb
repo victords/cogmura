@@ -126,7 +126,7 @@ class Screen
     @fading = :in
     @overlay_alpha = 255
     @hud = Hud.new
-    @menu = Menu.new
+    @menu = Menu.new(@hud)
     @message = Message.new(method(:on_message_close))
     @end_frame_callbacks = []
 
@@ -220,7 +220,7 @@ class Screen
       end
     end
 
-    @hud.update unless @message.visible?
+    @hud.update unless @menu.visible? || @message.visible?
     @menu.update unless @message.visible?
     @message.update
     return if @menu.visible? || @message.visible?

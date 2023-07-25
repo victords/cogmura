@@ -108,7 +108,7 @@ module Battle
         name_size = Game.font.text_width(name) * 0.5 * Graphics::SCALE
         name_scale = name_size > 200 ? 200.0 / name_size : 1
         [
-          PanelImage.new(10, y, "icon_#{item_type}", 0.5, 0.5),
+          PanelImage.new(10, y, "icon_#{item_type}", Graphics::SCALE, Graphics::SCALE),
           Label.new(64, y, Game.font, name, 0, 0, 0.5 * Graphics::SCALE * name_scale, 0.5 * Graphics::SCALE * name_scale),
           Label.new(10, y, Game.font, amount.to_s, 0, 0, 0.5 * Graphics::SCALE, 0.5 * Graphics::SCALE, :top_right)
         ]

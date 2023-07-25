@@ -14,3 +14,5 @@ xp_to_next		(# to next)
 items			Items
 message_0		This is the message from the first letter, found inside Cogmura's house. It contains a fairly long text.
 item_lifeMush	Life Mushroom
+left_shift		Left Shift
+right_shift		Right Shift
