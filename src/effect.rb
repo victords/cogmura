@@ -85,6 +85,7 @@ class BattleVictory < ScreenEffect
   def update
     super
     @scale += 0.1 if @scale < Graphics::SCALE
+    @scale = Graphics::SCALE if @scale > Graphics::SCALE
   end
 
   def draw
