@@ -16,3 +16,7 @@ message_0		This is the message from the first letter, found inside Cogmura's hou
 item_lifeMush	Life Mushroom
 left_shift		Left Shift
 right_shift		Right Shift
+close			Close
+yes				Yes
+no				No
+sleep_confirm	Do you want to sleep here for $#?

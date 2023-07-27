@@ -132,7 +132,7 @@ class Screen
     @overlay_alpha = 255
     @hud = Hud.new
     @menu = Menu.new(@hud)
-    @message = Message.new(method(:on_message_close))
+    @message = Message.new
     @end_frame_callbacks = []
 
     # TODO remove later
@@ -174,22 +174,25 @@ class Screen
     end
   end
 
-  def on_message_read(type, text)
-    return unless @man.active
-
-    @hud.hide
-    @man.active = false
-    @message.set_message(type, text)
+  def on_message_read(type, text_id)
+    set_message(type, text_id, [:close], method(:on_message_close))
   end
 
-  def on_message_close
+  def on_message_close(_index)
     @end_frame_callbacks << lambda do
       @man.active = true
     end
   end
 
   def on_sleep_confirm(price)
-    puts "calling sleep with #{price}"
+    set_message(:confirm, :sleep_confirm, [:yes, :no], method(:on_sleep), price)
+  end
+
+  def on_sleep(option)
+    puts "sleep: #{option}"
+    @end_frame_callbacks << lambda do
+      @man.active = true
+    end
   end
 
   def add_block(col, row, layer, x_tiles, y_tiles, height)
@@ -198,6 +201,14 @@ class Screen
 
   def add_effect(effect)
     @effects << effect
+  end
+
+  def set_message(type, text_id, options, on_select, *msg_args)
+    return unless @man.active
+
+    @hud.hide
+    @man.active = false
+    @message.set_message(type, text_id, options, on_select, *msg_args)
   end
 
   def update
