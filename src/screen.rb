@@ -6,6 +6,7 @@ require_relative 'character'
 require_relative 'effect'
 require_relative 'battle/battle'
 require_relative 'objects/arc'
+require_relative 'objects/bed'
 require_relative 'objects/box'
 require_relative 'objects/door'
 require_relative 'objects/graphic'
@@ -93,6 +94,10 @@ class Screen
           @blocks << IsoBlock.new(nil, d[0], d[1], 0, d[2], d[3])
         when 'x'
           @objects << Box.new(d[0].to_i, d[1].to_i, d[2].to_i, d[3], self)
+        when '['
+          bed = Bed.new(d[0], d[1], d[2], d[3], method(:on_sleep_confirm))
+          @objects << bed
+          @blocks << bed
         end
       end
 
@@ -183,6 +188,10 @@ class Screen
     end
   end
 
+  def on_sleep_confirm(price)
+    puts "calling sleep with #{price}"
+  end
+
   def add_block(col, row, layer, x_tiles, y_tiles, height)
     @blocks << IsoBlock.new(nil, col, row, layer, x_tiles, y_tiles, height)
   end
@@ -271,7 +280,7 @@ class Screen
       @grid.draw(x, y + Graphics::V_OFFSET, 0, Graphics::SCALE, Graphics::SCALE) if @grid
     end
     @blocks.each { |b| b.draw(@map, @man) }
-    @objects.each { |d| d.draw(@map) }
+    @objects.each { |o| o.draw(@map) unless o.drawn? }
 
     if @battle
       @battle.draw(@map)

@@ -28,4 +28,6 @@ class Graphic
       @z_index, Graphics::SCALE, Graphics::SCALE
     )
   end
+
+  def drawn?; false; end
 end

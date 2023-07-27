@@ -56,6 +56,8 @@ class IsoGameObject < MiniGL::GameObject
     @x = phys_x; @y = phys_y
   end
 
+  def drawn?; false; end
+
   private
 
   def calculate_z_index(i, j)
