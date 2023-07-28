@@ -82,7 +82,7 @@ class Menu
 
   def update
     toggle if KB.key_pressed?(Gosu::KB_RETURN)
-    return unless @panels[@panel_index].visible
+    return unless visible?
 
     if KB.key_pressed?(Gosu::KB_LEFT_SHIFT)
       change_panel(-1)

@@ -11,9 +11,6 @@ require_relative 'objects/box'
 require_relative 'objects/door'
 require_relative 'objects/graphic'
 require_relative 'objects/letter'
-require_relative 'ui/hud'
-require_relative 'ui/menu'
-require_relative 'ui/message'
 
 include MiniGL
 
@@ -130,10 +127,6 @@ class Screen
 
     @fading = :in
     @overlay_alpha = 255
-    @hud = Hud.new
-    @menu = Menu.new(@hud)
-    @message = Message.new
-    @end_frame_callbacks = []
 
     # TODO remove later
     # @grid = Res.img(:grid)
@@ -158,7 +151,6 @@ class Screen
 
   def on_enemy_encounter(enemy)
     enemy.set_inactive
-    @hud.hide
     @man.active = false
     @effects << BattleSplash.new do
       @battle = Battle.start(@spawn_points[0], enemy.type, @spawn_points[1..]) do |result|
@@ -177,31 +169,20 @@ class Screen
   end
 
   def on_message_read(type, text_id)
-    set_message(type, text_id, [:close], method(:on_message_close))
-  end
-
-  def on_message_close(_index)
-    @end_frame_callbacks << lambda do
-      @man.active = true
-    end
+    Game.set_message(type, text_id, [:close])
   end
 
   def on_sleep_confirm(price)
-    set_message(:confirm, :sleep_confirm, [:yes, :no], method(:on_sleep), price)
+    Game.set_message(:confirm, :sleep_confirm, [:yes, :no], method(:on_sleep), price)
   end
 
   def on_sleep(option)
-    if option == :yes
-      @fading = :out
-      @on_fade_end = lambda do
-        Game.player_stats.recover
-        @man.active = true
-        @fading = :in
-      end
-    else
-      @end_frame_callbacks << lambda do
-        @man.active = true
-      end
+    return unless option == :yes
+
+    @fading = :out
+    @on_fade_end = lambda do
+      Game.player_stats.recover
+      @fading = :in
     end
   end
 
@@ -211,14 +192,6 @@ class Screen
 
   def add_effect(effect)
     @effects << effect
-  end
-
-  def set_message(type, text_id, options, on_select, *msg_args)
-    return unless @man.active
-
-    @hud.hide
-    @man.active = false
-    @message.set_message(type, text_id, options, on_select, *msg_args)
   end
 
   def update
@@ -249,11 +222,6 @@ class Screen
         @on_fade_end.call
       end
     end
-
-    @hud.update unless @menu.visible? || @message.visible?
-    @menu.update unless @message.visible?
-    @message.update
-    return if @menu.visible? || @message.visible?
 
     unless @fading == :out || @fading == :in && @overlay_alpha > 127
       obstacles = (@blocks + @npcs + @objects.select(&:collide?)).select do |b|
@@ -288,9 +256,6 @@ class Screen
     end
 
     @objects.each { |d| d.update(@man) }
-
-    @end_frame_callbacks.each(&:call)
-    @end_frame_callbacks.clear
   end
 
   def draw
@@ -313,11 +278,6 @@ class Screen
       @effects.each(&:draw)
     end
 
-    G.window.draw_rect(0, 0, G.window.width, Graphics::V_OFFSET, 0xff000000, Graphics::UI_Z_INDEX)
-    G.window.draw_rect(0, G.window.height - Graphics::V_OFFSET, G.window.width, Graphics::V_OFFSET, 0xff000000, Graphics::UI_Z_INDEX)
-    @hud.draw
-    @menu.draw
-    @message.draw
     return unless @overlay_alpha > 0
 
     color = @overlay_alpha.round << 24

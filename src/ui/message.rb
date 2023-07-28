@@ -9,7 +9,7 @@ class Message
     !@text.nil?
   end
 
-  def set_message(type, text_id, options, on_select, *msg_args)
+  def show(type, text_id, options, on_select = nil, *msg_args)
     @bg = Res.img("ui_#{type}")
     @text = Game.text(:ui, text_id, *msg_args)
     @options = options
@@ -22,7 +22,7 @@ class Message
 
     if KB.key_pressed?(Gosu::KB_RETURN) || KB.key_pressed?(Gosu::KB_Z)
       @bg = @text = nil
-      @on_select.call(@options[@index])
+      @on_select&.call(@options[@index])
     elsif KB.key_pressed?(Gosu::KB_UP) && @index > 0
       @index -= 1
     elsif KB.key_pressed?(Gosu::KB_DOWN) && @index < @options.size - 1
