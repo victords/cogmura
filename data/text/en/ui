@@ -1,22 +1,25 @@
-item_pick_up	Got # #
-money_pick_up	Got $#
-no_techniques	You haven't learned any techniques yet
-no_items		You don't have any items
-flee_prob		# chance
-flee_fail		Unable to flee!
-item_pakia		Pakia
-battle_start	BATTLE\nTIME!
-battle_won		VICTORY!
-stats			Stats
-level			Level
-xp				Exp
-xp_to_next		(# to next)
-items			Items
-message_0		This is the message from the first letter, found inside Cogmura's house. It contains a fairly long text.
-item_lifeMush	Life Mushroom
-left_shift		Left Shift
-right_shift		Right Shift
-close			Close
-yes				Yes
-no				No
-sleep_confirm	Do you want to sleep here for $#?
+item_pick_up		Got # #
+money_pick_up		Got $#
+no_techniques		You haven't learned any techniques yet
+no_items			You don't have any items
+flee_prob			# chance
+flee_fail			Unable to flee!
+item_pakia			Pakia
+battle_start		BATTLE\nTIME!
+battle_won			VICTORY!
+stats				Stats
+level				Level
+xp					Exp
+xp_to_next			(# to next)
+items				Items
+message_0			This is the message from the first letter, found inside Cogmura's house. It contains a fairly long text.
+item_lifeMush		Life Mushroom
+left_shift			Left Shift
+right_shift			Right Shift
+close				Close
+yes					Yes
+no					No
+sleep_paid			Do you want to sleep here for $#?
+sleep_free			Do you want to sleep here?
+not_enough_money	You don't have enough money.
+ok					OK

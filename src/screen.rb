@@ -173,11 +173,21 @@ class Screen
   end
 
   def on_sleep_confirm(price)
-    Game.set_message(:confirm, :sleep_confirm, [:yes, :no], method(:on_sleep), price)
+    @sleep_price = price
+    if price > 0
+      Game.set_message(:confirm, :sleep_paid, [:yes, :no], method(:on_sleep), price)
+    else
+      Game.set_message(:confirm, :sleep_free, [:yes, :no], method(:on_sleep))
+    end
   end
 
   def on_sleep(option)
     return unless option == :yes
+
+    if Game.player_stats.money < @sleep_price
+      Game.set_message(:confirm, :not_enough_money, [:ok])
+      return
+    end
 
     @fading = :out
     @on_fade_end = lambda do
