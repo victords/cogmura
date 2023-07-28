@@ -21,4 +21,9 @@ class Stats
   def take_damage(damage)
     change_hp(-damage)
   end
+
+  def change_mp(delta)
+    @mp = [[@mp + delta, 0].max, @max_mp].min
+    @on_mp_change.each { |c| c.call(@mp, delta) }
+  end
 end

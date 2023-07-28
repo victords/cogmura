@@ -62,10 +62,10 @@ class PlayerStats < Stats
   end
 
   def recover
-    @on_hp_change.each { |c| c.call(@max_hp, @max_hp - @hp) }
-    @on_mp_change.each { |c| c.call(@max_mp, @max_mp - @mp) }
-    @hp = @max_hp
-    @mp = @max_mp
+    hp_delta = @max_hp - @hp
+    change_hp(hp_delta) if hp_delta > 0
+    mp_delta = @max_mp - @mp
+    change_mp(mp_delta) if mp_delta > 0
   end
 
   private

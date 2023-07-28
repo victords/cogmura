@@ -140,8 +140,10 @@ class Screen
   end
 
   def on_player_leave(exit_obj)
-    @active_exit = exit_obj
     @fading = :out
+    @on_fade_end = lambda do
+      @on_exit.call(exit_obj)
+    end
   end
 
   def on_item_picked_up(item_type)
@@ -189,9 +191,17 @@ class Screen
   end
 
   def on_sleep(option)
-    puts "sleep: #{option}"
-    @end_frame_callbacks << lambda do
-      @man.active = true
+    if option == :yes
+      @fading = :out
+      @on_fade_end = lambda do
+        Game.player_stats.recover
+        @man.active = true
+        @fading = :in
+      end
+    else
+      @end_frame_callbacks << lambda do
+        @man.active = true
+      end
     end
   end
 
@@ -236,7 +246,7 @@ class Screen
       @overlay_alpha += 255 / FADE_DURATION
       if @overlay_alpha >= 255
         @overlay_alpha = 255
-        @on_exit.call(@active_exit)
+        @on_fade_end.call
       end
     end
 
