@@ -3,7 +3,6 @@ Vector = MiniGL::Vector
 module Graphics
   SCR_W = 1920
   SCR_H = 1080
-  SCALE = 1
   MAP_SIZE = 30
   TILE_WIDTH = 128
   TILE_HEIGHT = 64

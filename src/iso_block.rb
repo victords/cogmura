@@ -3,7 +3,7 @@ require_relative 'constants'
 include MiniGL
 
 class IsoBlock
-  IMG_SLICE_OFFSET = Graphics::TILE_WIDTH / 2 / Graphics::SCALE
+  IMG_SLICE_OFFSET = Graphics::TILE_WIDTH / 2
   FADE_DURATION = 15.0
 
   TYPE_MAP = [
@@ -57,10 +57,10 @@ class IsoBlock
       end
     elsif image
       @imgs = (0...(x_tiles + y_tiles - 1)).map do |i|
-        img_gap_offset = i == 0 ? 0 : -img_gap_x / Graphics::SCALE
+        img_gap_offset = i == 0 ? 0 : -img_gap_x
         x = (i >= x_tiles ? (i + 1) : i) * IMG_SLICE_OFFSET + img_gap_offset
         w = i == x_tiles + y_tiles - 2 ? image.width - x :
-              (i == x_tiles - 1 ? 2 : 1) * IMG_SLICE_OFFSET + (i == 0 ? -img_gap_x / Graphics::SCALE : 0)
+              (i == x_tiles - 1 ? 2 : 1) * IMG_SLICE_OFFSET + (i == 0 ? -img_gap_x : 0)
         image.subimage(x, 0, w, image.height)
       end
       @z_index = 100 * (col + row + x_tiles + y_tiles - 2) + 10 * layer
@@ -93,24 +93,24 @@ class IsoBlock
     if @img
       x = pos.x + @img_gap.x
       y = pos.y + Graphics::TILE_HEIGHT / 2 - @z - @height + @img_gap.y + Graphics::V_OFFSET
-      behind = man_behind(man, x, x + @img.width * Graphics::SCALE, y, @z_index)
+      behind = man_behind(man, x, x + @img.width, y, @z_index)
       update_alpha(behind)
       color = (@alpha << 24) | 0xffffff
-      @img.draw(x, y, @z_index, Graphics::SCALE, Graphics::SCALE, color)
+      @img.draw(x, y, @z_index, 1, 1, color)
     elsif @imgs
       x = pos.x - ((@y_tiles - 1) * Graphics::TILE_WIDTH / 2)
       y = pos.y - @z - @height + @img_gap.y + Graphics::V_OFFSET
       behind =
         (0...@imgs.size).any? do |i|
           x1 = x + (i >= @x_tiles ? (i + 1) : i) * Graphics::TILE_WIDTH / 2 + (i == 0 ? @img_gap.x : 0)
-          x2 = x1 + @imgs[i].width * Graphics::SCALE
+          x2 = x1 + @imgs[i].width
           man_behind(man, x1, x2, y, @z_index - 100 * (i + 1 - @x_tiles).abs)
         end
       update_alpha(behind)
       color = (@alpha << 24) | 0xffffff
       @imgs.each_with_index do |img, i|
         img.draw(x + (i >= @x_tiles ? (i + 1) : i) * Graphics::TILE_WIDTH / 2 + (i == 0 ? @img_gap.x : 0), y,
-          @z_index - 100 * (i + 1 - @x_tiles).abs, Graphics::SCALE, Graphics::SCALE, color)
+          @z_index - 100 * (i + 1 - @x_tiles).abs, 1, 1, color)
       end
     end
   end

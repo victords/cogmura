@@ -9,36 +9,35 @@ class Menu
 
   def initialize(hud)
     @hud = hud
-    scale = Graphics::SCALE
     stats = Game.player_stats
     @labels = {}
     controls = [
       # stats
       [
-        Label.new(0, 10, Game.font, "- #{Game.text(:ui, :stats)} -", 0, 0, scale, scale, :top),
-        PanelImage.new(50, 110, :icon_hp, scale, scale),
-        (@labels[:hp] = Label.new(158, 100, Game.font, "#{stats.hp}/#{stats.max_hp}", 0, 0, scale, scale)),
-        PanelImage.new(50, 200, :icon_mp, scale, scale),
-        (@labels[:mp] = Label.new(158, 200, Game.font, "#{stats.mp}/#{stats.max_mp}", 0, 0, scale, scale)),
-        PanelImage.new(50, 296, :icon_money, scale, scale),
-        (@labels[:money] = Label.new(158, 300, Game.font, stats.money.to_s, 0, 0, scale, scale)),
-        (@labels[:level] = Label.new(50, 100, Game.font, "#{Game.text(:ui, :level)} #{stats.level}", 0, 0, scale, scale, :top_right)),
-        (@labels[:xp] = Label.new(50, 200, Game.font, "#{Game.text(:ui, :xp)} #{stats.xp}", 0, 0, scale, scale, :top_right)),
-        (@labels[:xp_to_next] = Label.new(50, 280, Game.font, Game.text(:ui, :xp_to_next, stats.xp_to_next_level), 0, 0, 0.5 * scale, 0.5 * scale, :top_right)),
+        Label.new(0, 10, Game.font, "- #{Game.text(:ui, :stats)} -", 0, 0, 1, 1, :top),
+        PanelImage.new(50, 110, :icon_hp, 1, 1),
+        (@labels[:hp] = Label.new(158, 100, Game.font, "#{stats.hp}/#{stats.max_hp}", 0, 0, 1, 1)),
+        PanelImage.new(50, 200, :icon_mp, 1, 1),
+        (@labels[:mp] = Label.new(158, 200, Game.font, "#{stats.mp}/#{stats.max_mp}", 0, 0, 1, 1)),
+        PanelImage.new(50, 296, :icon_money, 1, 1),
+        (@labels[:money] = Label.new(158, 300, Game.font, stats.money.to_s, 0, 0, 1, 1)),
+        (@labels[:level] = Label.new(50, 100, Game.font, "#{Game.text(:ui, :level)} #{stats.level}", 0, 0, 1, 1, :top_right)),
+        (@labels[:xp] = Label.new(50, 200, Game.font, "#{Game.text(:ui, :xp)} #{stats.xp}", 0, 0, 1, 1, :top_right)),
+        (@labels[:xp_to_next] = Label.new(50, 280, Game.font, Game.text(:ui, :xp_to_next, stats.xp_to_next_level), 0, 0, 0.5, 0.5, :top_right)),
       ],
       # items
       [
-        Label.new(0, 10, Game.font, "- #{Game.text(:ui, :items)} -", 0, 0, scale, scale, :top),
+        Label.new(0, 10, Game.font, "- #{Game.text(:ui, :items)} -", 0, 0, 1, 1, :top),
       ]
     ]
     arrows = [
-      PanelImage.new(10, 10, :ui_arrow, scale, scale, :top_left, 2, 2, 3),
-      PanelImage.new(10, 10, :ui_arrow, scale, scale, :top_right, 2, 2, 1),
-      Label.new(10, 68, Game.font, Game.text(:ui, :left_shift), 0, 0, 0.25 * scale, 0.25 * scale, :top_left),
-      Label.new(10, 68, Game.font, Game.text(:ui, :right_shift), 0, 0, 0.25 * scale, 0.25 * scale, :top_right),
+      PanelImage.new(10, 10, :ui_arrow, 1, 1, :top_left, 2, 2, 3),
+      PanelImage.new(10, 10, :ui_arrow, 1, 1, :top_right, 2, 2, 1),
+      Label.new(10, 68, Game.font, Game.text(:ui, :left_shift), 0, 0, 0.25, 0.25, :top_left),
+      Label.new(10, 68, Game.font, Game.text(:ui, :right_shift), 0, 0, 0.25, 0.25, :top_right),
     ]
     @panels = controls.map do |c|
-      Panel.new(0, Graphics::V_OFFSET + 130, 1000, 640, c + arrows, :ui_panel, :tiled, true, scale, scale, :top)
+      Panel.new(0, Graphics::V_OFFSET + 130, 1000, 640, c + arrows, :ui_panel, :tiled, true, 1, 1, :top)
     end
     @panels.each { |p| p.visible = false }
     @panel_index = 0
@@ -137,7 +136,7 @@ class Menu
       half = @panels[1].w / 2
       y = 110 + i / 2 * 54
       name = Game.text(:ui, "item_#{k}")
-      scale = 0.5 * Graphics::SCALE
+      scale = 0.5
       name_size = Game.font.text_width(name) * scale
       name_slot_size = @panels[1].w / 2 - 210
       name_scale = name_size > name_slot_size ? scale * name_slot_size.to_f / name_size : scale

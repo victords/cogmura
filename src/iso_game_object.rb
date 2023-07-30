@@ -12,7 +12,7 @@ class IsoGameObject < MiniGL::GameObject
     @height = height * Physics::V_UNIT
     @z_index = calculate_z_index(col + 0.5, row + 0.5)
     @screen_x = @screen_y = -10_000
-    @img_size = Vector.new(@img[0].width * Graphics::SCALE, @img[0].height * Graphics::SCALE)
+    @img_size = Vector.new(@img[0].width, @img[0].height)
   end
 
   def height_level
@@ -52,7 +52,7 @@ class IsoGameObject < MiniGL::GameObject
     @z_index = z_index || calculate_z_index(i, j)
     @screen_x = @x - map.cam.x + @img_gap.x
     @screen_y = @y - map.cam.y + @img_gap.y
-    super(map, Graphics::SCALE, Graphics::SCALE, alpha, 0xffffff, nil, @flip ? :horiz : nil, @z_index)
+    super(map, 1, 1, alpha, 0xffffff, nil, @flip ? :horiz : nil, @z_index)
     @x = phys_x; @y = phys_y
   end
 

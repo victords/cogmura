@@ -32,6 +32,6 @@ class Letter < IsoGameObject
     super
     return unless @in_range && !@opened
 
-    Res.img(:fx_alert).draw(@screen_x + @img[0].width * 0.5 - 4, @screen_y - 60, @z_index, Graphics::SCALE, Graphics::SCALE)
+    Res.img(:fx_alert).draw(@screen_x + @img[0].width * 0.5 - 4, @screen_y - 60, @z_index)
   end
 end

@@ -19,7 +19,7 @@ class Game
                               6, 6, 2, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 2, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
                               6, 3, 6, 6, 6, 6, 6, 6, 6, 6, 2, 2, 2, 2, 2, 6, 2, 6, 5, 5, 3, 3, 3, 3, 6, 4, 6, 2, 4, 6
                             ].map { |n| 8 * n }, 88, 32)
-      @text_helper = TextHelper.new(@font, Graphics::FONT_LINE_SPACING, 0.5 * Graphics::SCALE, 0.5 * Graphics::SCALE)
+      @text_helper = TextHelper.new(@font, Graphics::FONT_LINE_SPACING, 0.5, 0.5)
 
       @language = 'en'
       @texts = {}
@@ -101,7 +101,7 @@ class Game
         return
       end
 
-      @menu.update unless @message.visible?
+      @menu.update unless @message.visible? || @screen.battle?
       unless @menu.visible?
         if @message.visible?
           @message.update

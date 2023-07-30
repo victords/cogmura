@@ -23,7 +23,7 @@ class TextEffect < ScreenEffect
   def initialize(text_id, *args)
     super(120)
     @text = Game.text(:ui, text_id, *args)
-    @width = Game.font.text_width(@text) * 0.5 * Graphics::SCALE + 40
+    @width = Game.font.text_width(@text) * 0.5 + 40
     @height = Game.font.height * 0.5 + 10
     @x = (Graphics::SCR_W - @width) / 2
     @y = (Graphics::SCR_H - @height) / 2
@@ -60,7 +60,8 @@ class BattleSplash < ScreenEffect
   def update
     super
 
-    @scale += 0.02 if @scale < Graphics::SCALE
+    @scale += 0.02 if @scale < 1
+    @scale = 1 if @scale > 1
     @angle += @lifetime >= 90 ? 5 : 1
   end
 
@@ -70,8 +71,8 @@ class BattleSplash < ScreenEffect
     z = Graphics::UI_Z_INDEX
     @img.draw_rot(x, y, z, @angle, 0.5, 0.5, @scale, @scale, 0xffffffff)
     Game.text_helper.write_breaking(
-      Game.text(:ui, :battle_start), x, y - (@scale / Graphics::SCALE) * (Game.font.height + Graphics::FONT_LINE_SPACING / 2),
-      Graphics::SCR_W, :center, 0, 255, z, @scale * Graphics::SCALE, @scale * Graphics::SCALE
+      Game.text(:ui, :battle_start), x, y - @scale * (Game.font.height + Graphics::FONT_LINE_SPACING / 2),
+      Graphics::SCR_W, :center, 0, 255, z, @scale, @scale
     )
   end
 end
@@ -84,13 +85,13 @@ class BattleVictory < ScreenEffect
 
   def update
     super
-    @scale += 0.1 if @scale < Graphics::SCALE
-    @scale = Graphics::SCALE if @scale > Graphics::SCALE
+    @scale += 0.1 if @scale < 1
+    @scale = 1 if @scale > 1
   end
 
   def draw
     Game.text_helper.write_line(Game.text(:ui, :battle_won), Graphics::SCR_W / 2,
-                                Graphics::SCR_H / 2 - (@scale / Graphics::SCALE) * Game.font.height,
+                                Graphics::SCR_H / 2 - @scale * Game.font.height,
                                 :center, 0xffffff, 255, :border, 0, 2 * @scale, 255, Graphics::UI_Z_INDEX, @scale, @scale)
   end
 end
@@ -113,7 +114,7 @@ class StatChangeEffect < ScreenEffect
 
   def draw
     Game.text_helper.write_line(@text, @x - SPACING, @y, :right, @color, 255, :border, 0, 2, 255, Graphics::UI_Z_INDEX)
-    @icon.draw(@x, @y, Graphics::UI_Z_INDEX, Graphics::SCALE * 0.5, Graphics::SCALE * 0.5)
+    @icon.draw(@x, @y, Graphics::UI_Z_INDEX, 0.5, 0.5)
   end
 end
 
@@ -145,8 +146,8 @@ class RecoverEffect < ScreenEffect
   def draw
     color = @lifetime >= 35 ? 0xffffffff : ((@lifetime.to_f / 35 * 255).round << 24) | 0xffffff
     y_offset = ((155 - @lifetime).to_f / 155 * 30).round
-    @hp.draw(@x, @y - 10 - y_offset, Graphics::UI_Z_INDEX, Graphics::SCALE * 0.5, Graphics::SCALE * 0.5, color)
-    @mp.draw(@x + 20, @y - y_offset, Graphics::UI_Z_INDEX, Graphics::SCALE * 0.5, Graphics::SCALE * 0.5, color)
-    @effects.each { |e| e.draw(nil, Graphics::SCALE, Graphics::SCALE, 255, 0xffffff, nil, Graphics::UI_Z_INDEX) }
+    @hp.draw(@x, @y - 10 - y_offset, Graphics::UI_Z_INDEX, 0.5, 0.5, color)
+    @mp.draw(@x + 20, @y - y_offset, Graphics::UI_Z_INDEX, 0.5, 0.5, color)
+    @effects.each { |e| e.draw(nil, 1, 1, 255, 0xffffff, nil, Graphics::UI_Z_INDEX) }
   end
 end

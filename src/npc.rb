@@ -88,7 +88,7 @@ class Npc < IsoGameObject
       G.window.draw_rect(10, y, Graphics::SCR_W - 20, 80, 0xccffffff, Graphics::UI_Z_INDEX)
       Game.text_helper.write_breaking(@texts[@text_index][1], 20, y + 5, Graphics::SCR_W - 40, :justified, 0, 255, Graphics::UI_Z_INDEX)
     elsif @man_in_range
-      @balloon.draw(pos.x + Graphics::TILE_WIDTH / 2 - 14, pos.y - 2 * Physics::V_UNIT + @img_gap.y, @z_index, Graphics::SCALE, Graphics::SCALE)
+      @balloon.draw(pos.x + Graphics::TILE_WIDTH / 2 - 14, pos.y - 2 * Physics::V_UNIT + @img_gap.y, @z_index)
     end
   end
 end

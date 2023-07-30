@@ -31,7 +31,7 @@ class Arc < IsoGameObject
     if man.intersect?(bounds)
       unless @active
         Game.player_stats.recover
-        @screen.add_effect(RecoverEffect.new(@screen_x + @img[0].width / 2 * Graphics::SCALE - 30, @screen_y - 50))
+        @screen.add_effect(RecoverEffect.new(@screen_x + @img[0].width / 2 - 30, @screen_y - 50))
         @active = true
       end
     else

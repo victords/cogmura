@@ -2,13 +2,12 @@ class Hud
   include MiniGL
 
   def initialize
-    scale = Graphics::SCALE
     @panel = Panel.new(0, Graphics::V_OFFSET + 20, 600, 90, [
-      PanelImage.new(20, 0, :icon_hp, 0.5 * scale, 0.5 * scale, :left),
-      Label.new(340, 0, Game.font, hp_text, 0, 0, 0.5 * scale, 0.5 * scale, :right),
-      PanelImage.new(340, 0, :icon_mp, 0.5 * scale, 0.5 * scale, :left),
-      Label.new(20, 0, Game.font, mp_text, 0, 0, 0.5 * scale, 0.5 * scale, :right),
-    ], :ui_panel, :tiled, false, scale, scale, :top)
+      PanelImage.new(20, 0, :icon_hp, 0.5, 0.5, :left),
+      Label.new(340, 0, Game.font, hp_text, 0, 0, 0.5, 0.5, :right),
+      PanelImage.new(340, 0, :icon_mp, 0.5, 0.5, :left),
+      Label.new(20, 0, Game.font, mp_text, 0, 0, 0.5, 0.5, :right),
+    ], :ui_panel, :tiled, false, 1, 1, :top)
     @alpha = 255
     show
 

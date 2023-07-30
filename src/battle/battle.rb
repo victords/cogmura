@@ -33,13 +33,13 @@ module Battle
 
       # UI
       @panel = Panel.new(50, 50 + Graphics::V_OFFSET, 300, 10 + 4 * 54, (@labels = [
-        Label.new(10, 10, Game.font, 'Attack', 0, 0, 0.5 * Graphics::SCALE, 0.5 * Graphics::SCALE),
-        Label.new(10, 10 + 54, Game.font, 'Technique', 0, 0, 0.5 * Graphics::SCALE, 0.5 * Graphics::SCALE),
-        Label.new(10, 10 + 2 * 54, Game.font, 'Item', 0, 0, 0.5 * Graphics::SCALE, 0.5 * Graphics::SCALE),
-        Label.new(10, 10 + 3 * 54, Game.font, 'Flee', 0, 0, 0.5 * Graphics::SCALE, 0.5 * Graphics::SCALE)
+        Label.new(10, 10, Game.font, 'Attack', 0, 0, 0.5, 0.5),
+        Label.new(10, 10 + 54, Game.font, 'Technique', 0, 0, 0.5, 0.5),
+        Label.new(10, 10 + 2 * 54, Game.font, 'Item', 0, 0, 0.5, 0.5),
+        Label.new(10, 10 + 3 * 54, Game.font, 'Flee', 0, 0, 0.5, 0.5)
       ]) + [
         @flee_balloon = Balloon.new(290, 6 + 3 * 54, '')
-      ], :ui_panel, :tiled, false, Graphics::SCALE, Graphics::SCALE)
+      ], :ui_panel, :tiled, false)
       @flee_balloon.visible = false
       @target_arrow = Res.imgs(:ui_arrow, 2, 2)[2]
       @effects = []
@@ -105,16 +105,16 @@ module Battle
       controls = @player.stats.items.map do |(item_type, amount)|
         y += 54
         name = Game.text(:ui, "item_#{item_type}")
-        name_size = Game.font.text_width(name) * 0.5 * Graphics::SCALE
+        name_size = Game.font.text_width(name) * 0.5
         name_scale = name_size > 200 ? 200.0 / name_size : 1
         [
-          PanelImage.new(10, y, "icon_#{item_type}", Graphics::SCALE, Graphics::SCALE),
-          Label.new(64, y, Game.font, name, 0, 0, 0.5 * Graphics::SCALE * name_scale, 0.5 * Graphics::SCALE * name_scale),
-          Label.new(10, y, Game.font, amount.to_s, 0, 0, 0.5 * Graphics::SCALE, 0.5 * Graphics::SCALE, :top_right)
+          PanelImage.new(10, y, "icon_#{item_type}"),
+          Label.new(64, y, Game.font, name, 0, 0, 0.5 * name_scale, 0.5 * name_scale),
+          Label.new(10, y, Game.font, amount.to_s, 0, 0, 0.5, 0.5, :top_right)
         ]
       end.flatten
       @item_panel = Panel.new(@panel.x + @panel.w, @panel.y + 2 * 54, 300, 10 + @player.stats.items.size * 54, controls,
-                              :ui_panel, :tiled, true, Graphics::SCALE, Graphics::SCALE)
+                              :ui_panel, :tiled, true)
     end
 
     def finish(result)
@@ -241,7 +241,7 @@ module Battle
         G.window.draw_rect(@panel.x + 10, y, @panel.w - 20, 44, 0x33000000, ui_z)
       when :choosing_target
         target = @targets[@action_index]
-        @target_arrow.draw(target.screen_x + target.img_size.x / 2 - 24, target.screen_y - 58, ui_z, Graphics::SCALE, Graphics::SCALE)
+        @target_arrow.draw(target.screen_x + target.img_size.x / 2 - 24, target.screen_y - 58, ui_z)
       when :choosing_item
         @panel.draw(255, ui_z)
         @item_panel.draw(255, ui_z)

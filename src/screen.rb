@@ -57,7 +57,7 @@ class Screen
     File.open("#{Res.prefix}map/#{id}") do |f|
       info, entrances, exits, spawn_points, objects, tiles = f.read.split('#')
       info = info.split(',')
-      @tileset = Res.tileset(info[0], t_w / Graphics::SCALE, t_h / Graphics::SCALE)
+      @tileset = Res.tileset(info[0], t_w, t_h)
       fill = info[1]
 
       @entrances = entrances.split(';').map { |e| e.split(',').map(&:to_f) }
@@ -204,6 +204,8 @@ class Screen
     @effects << effect
   end
 
+  def battle?; !!@battle; end
+
   def update
     battle_start = false
     @effects.reverse_each do |e|
@@ -272,8 +274,8 @@ class Screen
     @map.foreach do |i, j, x, y|
       next unless @tiles[i][j]
 
-      @tileset[@tiles[i][j]].draw(x, y + Graphics::V_OFFSET, 0, Graphics::SCALE, Graphics::SCALE)
-      @grid.draw(x, y + Graphics::V_OFFSET, 0, Graphics::SCALE, Graphics::SCALE) if @grid
+      @tileset[@tiles[i][j]].draw(x, y + Graphics::V_OFFSET, 0)
+      @grid.draw(x, y + Graphics::V_OFFSET, 0) if @grid
     end
     @blocks.each { |b| b.draw(@map, @man) }
     @objects.each { |o| o.draw(@map) unless o.drawn? }

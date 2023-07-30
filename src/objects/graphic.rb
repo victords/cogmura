@@ -25,7 +25,7 @@ class Graphic
     @img.draw(
       @pos.x + 0.5 * Graphics::TILE_WIDTH + @img_gap.x,
       @pos.y + 0.5 * Graphics::TILE_HEIGHT + @img_gap.y - @z + Graphics::V_OFFSET,
-      @z_index, Graphics::SCALE, Graphics::SCALE
+      @z_index
     )
   end
 

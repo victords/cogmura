@@ -7,7 +7,7 @@ include MiniGL
 class Balloon < Component
   attr_writer :text
 
-  def initialize(x, y, text, type = :left, scale_x = Graphics::SCALE, scale_y = Graphics::SCALE, anchor = nil)
+  def initialize(x, y, text, type = :left, scale_x = 1, scale_y = 1, anchor = nil)
     super(x, y, Game.font, text, 0, 0)
     @image = Res.imgs("ui_balloon#{type.to_s.capitalize}", 2, 1)
     @scale_x = scale_x
