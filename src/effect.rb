@@ -36,8 +36,8 @@ class TextEffect < ScreenEffect
 end
 
 class ItemPickUpEffect < TextEffect
-  def initialize(item_type)
-    name = Game.text(:ui, "item_#{item_type}")
+  def initialize(item_key)
+    name = Game.text(:ui, "item_#{item_key}")
     article = %w(a e i o u).any? { |v| name.downcase.start_with?(v) } ? 'an' : 'a'
     super(:item_pick_up, article, name)
   end

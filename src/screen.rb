@@ -139,9 +139,9 @@ class Screen
     end
   end
 
-  def on_item_picked_up(item_type)
-    Game.player_stats.add_item(item_type)
-    @effects << ItemPickUpEffect.new(item_type)
+  def on_item_picked_up(item_key)
+    Game.player_stats.add_item(item_key)
+    @effects << ItemPickUpEffect.new(item_key)
   end
 
   def on_money_picked_up(amount)

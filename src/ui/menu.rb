@@ -100,7 +100,7 @@ class Menu
         @select_index += 2
       elsif KB.key_pressed?(Gosu::KB_Z)
         item_key = Game.player_stats.items.keys[@select_index]
-        if Game.items[item_key][:type] == :heal
+        if Game.items[item_key][:type].include?(:heal)
           Game.player_stats.use_item(InventoryItem.new(item_key), Game.player_stats)
         end
       end

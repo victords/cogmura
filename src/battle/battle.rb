@@ -45,13 +45,14 @@ module Battle
       @effects = []
       set_flee_probability
 
-      @state = :choosing_action
       @action_index = 0
       @enemy_index = 0
       @xp_earned = 0
       @money_earned = 0
 
       @on_finish = on_finish
+
+      start_player_turn
     end
 
     def on_player_hp_change(_, delta)
@@ -76,12 +77,24 @@ module Battle
       @flee_balloon.text = Game.text(:ui, :flee_prob, "#{(@flee_probability * 100).round}%")
     end
 
+    def start_player_turn
+      @state = :choosing_action
+      @player.stats.apply_status
+    end
+
+    def start_enemy_turn
+      @state = :enemy_turn
+      return if @enemies.empty?
+
+      @enemies[@enemy_index].stats.apply_status
+    end
+
     def player_attack(enemy)
       @state = :animating
       @player.attack_animation(Vector.new(enemy.x - Physics::UNIT, enemy.y + Physics::UNIT), lambda {
         enemy.stats.take_damage([@player.stats.strength - enemy.stats.defense, 0].max)
       }, lambda {
-        @state = :enemy_turn
+        start_enemy_turn
       })
     end
 
@@ -93,9 +106,9 @@ module Battle
         @enemy_index += 1
         if @enemy_index >= @enemies.size
           @enemy_index = 0
-          @state = :choosing_action
+          start_player_turn
         else
-          @state = :enemy_turn
+          start_enemy_turn
         end
       })
     end
@@ -120,6 +133,7 @@ module Battle
     def finish(result)
       @player.stats.xp += @xp_earned
       @player.stats.money += @money_earned
+      @player.stats.remove_boost
       @on_finish.call(result)
     end
 
@@ -175,7 +189,7 @@ module Battle
             if rand <= @flee_probability
               finish(:fled)
             else
-              @effects << TextEffect.new(:flee_fail) { @state = :enemy_turn }
+              @effects << TextEffect.new(:flee_fail) { start_enemy_turn }
               @state = :showing_message
             end
           end
@@ -204,10 +218,11 @@ module Battle
         if KB.key_pressed?(Gosu::KB_SPACE) || KB.key_pressed?(Gosu::KB_RETURN)
           item = InventoryItem.new(@player.stats.items.keys[@action_index])
           @targets = item.target_type == :ally ? @allies : @enemies
-          @target_callback = lambda { |target|
+          @target_callback = lambda do |target|
             Game.player_stats.use_item(item, target.stats)
-            @state = :enemy_turn
-          }
+            start_enemy_turn
+          end
+          @action_index = 0
           @state = :choosing_target
         elsif KB.key_pressed?(Gosu::KB_DOWN) || KB.key_held?(Gosu::KB_DOWN)
           @action_index += 1

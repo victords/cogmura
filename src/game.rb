@@ -40,9 +40,9 @@ class Game
           parts = line.split("\t")
           data = parts[-1].chomp.split(',')
           @items[parts[0].to_sym] = {
-            type: data[0].to_sym,
+            type: data[0].split('|').map(&:to_sym),
             target: data[1].to_sym,
-            amount: data[2]&.to_i
+            params: data[2].split('|')
           }
         end
       end

@@ -10,6 +10,7 @@ class PlayerStats < Stats
     @xp = 0
     @level = 1
     @money = 0
+    @hp_boost = 0
 
     @items = {}
     @techniques = []
@@ -22,20 +23,20 @@ class PlayerStats < Stats
     @on_items_change = []
   end
 
-  def add_item(item_type)
-    @items[item_type] ||= 0
-    @items[item_type] += 1
+  def add_item(key)
+    @items[key] ||= 0
+    @items[key] += 1
     @on_items_change.each(&:call)
   end
 
-  def remove_item(item_type)
-    @items[item_type] -= 1
-    @items.delete(item_type) if @items[item_type] <= 0
+  def remove_item(key)
+    @items[key] -= 1
+    @items.delete(key) if @items[key] <= 0
     @on_items_change.each(&:call)
   end
 
   def use_item(item, target)
-    remove_item(item.type)
+    remove_item(item.key)
     item.use(target)
   end
 
@@ -66,6 +67,19 @@ class PlayerStats < Stats
     change_hp(hp_delta) if hp_delta > 0
     mp_delta = @max_mp - @mp
     change_mp(mp_delta) if mp_delta > 0
+  end
+
+  def boost(percent)
+    amount = (percent.to_f / 100 * @max_hp).round
+    @hp_boost += amount
+    @max_hp += amount
+    change_hp(amount)
+  end
+
+  def remove_boost
+    @max_hp -= @hp_boost
+    change_hp(-@hp_boost)
+    @hp_boost = 0
   end
 
   private

@@ -8,6 +8,8 @@ class Stats
     @strength = strength
     @defense = defense
 
+    @status = []
+
     # events
     @on_hp_change = []
     @on_mp_change = []
@@ -25,5 +27,13 @@ class Stats
   def change_mp(delta)
     @mp = [[@mp + delta, 0].max, @max_mp].min
     @on_mp_change.each { |c| c.call(@mp, delta) }
+  end
+
+  def apply_status
+    @status.each { |s| s.update(self) }
+  end
+
+  def remove_bad_status
+    @status.delete_if(&:bad?)
   end
 end
