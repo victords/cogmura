@@ -43,6 +43,6 @@ class Box < IsoGameObject
     super
 
     return unless @in_range && !@opened
-    Res.img(:fx_alert).draw(@screen_x + @img[0].width / 2 - 4, @screen_y - 28, @z_index + 1)
+    Res.img(:fx_alert).draw(@screen_x + 32, @screen_y - 28, Graphics::UI_Z_INDEX)
   end
 end

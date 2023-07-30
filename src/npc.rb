@@ -6,7 +6,7 @@ class Npc < IsoGameObject
   ID_MAP = [
     [:cogjian, -38, -128]
   ].freeze
-  RANGE = 1.5 * Physics::UNIT
+  RANGE = Physics::UNIT
 
   attr_reader :man_in_range
 
@@ -88,7 +88,7 @@ class Npc < IsoGameObject
       G.window.draw_rect(10, y, Graphics::SCR_W - 20, 80, 0xccffffff, Graphics::UI_Z_INDEX)
       Game.text_helper.write_breaking(@texts[@text_index][1], 20, y + 5, Graphics::SCR_W - 40, :justified, 0, 255, Graphics::UI_Z_INDEX)
     elsif @man_in_range
-      @balloon.draw(pos.x + Graphics::TILE_WIDTH / 2 - 14, pos.y - 2 * Physics::V_UNIT + @img_gap.y, @z_index)
+      @balloon.draw(@screen_x + @img[0].width / 2 - 28, @screen_y - 58, Graphics::UI_Z_INDEX)
     end
   end
 end
