@@ -54,7 +54,7 @@ class Screen
     @enemies = []
     @effects = []
 
-    File.open("#{Res.prefix}map/#{id}") do |f|
+    File.open("#{Res.prefix}screen/#{id}") do |f|
       info, entrances, exits, spawn_points, objects, tiles = f.read.split('#')
       info = info.split(',')
       @tileset = Res.tileset(info[0], t_w, t_h)
@@ -88,7 +88,7 @@ class Screen
         when 'n'
           @npcs << Npc.new(d[0], d[1], d[2], d[3])
         when 'w' # invisible block
-          @blocks << IsoBlock.new(nil, d[0], d[1], 0, d[2], d[3])
+          @blocks << IsoBlock.new(nil, d[0], d[1], 0, d[2], d[3], 999, d[4])
         when 'x'
           @objects << Box.new(d[0].to_i, d[1].to_i, d[2].to_i, d[3], self)
         when '['
@@ -129,7 +129,7 @@ class Screen
     @overlay_alpha = 255
 
     # TODO remove later
-    # @grid = Res.img(:grid)
+    @grid = Res.img(:grid)
   end
 
   def on_player_leave(exit_obj)
