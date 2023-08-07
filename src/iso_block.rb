@@ -7,19 +7,20 @@ class IsoBlock
   FADE_DURATION = 15.0
 
   TYPE_MAP = [
-    [1, 1, 1, :block1, 0, 0],       # 0
-    [4, 6, 7, :house1, -10, -40],   # 1
-    [3, 3, 7, :house2, -10, -64],   # 2
-    [1, 1, 15, :tree1, -128, 0],    # 3
-    [3, 2, 2, :bed1, 0, -16],       # 4
-    [1, 1, 7, :bedtable1, 0, 48],   # 5
-    [1, 10, 7, :wall1, 0, -32],     # 6
-    [6, 1, 7, :wall2, 0, -32],      # 7
-    [4, 1, 7, :wall3, 0, 0],        # 8
-    [1, 1, 7, :wall4, 0, 0],        # 9
-    [1, 2, 7, :rack1, -4, 96],      # 10
-    [2, 2, 2, :table1, 0, 0],       # 11
-    [4, 6, 7, :house3, -10, -136],  # 12
+    [1, 1, 1, :block1, 0, 0],          # 0
+    [4, 6, 7, :house1, -10, -40],      # 1
+    [3, 3, 7, :house2, -10, -64],      # 2
+    [1, 1, 15, :tree1, -128, 0],       # 3
+    [3, 2, 2, :bed1, 0, -16],          # 4
+    [1, 1, 7, :bedtable1, 0, 48],      # 5
+    [1, 10, 7, :wall1, 0, -32],        # 6
+    [6, 1, 7, :wall2, 0, -32],         # 7
+    [4, 1, 7, :wall3, 0, 0],           # 8
+    [1, 1, 7, :wall4, 0, 0],           # 9
+    [1, 2, 7, :rack1, -4, 96],         # 10
+    [2, 2, 2, :table1, 0, 0],          # 11
+    [4, 6, 7, :house3, -10, -136],     # 12
+    [6, 2, 7, :house4, -10, -136, true], # 13
   ].freeze
 
   attr_reader :x, :y, :z, :w, :h, :height, :ramps, :z_index
@@ -45,7 +46,7 @@ class IsoBlock
     image = img_id && Res.img("block_#{img_id}")
     if angled
       @img = image
-      @z_index = col + row + (layer / 3) + 3
+      @z_index = 100 * (col + row + 2 * y_tiles) + 10 * layer
       @ramps = []
       x = col * unit
       (0...x_tiles).each do |i|
