@@ -7,20 +7,22 @@ class IsoBlock
   FADE_DURATION = 15.0
 
   TYPE_MAP = [
-    [1, 1, 1, :block1, 0, 0],          # 0
-    [4, 6, 7, :house1, -10, -40],      # 1
-    [3, 3, 7, :house2, -10, -64],      # 2
-    [1, 1, 15, :tree1, -128, 0],       # 3
-    [3, 2, 2, :bed1, 0, -16],          # 4
-    [1, 1, 7, :bedtable1, 0, 48],      # 5
-    [1, 10, 7, :wall1, 0, -32],        # 6
-    [6, 1, 7, :wall2, 0, -32],         # 7
-    [4, 1, 7, :wall3, 0, 0],           # 8
-    [1, 1, 7, :wall4, 0, 0],           # 9
-    [1, 2, 7, :rack1, -4, 96],         # 10
-    [2, 2, 2, :table1, 0, 0],          # 11
-    [4, 6, 7, :house3, -10, -136],     # 12
+    [1, 1, 1, :block1, 0, 0],            # 0
+    [4, 6, 7, :house1, -10, -40],        # 1
+    [3, 3, 7, :house2, -10, -64],        # 2
+    [1, 1, 15, :tree1, -128, 0],         # 3
+    [3, 2, 2, :bed1, 0, -16],            # 4
+    [1, 1, 7, :bedtable1, 0, 48],        # 5
+    [1, 10, 7, :wall1, 0, -32],          # 6
+    [6, 1, 7, :wall2, 0, -32],           # 7
+    [4, 1, 7, :wall3, 0, 0],             # 8
+    [1, 1, 7, :wall4, 0, 0],             # 9
+    [1, 2, 7, :rack1, -4, 96],           # 10
+    [2, 2, 2, :table1, 0, 0],            # 11
+    [4, 6, 7, :house3, -10, -136],       # 12
     [6, 2, 7, :house4, -10, -136, true], # 13
+    [2, 1, 1, :balcony1, 0, 0, true],    # 14
+    [2, 1, 10, :fence1, 0, 192, true],   # 15
   ].freeze
 
   attr_reader :x, :y, :z, :w, :h, :height, :ramps, :z_index
@@ -57,6 +59,13 @@ class IsoBlock
         @ramps << Ramp.new(x + i * unit, @y + (i + 1) * unit, unit, unit, true, true)
         @ramps << Ramp.new(x + (x_tiles + i) * unit, @y + (i - x_tiles + 1) * unit, unit, unit, false, false)
       end
+      @rects = []
+      (0...y_tiles).each do |j|
+        (0...x_tiles).each do |i|
+          @rects << Rectangle.new(x + (i + j + 1) * unit, @y + (j - i) * unit, unit, unit) if i < x_tiles - 1
+          @rects << Rectangle.new(x + (i + j + 1) * unit, @y + (j - i + 1) * unit, unit, unit) if j < y_tiles - 1
+        end
+      end
     elsif image
       @imgs = (0...(x_tiles + y_tiles - 1)).map do |i|
         img_gap_offset = i == 0 ? 0 : -img_gap_x
@@ -84,7 +93,7 @@ class IsoBlock
 
   def intersect?(obj)
     if @ramps
-      @ramps.any? { |r| r.intersect?(obj) }
+      (@ramps + @rects).any? { |r| r.intersect?(obj) }
     else
       bounds.intersect?(obj)
     end

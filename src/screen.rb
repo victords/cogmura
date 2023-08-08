@@ -29,9 +29,11 @@ class Screen
   FADE_DURATION = 30.0
   M_S = Graphics::MAP_SIZE
 
+  attr_reader :id
   attr_writer :on_exit
 
   def initialize(id, entrance_index = 0)
+    @id = id
     t_w = Graphics::TILE_WIDTH
     t_h = Graphics::TILE_HEIGHT
     @map = Map.new(t_w, t_h, M_S, M_S, M_S * t_w, M_S * t_h, true)
