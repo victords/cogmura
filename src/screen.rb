@@ -29,11 +29,9 @@ class Screen
   FADE_DURATION = 30.0
   M_S = Graphics::MAP_SIZE
 
-  attr_reader :id
   attr_writer :on_exit
 
   def initialize(id, entrance_index = 0)
-    @id = id
     t_w = Graphics::TILE_WIDTH
     t_h = Graphics::TILE_HEIGHT
     @map = Map.new(t_w, t_h, M_S, M_S, M_S * t_w, M_S * t_h, true)
@@ -90,7 +88,7 @@ class Screen
         when 'n'
           @npcs << Npc.new(d[0], d[1], d[2], d[3])
         when 'w' # invisible block
-          @blocks << IsoBlock.new(nil, d[0], d[1], 0, d[2], d[3], 999, d[4])
+          @blocks << IsoBlock.new(nil, d[0], d[1], d[4] || 0, d[2], d[3], 999, d[5])
         when 'x'
           @objects << Box.new(d[0].to_i, d[1].to_i, d[2].to_i, d[3], self)
         when '['

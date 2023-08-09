@@ -19,10 +19,11 @@ class IsoBlock
     [1, 1, 7, :wall4, 0, 0],             # 9
     [1, 2, 7, :rack1, -4, 96],           # 10
     [2, 2, 2, :table1, 0, 0],            # 11
-    [4, 6, 7, :house3, -10, -136],       # 12
-    [6, 2, 7, :house4, -10, -136, true], # 13
+    [3, 4, 7, :house3, -10, -94],        # 12
+    [6, 2, 10, :house4, -10, -40, true], # 13
     [2, 1, 1, :balcony1, 0, 0, true],    # 14
-    [2, 1, 10, :fence1, 0, 192, true],   # 15
+    [2, 1, 10, :fence1, 0, 128, true],   # 15
+    [4, 3, 7, :house5, -10, -94],        # 16
   ].freeze
 
   attr_reader :x, :y, :z, :w, :h, :height, :ramps, :z_index

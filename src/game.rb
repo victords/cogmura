@@ -9,7 +9,7 @@ include MiniGL
 class Game
   class << self
     attr_reader :font, :text_helper, :npc_texts, :on_switch_activated, :player_stats,
-                :enemies, :items, :screen
+                :enemies, :items
 
     def init
       @font = ImageFont.new(:font, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÁÉÍÓÚÀÃÕÂÊÔÑÇáéíóúàãõâêôñç0123456789.,:;!?¡¿/\\()[]+-%'\"$",

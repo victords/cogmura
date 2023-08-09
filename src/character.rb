@@ -5,7 +5,7 @@ include MiniGL
 class Character < IsoGameObject
   SPEED = 4
   SPEED_D = SPEED * 0.7071
-  JUMP_SPEED = 15
+  JUMP_SPEED = 12
   DIR_KEYS = [Gosu::KB_UP, Gosu::KB_RIGHT, Gosu::KB_DOWN, Gosu::KB_LEFT].freeze
 
   attr_reader :grounded
