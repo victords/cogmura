@@ -2,22 +2,22 @@ require_relative '../iso_game_object'
 require_relative '../constants'
 
 class Door < IsoGameObject
+  TYPE_MAP = [
+    [-28, -112],
+    [-59, -96, true],
+  ].freeze
+
   attr_reader :dest_scr, :dest_entr
 
-  # type 0: along iso y-axis
-  # type 1: along iso x-axis
-  # type 2: angled (facing front)
   def initialize(type, dest_scr, dest_entr, col, row, layer, on_open)
-    super(col, row, layer, Physics::UNIT, Physics::UNIT, type == 2 ? :obj_door1a : :obj_door1, Vector.new(-28, type == 2 ? -48 : -112), 5, 1)
-    @type = type
-    @flip = type == 1
+    img_gap_x, img_gap_y, angled = TYPE_MAP[type - 1]
+    super(col, row, layer, Physics::UNIT, Physics::UNIT, "obj_door#{type}", Vector.new(img_gap_x, img_gap_y), 5, 1)
     @dest_scr = dest_scr
     @dest_entr = dest_entr
     @on_open = on_open
+    return if angled
 
-    if type != 2
-      @sub_img = @img.map { |img| img.subimage(0, 0, img.width / 2, img.height) }
-    end
+    @sub_img = @img.map { |img| img.subimage(0, 0, img.width / 2, img.height) }
   end
 
   def collide?
@@ -40,7 +40,7 @@ class Door < IsoGameObject
 
   def draw(map)
     prev_z_index = @z_index
-    super(map, @z_index - 200)
+    super(map, @z_index - (@sub_img ? 200 : 100))
     @z_index = prev_z_index
 
     if @can_open && !@opening
@@ -49,7 +49,6 @@ class Door < IsoGameObject
 
     return unless @sub_img
 
-    x_offset = @type == 0 ? 0 : @img[0].width
-    @sub_img[@img_index].draw(@screen_x + x_offset, @screen_y, @z_index - 100, @type == 0 ? 1 : -1)
+    @sub_img[@img_index].draw(@screen_x, @screen_y, @z_index - 100)
   end
 end
