@@ -20,13 +20,51 @@ class ScreenEffect
 end
 
 class TextEffect < ScreenEffect
+  HEIGHT = 54
+  SPACING = 10
+
+  attr_writer :y
+
+  class << self
+    def instances
+      @instances ||= []
+    end
+
+    def add(instance)
+      instances << instance
+      update_instances
+    end
+
+    def remove(instance)
+      instances.delete(instance)
+      update_instances
+    end
+
+    def update_instances
+      y = base_y
+      instances.each do |i|
+        i.y = y
+        y += HEIGHT + SPACING
+      end
+    end
+
+    def base_y
+      (Graphics::SCR_H - (instances.size * HEIGHT) - ((instances.size - 1) * SPACING)) / 2
+    end
+  end
+
   def initialize(text_id, *args)
     super(120)
     @text = Game.text(:ui, text_id, *args)
     @width = Game.font.text_width(@text) * 0.5 + 40
     @height = Game.font.height * 0.5 + 10
     @x = (Graphics::SCR_W - @width) / 2
-    @y = (Graphics::SCR_H - @height) / 2
+    TextEffect.add(self)
+  end
+
+  def update
+    super
+    TextEffect.remove(self) if @destroyed
   end
 
   def draw
