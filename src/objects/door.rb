@@ -4,7 +4,7 @@ require_relative '../constants'
 class Door < IsoGameObject
   TYPE_MAP = [
     [-28, -112],
-    [-59, -96, true],
+    [-79, -128, true],
   ].freeze
 
   attr_reader :dest_scr, :dest_entr
