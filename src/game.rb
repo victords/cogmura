@@ -1,5 +1,6 @@
 require 'set'
 require_relative 'player_stats'
+require_relative 'screen'
 require_relative 'ui/hud'
 require_relative 'ui/menu'
 require_relative 'ui/message'

@@ -1,18 +1,20 @@
 require 'minigl'
 require_relative 'constants'
-require_relative 'screen'
 require_relative 'game'
 
 include MiniGL
 
 class Cogmura < GameWindow
   def initialize
-    super(1920, 1080, true)
+    super(Graphics::SCR_W, Graphics::SCR_H, true)
 
     Res.prefix = File.expand_path(__FILE__).split('/')[0..-3].join('/') + '/data'
-    Res.retro_images = true
 
     Game.init
+  end
+
+  def needs_cursor?
+    false
   end
 
   def update
