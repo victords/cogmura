@@ -5,13 +5,14 @@ class Door < IsoGameObject
   TYPE_MAP = [
     [-28, -112],
     [-79, -128, true],
+    [-28, -120, true],
   ].freeze
 
   attr_reader :dest_scr, :dest_entr
 
   def initialize(type, dest_scr, dest_entr, col, row, layer, on_open)
     img_gap_x, img_gap_y, angled = TYPE_MAP[type - 1]
-    super(col, row, layer, Physics::UNIT, Physics::UNIT, "obj_door#{type}", Vector.new(img_gap_x, img_gap_y), 5, 1)
+    super(col, row, layer, Physics::UNIT, Physics::UNIT, "obj_door#{type}", Vector.new(img_gap_x, img_gap_y), 4, 1)
     @dest_scr = dest_scr
     @dest_entr = dest_entr
     @on_open = on_open
@@ -26,7 +27,7 @@ class Door < IsoGameObject
 
   def update(man)
     if @opening
-      animate_once([1, 2, 3, 4], 7)
+      animate_once([1, 2, 3], 7)
     elsif man.bounds.intersect?(bounds)
       @can_open = true
       if KB.key_pressed?(Gosu::KB_Z)
