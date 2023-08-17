@@ -5,11 +5,23 @@ require_relative 'game'
 include MiniGL
 
 class EditorScreen < Screen
+  TRANSLUCENT_RED = 0x80ff0000
+
   def initialize(id)
     super
     @fading = nil
     @overlay_alpha = 0
     @grid = Res.img(:grid)
+  end
+
+  def draw
+    super
+    map_pos = @map.get_map_pos(Mouse.x, Mouse.y)
+    pos = @map.get_screen_pos(map_pos.x, map_pos.y)
+    G.window.draw_quad(pos.x + Graphics::TILE_WIDTH / 2, pos.y, TRANSLUCENT_RED,
+                       pos.x + Graphics::TILE_WIDTH, pos.y + Graphics::TILE_HEIGHT / 2, TRANSLUCENT_RED,
+                       pos.x + Graphics::TILE_WIDTH / 2, pos.y + Graphics::TILE_HEIGHT, TRANSLUCENT_RED,
+                       pos.x, pos.y + Graphics::TILE_HEIGHT / 2, TRANSLUCENT_RED, Graphics::UI_Z_INDEX)
   end
 end
 

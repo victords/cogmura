@@ -30,7 +30,7 @@ class Bed < IsoBlock
         screen_pos = map.get_screen_pos(@col, @row)
         screen_width = (@x_tiles + @y_tiles) * Graphics::TILE_WIDTH / 2
         @alert_screen_x = screen_pos.x - ((@y_tiles - 1) * Graphics::TILE_WIDTH / 2) + screen_width / 2 - @alert.width / 2
-        @alert_screen_y = screen_pos.y + Graphics::TILE_HEIGHT / 2 - @z - @height - @alert.height + Graphics::V_OFFSET
+        @alert_screen_y = screen_pos.y + Graphics::TILE_HEIGHT / 2 - @z - @height - @alert.height
       end
       @alert.draw(@alert_screen_x, @alert_screen_y, Graphics::UI_Z_INDEX)
     end

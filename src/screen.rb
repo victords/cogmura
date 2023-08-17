@@ -35,7 +35,7 @@ class Screen
     t_w = Graphics::TILE_WIDTH
     t_h = Graphics::TILE_HEIGHT
     @map = Map.new(t_w, t_h, M_S, M_S, M_S * t_w, M_S * t_h, true)
-    @map.set_camera(M_S / 4.0 * t_w, M_S / 4.0 * t_h)
+    @map.set_camera(M_S / 4.0 * t_w, M_S / 4.0 * t_h - Graphics::V_OFFSET)
 
     @tiles = Array.new(M_S) { Array.new(M_S) }
     @blocks = [
@@ -274,8 +274,8 @@ class Screen
     @map.foreach do |i, j, x, y|
       next unless @tiles[i][j]
 
-      @tileset[@tiles[i][j]].draw(x, y + Graphics::V_OFFSET, 0)
-      @grid.draw(x, y + Graphics::V_OFFSET, 0) if @grid
+      @tileset[@tiles[i][j]].draw(x, y, 0)
+      @grid.draw(x, y, 0) if @grid
     end
     @blocks.each { |b| b.draw(@map, @man) }
     @objects.each { |o| o.draw(@map) unless o.drawn? }

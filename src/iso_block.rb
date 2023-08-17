@@ -104,14 +104,14 @@ class IsoBlock
     pos = map.get_screen_pos(@col, @row)
     if @img
       x = pos.x + @img_gap.x
-      y = pos.y + Graphics::TILE_HEIGHT / 2 - @z - @height + @img_gap.y + Graphics::V_OFFSET
+      y = pos.y + Graphics::TILE_HEIGHT / 2 - @z - @height + @img_gap.y
       behind = man_behind(man, x, x + @img.width, y, @z_index)
       update_alpha(behind)
       color = (@alpha << 24) | 0xffffff
       @img.draw(x, y, @z_index, 1, 1, color)
     elsif @imgs
       x = pos.x - ((@y_tiles - 1) * Graphics::TILE_WIDTH / 2)
-      y = pos.y - @z - @height + @img_gap.y + Graphics::V_OFFSET
+      y = pos.y - @z - @height + @img_gap.y
       behind =
         (0...@imgs.size).any? do |i|
           x1 = x + (i >= @x_tiles ? (i + 1) : i) * Graphics::TILE_WIDTH / 2 + (i == 0 ? @img_gap.x : 0)

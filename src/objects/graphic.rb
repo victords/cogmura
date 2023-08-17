@@ -24,7 +24,7 @@ class Graphic
   def draw(map)
     @img.draw(
       @pos.x + 0.5 * Graphics::TILE_WIDTH + @img_gap.x,
-      @pos.y + 0.5 * Graphics::TILE_HEIGHT + @img_gap.y - @z + Graphics::V_OFFSET,
+      @pos.y + 0.5 * Graphics::TILE_HEIGHT + @img_gap.y - @z,
       @z_index
     )
   end
