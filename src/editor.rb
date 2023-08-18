@@ -1,4 +1,5 @@
 require 'minigl'
+require 'gosu'
 require_relative 'constants'
 require_relative 'game'
 require_relative 'character'
@@ -25,32 +26,55 @@ class EditorScreen < Screen
     super
     map_pos = @map.get_map_pos(Mouse.x, Mouse.y)
     pos = @map.get_screen_pos(map_pos.x, map_pos.y)
-    G.window.draw_quad(pos.x + Graphics::TILE_WIDTH / 2, pos.y, TRANSLUCENT_RED,
-                       pos.x + Graphics::TILE_WIDTH, pos.y + Graphics::TILE_HEIGHT / 2, TRANSLUCENT_RED,
-                       pos.x + Graphics::TILE_WIDTH / 2, pos.y + Graphics::TILE_HEIGHT, TRANSLUCENT_RED,
-                       pos.x, pos.y + Graphics::TILE_HEIGHT / 2, TRANSLUCENT_RED, Graphics::UI_Z_INDEX)
+    G.window.draw_quad(pos.x + T_W / 2, pos.y, TRANSLUCENT_RED,
+                       pos.x + T_W, pos.y + T_H / 2, TRANSLUCENT_RED,
+                       pos.x + T_W / 2, pos.y + T_H, TRANSLUCENT_RED,
+                       pos.x, pos.y + T_H / 2, TRANSLUCENT_RED, Graphics::UI_Z_INDEX)
   end
 end
 
 class Editor < GameWindow
+  T_W = Graphics::TILE_WIDTH
+  T_H = Graphics::TILE_HEIGHT
+  UI_Z = Graphics::UI_Z_INDEX
+
   def initialize
     super(Graphics::SCR_W, Graphics::SCR_H, true)
     Res.prefix = File.expand_path(__FILE__).split('/')[0..-3].join('/') + '/data'
     Game.init
     @screen = EditorScreen.new
+
+    @tilesets = Dir["#{Res.prefix}tileset/*"].sort.map { |s| s.split('/').last.chomp('.png') }
+    @tileset_index = 0
+
+    @font = Gosu::Font.new(24, name: 'DejaVu Sans')
+    @panels = [
+      Panel.new(10, 10, 2 * T_W + 20, 7 * T_H + 80, [
+        Button.new(x: -30, y: 10, font: @font, text: '<', img: :ui_button, anchor: :bottom),
+        Button.new(x: 30, y: 10, font: @font, text: '>', img: :ui_button, anchor: :bottom),
+      ], :ui_panel, :tiled)
+    ]
+    @panel_index = 0
   end
 
   def update
     KB.update
     Mouse.update
 
+    @panels[@panel_index].update
+
     close if KB.key_pressed?(Gosu::KB_ESCAPE)
   end
 
   def draw
     @screen.draw
-    G.window.draw_rect(0, 0, G.window.width, Graphics::V_OFFSET, 0xff000000, Graphics::UI_Z_INDEX)
-    G.window.draw_rect(0, G.window.height - Graphics::V_OFFSET, G.window.width, Graphics::V_OFFSET, 0xff000000, Graphics::UI_Z_INDEX)
+    G.window.draw_rect(0, 0, G.window.width, Graphics::V_OFFSET, 0xff000000, UI_Z)
+    G.window.draw_rect(0, G.window.height - Graphics::V_OFFSET, G.window.width, Graphics::V_OFFSET, 0xff000000, UI_Z)
+
+    @panels[@panel_index].draw(153, UI_Z)
+    Res.tileset(@tilesets[@tileset_index], T_W, T_H).each_with_index do |tile, i|
+      tile.draw(@panels[0].x + 10 + (i % 2) * T_W, @panels[0].y + 10 + (i / 2) * T_H, UI_Z)
+    end
   end
 end
 
