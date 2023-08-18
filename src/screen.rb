@@ -69,14 +69,14 @@ class Screen
 
       objects.split(';').each do |o|
         d = o[1..].split(',')
-        d = d.map(&:to_i) unless o[0] == 'd' || o[0] == 'x'
+        d = d.map(&:to_i) unless o[0] == 'x'
         case o[0]
         when 'a'
           @objects << Arc.new(d[0], d[1], d[2], d[3], self)
         when 'b' # textured block
           @blocks << IsoBlock.new(d[0], d[1], d[2], d[3])
         when 'd'
-          @objects << Door.new(d[0].to_i, d[1].to_i, d[2].to_i, d[3].to_f, d[4].to_f, d[5].to_i, method(:on_player_leave))
+          @objects << Door.new(d[0], d[1], d[2], d[3], d[4], d[5], method(:on_player_leave))
         when 'e'
           @enemies << Enemy.new(d[0], d[1], d[2], d[3], method(:on_enemy_encounter))
         when 'g'

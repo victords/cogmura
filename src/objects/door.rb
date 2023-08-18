@@ -12,7 +12,7 @@ class Door < IsoGameObject
 
   def initialize(type, dest_scr, dest_entr, col, row, layer, on_open)
     img_gap_x, img_gap_y, angled = TYPE_MAP[type - 1]
-    super(col, row, layer, Physics::UNIT, Physics::UNIT, "obj_door#{type}", Vector.new(img_gap_x, img_gap_y), 4, 1)
+    super(col + 0.5, row + 0.5, layer, Physics::UNIT, Physics::UNIT, "obj_door#{type}", Vector.new(img_gap_x, img_gap_y), 4, 1)
     @dest_scr = dest_scr
     @dest_entr = dest_entr
     @on_open = on_open
