@@ -28,172 +28,18 @@ end
 class Screen
   FADE_DURATION = 30.0
   M_S = Graphics::MAP_SIZE
+  T_W = Graphics::TILE_WIDTH
+  T_H = Graphics::TILE_HEIGHT
 
   attr_writer :on_exit
 
   def initialize(id, entrance_index = 0)
-    t_w = Graphics::TILE_WIDTH
-    t_h = Graphics::TILE_HEIGHT
-    @map = Map.new(t_w, t_h, M_S, M_S, M_S * t_w, M_S * t_h, true)
-    @map.set_camera(M_S / 4.0 * t_w, M_S / 4.0 * t_h - Graphics::V_OFFSET)
+    init_props
+    load_from_file(id)
+    init_player(entrance_index)
+    init_transition
 
-    @tiles = Array.new(M_S) { Array.new(M_S) }
-    @blocks = [
-      IsoBlock.new(nil, -1, M_S / 2 - 2, -100, 16, 1, 999, true),
-      IsoBlock.new(nil, M_S / 2, M_S - 1, -100, 16, 1, 999, true),
-      IsoBlock.new(nil, -1, M_S / 2, -100, 1, 16, 999, true),
-      IsoBlock.new(nil, M_S / 2, -1, -100, 1, 16, 999, true),
-      IsoBlock.new(nil, -0.5, M_S / 2 - 0.5, -100),
-      IsoBlock.new(nil, M_S / 2 - 0.5, -0.5, -100),
-      IsoBlock.new(nil, M_S / 2 - 0.5, M_S - 0.5, -100),
-      IsoBlock.new(nil, M_S - 0.5, M_S / 2 - 0.5, -100)
-    ]
-    @objects = []
-    @npcs = []
-    @items = []
-    @enemies = []
-    @effects = []
-
-    File.open("#{Res.prefix}screen/#{id}") do |f|
-      info, entrances, exits, spawn_points, objects, tiles = f.read.split('#')
-      info = info.split(',')
-      @tileset = Res.tileset(info[0], t_w, t_h)
-      fill = info[1]
-
-      @entrances = entrances.split(';').map { |e| e.split(',').map(&:to_f) }
-      @exits = exits.split(';').map do |e|
-        d = e.split(',')
-        Exit.new(d[0].to_i, d[1].to_i, d[2].to_f, d[3].to_f, d[4].to_i)
-      end
-      @spawn_points = spawn_points.split(';').map { |p| p.split(',').map(&:to_i) }
-
-      objects.split(';').each do |o|
-        d = o[1..].split(',')
-        d = d.map(&:to_i) unless o[0] == 'x'
-        case o[0]
-        when 'a'
-          @objects << Arc.new(d[0], d[1], d[2], d[3], self)
-        when 'b' # textured block
-          @blocks << IsoBlock.new(d[0], d[1], d[2], d[3])
-        when 'd'
-          @objects << Door.new(d[0], d[1], d[2], d[3], d[4], d[5], method(:on_player_leave))
-        when 'e'
-          @enemies << Enemy.new(d[0], d[1], d[2], d[3], method(:on_enemy_encounter))
-        when 'g'
-          @objects << Graphic.new(@map, d[0], d[1], d[2], d[3])
-        when 'i'
-          @items << Item.new(d[0], d[1], d[2], d[3], method(:on_item_picked_up))
-        when 'l'
-          @objects << Letter.new(@map, d[0], d[1], d[2], d[3], method(:on_message_read))
-        when 'n'
-          @npcs << Npc.new(d[0], d[1], d[2], d[3])
-        when 'w' # invisible block
-          @blocks << IsoBlock.new(nil, d[0], d[1], d[4] || 0, d[2], d[3], 999, d[5])
-        when 'x'
-          @objects << Box.new(d[0].to_i, d[1].to_i, d[2].to_i, d[3], self)
-        when '['
-          bed = Bed.new(d[0], d[1], d[2], d[3], method(:on_sleep_confirm))
-          @objects << bed
-          @blocks << bed
-        end
-      end
-
-      i = M_S / 2 - 1; j = 0
-      tiles.split(';').each do |d|
-        if d[0] == '_'
-          d[1..].to_i.times { i, j = next_tile(i, j) }
-          next
-        end
-
-        tile_type = d.to_i
-        index = d.index('*')
-        num_tiles = index ? d[(index + 1)..].to_i : 1
-        num_tiles.times do
-          @tiles[i][j] = tile_type
-          i, j = next_tile(i, j)
-        end
-      end
-      next unless fill
-
-      while j < M_S - 1 || j == M_S - 1 && i < M_S / 2 + 1
-        @tiles[i][j] = fill.to_i
-        i, j = next_tile(i, j)
-      end
-    end
-
-    entrance = @entrances[entrance_index]
-    @man = Character.new(entrance[0], entrance[1], entrance[2])
-    @man.on_exit = method(:on_player_leave)
-
-    @fading = :in
-    @overlay_alpha = 255
-
-    # TODO remove later
     # @grid = Res.img(:grid)
-  end
-
-  def on_player_leave(exit_obj)
-    @fading = :out
-    @on_fade_end = lambda do
-      @on_exit.call(exit_obj)
-    end
-  end
-
-  def on_item_picked_up(item_key)
-    Game.player_stats.add_item(item_key)
-    @effects << ItemPickUpEffect.new(item_key)
-  end
-
-  def on_money_picked_up(amount)
-    Game.player_stats.money += amount
-    @effects << MoneyPickUpEffect.new(amount)
-  end
-
-  def on_enemy_encounter(enemy)
-    enemy.set_inactive
-    @man.active = false
-    @effects << BattleSplash.new do
-      @battle = Battle.start(@spawn_points[0], enemy.type, @spawn_points[1..]) do |result|
-        @battle = nil
-        @man.active = true
-        case result
-        when :fled
-          enemy.set_active(120)
-        when :victory
-          @enemies.delete(enemy)
-        when :defeat
-          Game.game_over
-        end
-      end
-    end
-  end
-
-  def on_message_read(type, text_id)
-    Game.set_message(type, text_id, [:close])
-  end
-
-  def on_sleep_confirm(price)
-    @sleep_price = price
-    if price > 0
-      Game.set_message(:confirm, :sleep_paid, [:yes, :no], method(:on_sleep), price)
-    else
-      Game.set_message(:confirm, :sleep_free, [:yes, :no], method(:on_sleep))
-    end
-  end
-
-  def on_sleep(option)
-    return unless option == :yes
-
-    if Game.player_stats.money < @sleep_price
-      Game.set_message(:confirm, :not_enough_money, [:ok])
-      return
-    end
-
-    @fading = :out
-    @on_fade_end = lambda do
-      Game.player_stats.recover
-      @fading = :in
-    end
   end
 
   def add_block(col, row, layer, x_tiles, y_tiles, height)
@@ -296,6 +142,113 @@ class Screen
     G.window.draw_rect(0, 0, G.window.width, G.window.height, color, Graphics::UI_Z_INDEX)
   end
 
+  protected
+
+  def init_props
+    @map = Map.new(T_W, T_H, M_S, M_S, M_S * T_W, M_S * T_H, true)
+    @map.set_camera(M_S / 4.0 * T_W, M_S / 4.0 * T_H - Graphics::V_OFFSET)
+
+    @tiles = Array.new(M_S) { Array.new(M_S) }
+    @blocks = [
+      IsoBlock.new(nil, -1, M_S / 2 - 2, -100, 16, 1, 999, true),
+      IsoBlock.new(nil, M_S / 2, M_S - 1, -100, 16, 1, 999, true),
+      IsoBlock.new(nil, -1, M_S / 2, -100, 1, 16, 999, true),
+      IsoBlock.new(nil, M_S / 2, -1, -100, 1, 16, 999, true),
+      IsoBlock.new(nil, -0.5, M_S / 2 - 0.5, -100),
+      IsoBlock.new(nil, M_S / 2 - 0.5, -0.5, -100),
+      IsoBlock.new(nil, M_S / 2 - 0.5, M_S - 0.5, -100),
+      IsoBlock.new(nil, M_S - 0.5, M_S / 2 - 0.5, -100)
+    ]
+    @objects = []
+    @npcs = []
+    @items = []
+    @enemies = []
+    @effects = []
+  end
+
+  def load_from_file(id)
+    File.open("#{Res.prefix}screen/#{id}") do |f|
+      info, entrances, exits, spawn_points, objects, tiles = f.read.split('#')
+      info = info.split(',')
+      @tileset = Res.tileset(info[0], T_W, T_H)
+      fill = info[1]
+
+      @entrances = entrances.split(';').map { |e| e.split(',').map(&:to_f) }
+      @exits = exits.split(';').map do |e|
+        d = e.split(',')
+        Exit.new(d[0].to_i, d[1].to_i, d[2].to_f, d[3].to_f, d[4].to_i)
+      end
+      @spawn_points = spawn_points.split(';').map { |p| p.split(',').map(&:to_i) }
+
+      objects.split(';').each do |o|
+        d = o[1..].split(',')
+        d = d.map(&:to_i) unless o[0] == 'x'
+        case o[0]
+        when 'a'
+          @objects << Arc.new(d[0], d[1], d[2], d[3], self)
+        when 'b' # textured block
+          @blocks << IsoBlock.new(d[0], d[1], d[2], d[3])
+        when 'd'
+          @objects << Door.new(d[0], d[1], d[2], d[3], d[4], d[5], method(:on_player_leave))
+        when 'e'
+          @enemies << Enemy.new(d[0], d[1], d[2], d[3], method(:on_enemy_encounter))
+        when 'g'
+          @objects << Graphic.new(@map, d[0], d[1], d[2], d[3])
+        when 'i'
+          @items << Item.new(d[0], d[1], d[2], d[3], method(:on_item_picked_up))
+        when 'l'
+          @objects << Letter.new(@map, d[0], d[1], d[2], d[3], method(:on_message_read))
+        when 'n'
+          @npcs << Npc.new(d[0], d[1], d[2], d[3])
+        when 'w' # invisible block
+          @blocks << IsoBlock.new(nil, d[0], d[1], d[4] || 0, d[2], d[3], 999, d[5])
+        when 'x'
+          @objects << Box.new(d[0].to_i, d[1].to_i, d[2].to_i, d[3], self)
+        when '['
+          bed = Bed.new(d[0], d[1], d[2], d[3], method(:on_sleep_confirm))
+          @objects << bed
+          @blocks << bed
+        end
+      end
+
+      i = M_S / 2 - 1; j = 0
+      tiles.split(';').each do |d|
+        if d[0] == '_'
+          d[1..].to_i.times { i, j = next_tile(i, j) }
+          next
+        end
+
+        tile_type = d.to_i
+        index = d.index('*')
+        num_tiles = index ? d[(index + 1)..].to_i : 1
+        num_tiles.times do
+          @tiles[i][j] = tile_type
+          i, j = next_tile(i, j)
+        end
+      end
+
+      fill_tiles(fill, i, j) if fill
+    end
+  end
+
+  def fill_tiles(fill, i, j)
+    while j < M_S - 1 || j == M_S - 1 && i < M_S / 2 + 1
+      @tiles[i][j] = fill.to_i
+      i, j = next_tile(i, j)
+    end
+  end
+
+  def init_player(entrance_index)
+    entrance = @entrances[entrance_index]
+    @man = Character.new(entrance[0], entrance[1], entrance[2])
+    @man.on_exit = method(:on_player_leave)
+  end
+
+  def init_transition
+    @fading = :in
+    @overlay_alpha = 255
+  end
+
   private
 
   def next_tile(i, j)
@@ -306,4 +259,72 @@ class Screen
     end
     [i, j]
   end
+
+  # EVENTS ####################################################################
+
+  def on_player_leave(exit_obj)
+    @fading = :out
+    @on_fade_end = lambda do
+      @on_exit.call(exit_obj)
+    end
+  end
+
+  def on_item_picked_up(item_key)
+    Game.player_stats.add_item(item_key)
+    @effects << ItemPickUpEffect.new(item_key)
+  end
+
+  def on_money_picked_up(amount)
+    Game.player_stats.money += amount
+    @effects << MoneyPickUpEffect.new(amount)
+  end
+
+  def on_enemy_encounter(enemy)
+    enemy.set_inactive
+    @man.active = false
+    @effects << BattleSplash.new do
+      @battle = Battle.start(@spawn_points[0], enemy.type, @spawn_points[1..]) do |result|
+        @battle = nil
+        @man.active = true
+        case result
+        when :fled
+          enemy.set_active(120)
+        when :victory
+          @enemies.delete(enemy)
+        when :defeat
+          Game.game_over
+        end
+      end
+    end
+  end
+
+  def on_message_read(type, text_id)
+    Game.set_message(type, text_id, [:close])
+  end
+
+  def on_sleep_confirm(price)
+    @sleep_price = price
+    if price > 0
+      Game.set_message(:confirm, :sleep_paid, [:yes, :no], method(:on_sleep), price)
+    else
+      Game.set_message(:confirm, :sleep_free, [:yes, :no], method(:on_sleep))
+    end
+  end
+
+  def on_sleep(option)
+    return unless option == :yes
+
+    if Game.player_stats.money < @sleep_price
+      Game.set_message(:confirm, :not_enough_money, [:ok])
+      return
+    end
+
+    @fading = :out
+    @on_fade_end = lambda do
+      Game.player_stats.recover
+      @fading = :in
+    end
+  end
+
+  #############################################################################
 end

@@ -1,15 +1,22 @@
 require 'minigl'
 require_relative 'constants'
 require_relative 'game'
+require_relative 'character'
 
 include MiniGL
 
 class EditorScreen < Screen
   TRANSLUCENT_RED = 0x80ff0000
 
-  def initialize(id)
-    super
-    @fading = nil
+  def initialize(id = nil, tileset = '1')
+    init_props
+    if id
+      load_from_file(id)
+    else
+      @tileset = Res.tileset(tileset, T_W, T_H)
+      fill_tiles(0, M_S / 2 - 1, 0)
+    end
+    @man = Character.new(0, 0, 0)
     @overlay_alpha = 0
     @grid = Res.img(:grid)
   end
@@ -30,7 +37,7 @@ class Editor < GameWindow
     super(Graphics::SCR_W, Graphics::SCR_H, true)
     Res.prefix = File.expand_path(__FILE__).split('/')[0..-3].join('/') + '/data'
     Game.init
-    @screen = EditorScreen.new(1)
+    @screen = EditorScreen.new
   end
 
   def update
