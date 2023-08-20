@@ -83,7 +83,13 @@ class Editor < GameWindow
       hide_panels
       @panel_index = index
       @panels[@panel_index].visible = true
-      @action = [action, 0] if action
+      if action
+        @action = [action, 0]
+        case action
+        when :block
+          @active_object = IsoBlock.new(0, 0, 0)
+        end
+      end
     end
   end
 
@@ -92,6 +98,8 @@ class Editor < GameWindow
     @block_index = 0 if @block_index >= @blocks.size
     @block_index = @blocks.size - 1 if @block_index < 0
     @panels[1].controls[0].text = @blocks[@block_index]
+    @action[1] = @block_index
+    @active_object = IsoBlock.new(@block_index, 0, 0)
   end
 
   def update
@@ -114,6 +122,12 @@ class Editor < GameWindow
       end
     elsif @action[0] == :tile && ml_down
       @screen.set_tile(@action[1], @mouse_map_pos.x, @mouse_map_pos.y)
+    elsif @action[0] == :block
+      if ml_press
+        @screen.add_block(@action[1], @mouse_map_pos.x, @mouse_map_pos.y)
+      else
+        @active_object.move_to(@mouse_map_pos.x, @mouse_map_pos.y)
+      end
     end
     @panel_alpha = over_panel ? 255 : 153
 
@@ -129,6 +143,7 @@ class Editor < GameWindow
 
   def draw
     @screen.draw
+    @active_object.draw(@screen.map, nil, 127, Graphics::UI_Z_INDEX) if @active_object
     mouse_tile_pos = @screen.map.get_screen_pos(@mouse_map_pos.x, @mouse_map_pos.y)
     G.window.draw_quad(mouse_tile_pos.x + T_W / 2, mouse_tile_pos.y, TRANSLUCENT_RED,
                        mouse_tile_pos.x + T_W, mouse_tile_pos.y + T_H / 2, TRANSLUCENT_RED,

@@ -11,14 +11,14 @@ class Arc < IsoGameObject
     @img_index = type
     case type
     when 0
-      screen.add_block(col - 0.25, row + 0.375, layer, 0.25, 0.25, 999)
-      screen.add_block(col + 1, row + 0.375, layer, 0.25, 0.25, 999)
+      screen.add_wall(col - 0.25, row + 0.375, layer, 0.25, 0.25)
+      screen.add_wall(col + 1, row + 0.375, layer, 0.25, 0.25)
     when 1
-      screen.add_block(col, row + 0.75, layer, 0.25, 0.25, 999)
-      screen.add_block(col + 0.75, row, layer, 0.25, 0.25, 999)
+      screen.add_wall(col, row + 0.75, layer, 0.25, 0.25)
+      screen.add_wall(col + 0.75, row, layer, 0.25, 0.25)
     else
-      screen.add_block(col + 0.375, row - 0.25, layer, 0.25, 0.25, 999)
-      screen.add_block(col + 0.375, row + 1, layer, 0.25, 0.25, 999)
+      screen.add_wall(col + 0.375, row - 0.25, layer, 0.25, 0.25)
+      screen.add_wall(col + 0.375, row + 1, layer, 0.25, 0.25)
     end
     @screen = screen
   end

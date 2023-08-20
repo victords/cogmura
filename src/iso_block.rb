@@ -100,25 +100,41 @@ class IsoBlock
     end
   end
 
-  def draw(map, man)
+  def move_to(col, row)
+    @col = col
+    @row = row
+    @x = @ramps ? -10000 : col * Physics::UNIT
+    @y = row * Physics::UNIT
+  end
+
+  def draw(map, man, alpha = nil, z_index = nil)
+    @z_index = z_index if z_index
     pos = map.get_screen_pos(@col, @row)
     if @img
       x = pos.x + @img_gap.x
       y = pos.y + Graphics::TILE_HEIGHT / 2 - @z - @height + @img_gap.y
-      behind = man_behind(man, x, x + @img.width, y, @z_index)
-      update_alpha(behind)
+      if alpha
+        @alpha = alpha
+      else
+        behind = man_behind(man, x, x + @img.width, y, @z_index)
+        update_alpha(behind)
+      end
       color = (@alpha << 24) | 0xffffff
       @img.draw(x, y, @z_index, 1, 1, color)
     elsif @imgs
       x = pos.x - ((@y_tiles - 1) * Graphics::TILE_WIDTH / 2)
       y = pos.y - @z - @height + @img_gap.y
-      behind =
-        (0...@imgs.size).any? do |i|
-          x1 = x + (i >= @x_tiles ? (i + 1) : i) * Graphics::TILE_WIDTH / 2 + (i == 0 ? @img_gap.x : 0)
-          x2 = x1 + @imgs[i].width
-          man_behind(man, x1, x2, y, @z_index - 100 * (i + 1 - @x_tiles).abs)
-        end
-      update_alpha(behind)
+      if alpha
+        @alpha = alpha
+      else
+        behind =
+          (0...@imgs.size).any? do |i|
+            x1 = x + (i >= @x_tiles ? (i + 1) : i) * Graphics::TILE_WIDTH / 2 + (i == 0 ? @img_gap.x : 0)
+            x2 = x1 + @imgs[i].width
+            man_behind(man, x1, x2, y, @z_index - 100 * (i + 1 - @x_tiles).abs)
+          end
+        update_alpha(behind)
+      end
       color = (@alpha << 24) | 0xffffff
       @imgs.each_with_index do |img, i|
         img.draw(x + (i >= @x_tiles ? (i + 1) : i) * Graphics::TILE_WIDTH / 2 + (i == 0 ? @img_gap.x : 0), y,

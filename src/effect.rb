@@ -161,8 +161,8 @@ class RecoverEffect < ScreenEffect
     super(155)
     @x = x
     @y = y
-    @hp = Res.img(:icon_hp)
-    @mp = Res.img(:icon_mp)
+    @hp = Res.img(:fx_hp)
+    @mp = Res.img(:fx_mp)
     @effects = []
     @timer = 0
   end
@@ -184,8 +184,8 @@ class RecoverEffect < ScreenEffect
   def draw
     color = @lifetime >= 35 ? 0xffffffff : ((@lifetime.to_f / 35 * 255).round << 24) | 0xffffff
     y_offset = ((155 - @lifetime).to_f / 155 * 30).round
-    @hp.draw(@x, @y - 10 - y_offset, Graphics::UI_Z_INDEX, 0.5, 0.5, color)
-    @mp.draw(@x + 20, @y - y_offset, Graphics::UI_Z_INDEX, 0.5, 0.5, color)
+    @hp.draw(@x, @y - 10 - y_offset, Graphics::UI_Z_INDEX, 1, 1, color)
+    @mp.draw(@x + 20, @y - y_offset, Graphics::UI_Z_INDEX, 1, 1, color)
     @effects.each { |e| e.draw(nil, 1, 1, 255, 0xffffff, nil, Graphics::UI_Z_INDEX) }
   end
 end

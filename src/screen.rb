@@ -42,8 +42,12 @@ class Screen
     # @grid = Res.img(:grid)
   end
 
-  def add_block(col, row, layer, x_tiles, y_tiles, height)
-    @blocks << IsoBlock.new(nil, col, row, layer, x_tiles, y_tiles, height)
+  def add_wall(col, row, layer, x_tiles, y_tiles)
+    @blocks << IsoBlock.new(nil, col, row, layer, x_tiles, y_tiles)
+  end
+
+  def add_block(type, col, row, layer = 0)
+    @blocks << IsoBlock.new(type, col, row, layer)
   end
 
   def add_effect(effect)
