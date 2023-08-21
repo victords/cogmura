@@ -107,7 +107,7 @@ class IsoBlock
     @y = row * Physics::UNIT
   end
 
-  def draw(map, man, alpha = nil, z_index = nil)
+  def draw(map, man, z_index = nil, alpha = nil)
     @z_index = z_index if z_index
     pos = map.get_screen_pos(@col, @row)
     if @img

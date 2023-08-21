@@ -16,6 +16,10 @@ class PanelImage < MiniGL::Component
     @anchor_offset_y = y
   end
 
+  def image=(id, sprite_cols = 1, sprite_rows = 1)
+    @image = Res.imgs(id, sprite_cols, sprite_rows)
+  end
+
   def draw(alpha, z_index, color)
     c = (alpha << 24) | color
     @image[@img_index].draw(@x, @y, z_index, @scale_x, @scale_y, c)

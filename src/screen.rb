@@ -50,6 +50,10 @@ class Screen
     @blocks << IsoBlock.new(type, col, row, layer)
   end
 
+  def add_item(type, col, row, layer = 0)
+    @items << Item.new(type, col, row, layer, nil)
+  end
+
   def add_effect(effect)
     @effects << effect
   end

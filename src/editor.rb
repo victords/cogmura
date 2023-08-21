@@ -4,6 +4,8 @@ require_relative 'constants'
 require_relative 'game'
 require_relative 'character'
 require_relative 'iso_block'
+require_relative 'item'
+require_relative 'ui/panel_image'
 
 include MiniGL
 
@@ -39,6 +41,7 @@ class Editor < GameWindow
   PANEL_SHORTCUTS = {
     Gosu::KB_T => { index: 0, action: :tile },
     Gosu::KB_B => { index: 1, action: :block },
+    Gosu::KB_I => { index: 2, action: :item },
   }.freeze
 
   def initialize
@@ -51,7 +54,7 @@ class Editor < GameWindow
     @tileset_index = 0
 
     @blocks = IsoBlock::TYPE_MAP.map { |a| a[3].to_s }
-    @block_index = 0
+    @items = Item::MAP.map { |a| a[0].to_s }
 
     @font = Gosu::Font.new(24, name: 'DejaVu Sans')
     @panels = [
@@ -61,9 +64,26 @@ class Editor < GameWindow
       ], :ui_panel, :tiled),
       Panel.new(10, 10, 240, 70, [
         Label.new(x: 0, y: 0, font: @font, text: @blocks[0], anchor: :center),
-        Button.new(x: 10, y: 0, font: @font, text: '<', img: :ui_button, anchor: :left) { change_block(-1) },
-        Button.new(x: 10, y: 0, font: @font, text: '>', img: :ui_button, anchor: :right) { change_block },
-      ], :ui_panel, :tiled)
+        Button.new(x: 10, y: 0, font: @font, text: '<', img: :ui_button, anchor: :left) do
+          change_selection(@blocks, -1)
+          @panels[1].controls[0].text = @blocks[@action[1]]
+        end,
+        Button.new(x: 10, y: 0, font: @font, text: '>', img: :ui_button, anchor: :right) do
+          change_selection(@blocks)
+          @panels[1].controls[0].text = @blocks[@action[1]]
+        end,
+      ], :ui_panel, :tiled),
+      Panel.new(10, 10, 184, 70, [
+        PanelImage.new(0, 0, "icon_#{@items[0]}", 1, 1, :center),
+        Button.new(x: 10, y: 0, font: @font, text: '<', img: :ui_button, anchor: :left) do
+          change_selection(@items, -1)
+          @panels[2].controls[0].image = "icon_#{@items[@action[1]]}"
+        end,
+        Button.new(x: 10, y: 0, font: @font, text: '>', img: :ui_button, anchor: :right) do
+          change_selection(@items)
+          @panels[2].controls[0].image = "icon_#{@items[@action[1]]}"
+        end,
+      ])
     ]
     hide_panels
     @panel_alpha = 153
@@ -85,21 +105,25 @@ class Editor < GameWindow
       @panels[@panel_index].visible = true
       if action
         @action = [action, 0]
-        case action
-        when :block
-          @active_object = IsoBlock.new(0, 0, 0)
-        end
+        set_active_object
       end
     end
   end
 
-  def change_block(delta = 1)
-    @block_index += delta
-    @block_index = 0 if @block_index >= @blocks.size
-    @block_index = @blocks.size - 1 if @block_index < 0
-    @panels[1].controls[0].text = @blocks[@block_index]
-    @action[1] = @block_index
-    @active_object = IsoBlock.new(@block_index, 0, 0)
+  def change_selection(list, delta = 1)
+    @action[1] += delta
+    @action[1] = 0 if @action[1] >= list.size
+    @action[1] = list.size - 1 if @action[1] < 0
+    set_active_object
+  end
+
+  def set_active_object
+    case @action[0]
+    when :block
+      @active_object = IsoBlock.new(@action[1], 0, 0)
+    when :item
+      @active_object = Item.new(@action[1], 0, 0, 0, nil)
+    end
   end
 
   def update
@@ -128,6 +152,12 @@ class Editor < GameWindow
       else
         @active_object.move_to(@mouse_map_pos.x, @mouse_map_pos.y)
       end
+    elsif @action[0] == :item
+      if ml_press
+        @screen.add_item(@action[1], @mouse_map_pos.x, @mouse_map_pos.y)
+      else
+        @active_object.move_to(@mouse_map_pos.x, @mouse_map_pos.y, 0)
+      end
     end
     @panel_alpha = over_panel ? 255 : 153
 
@@ -143,7 +173,12 @@ class Editor < GameWindow
 
   def draw
     @screen.draw
-    @active_object.draw(@screen.map, nil, 127, Graphics::UI_Z_INDEX) if @active_object
+    if @active_object.is_a?(IsoBlock)
+      @active_object.draw(@screen.map, nil, Graphics::UI_Z_INDEX, 127)
+    elsif @active_object.is_a?(IsoGameObject)
+      @active_object.draw(@screen.map, Graphics::UI_Z_INDEX, 127)
+    end
+
     mouse_tile_pos = @screen.map.get_screen_pos(@mouse_map_pos.x, @mouse_map_pos.y)
     G.window.draw_quad(mouse_tile_pos.x + T_W / 2, mouse_tile_pos.y, TRANSLUCENT_RED,
                        mouse_tile_pos.x + T_W, mouse_tile_pos.y + T_H / 2, TRANSLUCENT_RED,
