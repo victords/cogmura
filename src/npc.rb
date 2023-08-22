@@ -79,7 +79,7 @@ class Npc < IsoGameObject
     end
   end
 
-  def draw(map)
+  def draw(map, z_index = nil, alpha = 255)
     super
 
     pos = map.get_screen_pos((@x + @w / 2) / Physics::UNIT, (@y + @h / 2) / Physics::UNIT)

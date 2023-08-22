@@ -100,11 +100,12 @@ class IsoBlock
     end
   end
 
-  def move_to(col, row)
+  def move_to(col, row, layer)
     @col = col
     @row = row
     @x = @ramps ? -10000 : col * Physics::UNIT
     @y = row * Physics::UNIT
+    @z = layer * Physics::V_UNIT
   end
 
   def draw(map, man, z_index = nil, alpha = nil)

@@ -54,6 +54,10 @@ class Screen
     @items << Item.new(type, col, row, layer, nil)
   end
 
+  def add_npc(id, col, row, layer = 0)
+    @npcs << Npc.new(id, col, row, layer)
+  end
+
   def add_effect(effect)
     @effects << effect
   end
