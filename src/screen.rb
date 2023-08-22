@@ -58,6 +58,10 @@ class Screen
     @npcs << Npc.new(id, col, row, layer)
   end
 
+  def add_enemy(type, col, row, layer = 0)
+    @enemies << Enemy.new(type, col, row, layer, nil)
+  end
+
   def add_effect(effect)
     @effects << effect
   end

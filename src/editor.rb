@@ -44,6 +44,7 @@ class Editor < GameWindow
     Gosu::KB_B => { index: 1, action: :block },
     Gosu::KB_I => { index: 2, action: :item },
     Gosu::KB_N => { index: 3, action: :npc },
+    Gosu::KB_E => { index: 4, action: :enemy },
   }.freeze
 
   def initialize
@@ -58,6 +59,7 @@ class Editor < GameWindow
     @blocks = IsoBlock::TYPE_MAP.map { |a| a[3].to_s }
     @items = Item::MAP.map { |a| a[0].to_s }
     @npcs = Npc::ID_MAP.map { |a| a[0].to_s }
+    @enemies = ENEMY_TYPE_MAP.map { |a| a[0].to_s }
 
     @font = Gosu::Font.new(24, name: 'DejaVu Sans')
     @panels = [
@@ -79,6 +81,11 @@ class Editor < GameWindow
         Label.new(x: 0, y: 0, font: @font, text: @npcs[0], anchor: :center),
         Button.new(x: 10, y: 0, font: @font, text: '<', img: :ui_button, anchor: :left) { change_npc_selection(-1) },
         Button.new(x: 10, y: 0, font: @font, text: '>', img: :ui_button, anchor: :right) { change_npc_selection },
+      ], :ui_panel, :tiled),
+      Panel.new(10, 10, 240, 70, [
+        Label.new(x: 0, y: 0, font: @font, text: @enemies[0], anchor: :center),
+        Button.new(x: 10, y: 0, font: @font, text: '<', img: :ui_button, anchor: :left) { change_enemy_selection(-1) },
+        Button.new(x: 10, y: 0, font: @font, text: '>', img: :ui_button, anchor: :right) { change_enemy_selection },
       ], :ui_panel, :tiled),
     ]
     hide_panels
@@ -107,7 +114,7 @@ class Editor < GameWindow
       end
     elsif @action[0] == :tile && ml_down
       @screen.set_tile(@action[1], @mouse_map_pos.x, @mouse_map_pos.y)
-    elsif %i[block item npc].include?(@action[0])
+    elsif %i[block item npc enemy].include?(@action[0])
       if ml_press
         @screen.send("add_#{@action[0]}", @action[1], @mouse_map_pos.x, @mouse_map_pos.y)
       else
@@ -192,6 +199,11 @@ class Editor < GameWindow
     @panels[3].controls[0].text = @npcs[@action[1]]
   end
 
+  def change_enemy_selection(delta = 1)
+    change_selection(@enemies, delta)
+    @panels[4].controls[0].text = @enemies[@action[1]]
+  end
+
   def change_selection(list, delta = 1)
     @action[1] += delta
     @action[1] = 0 if @action[1] >= list.size
@@ -207,6 +219,8 @@ class Editor < GameWindow
       @active_object = Item.new(@action[1], 0, 0, 0, nil)
     when :npc
       @active_object = Npc.new(@action[1], 0, 0, 0)
+    when :enemy
+      @active_object = Enemy.new(@action[1], 0, 0, 0, nil)
     end
   end
 end

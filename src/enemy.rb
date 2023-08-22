@@ -93,8 +93,8 @@ class Enemy < IsoGameObject
     @on_encounter.call(self)
   end
 
-  def draw(map)
-    alpha = @active_timer > 0 ? (@active_timer / 10) % 2 * 255 : 255
+  def draw(map, z_index = nil, alpha = 255)
+    alpha ||= @active_timer > 0 ? (@active_timer / 10) % 2 * 255 : 255
     super(map, nil, alpha)
   end
 end
