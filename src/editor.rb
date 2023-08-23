@@ -55,6 +55,7 @@ class Editor < GameWindow
 
     @tilesets = Dir["#{Res.prefix}tileset/*"].sort.map { |s| s.split('/').last.chomp('.png') }
     @tileset_index = 0
+    @layer = 0
 
     @blocks = IsoBlock::TYPE_MAP.map { |a| a[3].to_s }
     @items = Item::MAP.map { |a| a[0].to_s }
@@ -70,26 +71,30 @@ class Editor < GameWindow
       Panel.new(10, 10, 240, 70, [
         Label.new(x: 0, y: 0, font: @font, text: @blocks[0], anchor: :center),
         Button.new(x: 10, y: 0, font: @font, text: '<', img: :ui_button, anchor: :left) { change_block_selection(-1) },
-        Button.new(x: 10, y: 0, font: @font, text: '>', img: :ui_button, anchor: :right) { change_block_selection },
+        Button.new(x: 10, y: 0, font: @font, text: '>', img: :ui_button, anchor: :right) { change_block_selection(1) },
       ], :ui_panel, :tiled),
       Panel.new(10, 10, 184, 70, [
         PanelImage.new(0, 0, "icon_#{@items[0]}", 1, 1, :center),
         Button.new(x: 10, y: 0, font: @font, text: '<', img: :ui_button, anchor: :left) { change_item_selection(-1) },
-        Button.new(x: 10, y: 0, font: @font, text: '>', img: :ui_button, anchor: :right) { change_item_selection },
+        Button.new(x: 10, y: 0, font: @font, text: '>', img: :ui_button, anchor: :right) { change_item_selection(1) },
       ], :ui_panel, :tiled),
       Panel.new(10, 10, 240, 70, [
         Label.new(x: 0, y: 0, font: @font, text: @npcs[0], anchor: :center),
         Button.new(x: 10, y: 0, font: @font, text: '<', img: :ui_button, anchor: :left) { change_npc_selection(-1) },
-        Button.new(x: 10, y: 0, font: @font, text: '>', img: :ui_button, anchor: :right) { change_npc_selection },
+        Button.new(x: 10, y: 0, font: @font, text: '>', img: :ui_button, anchor: :right) { change_npc_selection(1) },
       ], :ui_panel, :tiled),
       Panel.new(10, 10, 240, 70, [
         Label.new(x: 0, y: 0, font: @font, text: @enemies[0], anchor: :center),
         Button.new(x: 10, y: 0, font: @font, text: '<', img: :ui_button, anchor: :left) { change_enemy_selection(-1) },
-        Button.new(x: 10, y: 0, font: @font, text: '>', img: :ui_button, anchor: :right) { change_enemy_selection },
+        Button.new(x: 10, y: 0, font: @font, text: '>', img: :ui_button, anchor: :right) { change_enemy_selection(1) },
       ], :ui_panel, :tiled),
     ]
-    hide_panels
+    @layer_panel = Panel.new(-10, -10, 150, 50, [
+      Label.new(x: 20, y: 0, font: @font, text: 'Layer:', anchor: :left),
+      Label.new(x: 20, y: 0, font: @font, text: @layer.to_s, anchor: :right),
+    ], :ui_panel, :tiled, nil, 1, 1, :bottom_left)
     @panel_alpha = 153
+    hide_panels
 
     @action = [:tile, 0]
   end
@@ -116,9 +121,9 @@ class Editor < GameWindow
       @screen.set_tile(@action[1], @mouse_map_pos.x, @mouse_map_pos.y)
     elsif %i[block item npc enemy].include?(@action[0])
       if ml_press
-        @screen.send("add_#{@action[0]}", @action[1], @mouse_map_pos.x, @mouse_map_pos.y)
+        @screen.send("add_#{@action[0]}", @action[1], @mouse_map_pos.x, @mouse_map_pos.y, @layer)
       else
-        @active_object.move_to(@mouse_map_pos.x, @mouse_map_pos.y, 0)
+        update_active_object_position
       end
     end
     @panel_alpha = over_panel ? 255 : 153
@@ -128,6 +133,12 @@ class Editor < GameWindow
         toggle_panel(v[:index], v[:action])
         break
       end
+    end
+
+    if KB.key_pressed?(Gosu::KB_UP)
+      change_layer(1)
+    elsif KB.key_pressed?(Gosu::KB_DOWN) && @layer > 0
+      change_layer(-1)
     end
 
     close if KB.key_pressed?(Gosu::KB_ESCAPE)
@@ -161,6 +172,7 @@ class Editor < GameWindow
         G.window.draw_rect(@panels[0].x + 10 + (i % 2) * T_W, @panels[0].y + 10 + (i / 2) * T_H, T_W, T_H, TRANSLUCENT_YELLOW, UI_Z)
       end
     end
+    @layer_panel.draw(@panel_alpha, UI_Z)
   end
 
   private
@@ -184,27 +196,27 @@ class Editor < GameWindow
     end
   end
 
-  def change_block_selection(delta = 1)
+  def change_block_selection(delta)
     change_selection(@blocks, delta)
     @panels[1].controls[0].text = @blocks[@action[1]]
   end
 
-  def change_item_selection(delta = 1)
+  def change_item_selection(delta)
     change_selection(@items, delta)
     @panels[2].controls[0].image = "icon_#{@items[@action[1]]}"
   end
 
-  def change_npc_selection(delta = 1)
+  def change_npc_selection(delta)
     change_selection(@npcs, delta)
     @panels[3].controls[0].text = @npcs[@action[1]]
   end
 
-  def change_enemy_selection(delta = 1)
+  def change_enemy_selection(delta)
     change_selection(@enemies, delta)
     @panels[4].controls[0].text = @enemies[@action[1]]
   end
 
-  def change_selection(list, delta = 1)
+  def change_selection(list, delta)
     @action[1] += delta
     @action[1] = 0 if @action[1] >= list.size
     @action[1] = list.size - 1 if @action[1] < 0
@@ -222,6 +234,16 @@ class Editor < GameWindow
     when :enemy
       @active_object = Enemy.new(@action[1], 0, 0, 0, nil)
     end
+  end
+
+  def update_active_object_position
+    @active_object&.move_to(@mouse_map_pos.x, @mouse_map_pos.y, @layer)
+  end
+
+  def change_layer(delta)
+    @layer += delta
+    update_active_object_position
+    @layer_panel.controls[1].text = @layer.to_s
   end
 end
 
