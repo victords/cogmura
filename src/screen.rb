@@ -46,22 +46,6 @@ class Screen
     @blocks << IsoBlock.new(nil, col, row, layer, x_tiles, y_tiles)
   end
 
-  def add_block(type, col, row, layer = 0)
-    @blocks << IsoBlock.new(type, col, row, layer)
-  end
-
-  def add_item(type, col, row, layer = 0)
-    @items << Item.new(type, col, row, layer, nil)
-  end
-
-  def add_npc(id, col, row, layer = 0)
-    @npcs << Npc.new(id, col, row, layer)
-  end
-
-  def add_enemy(type, col, row, layer = 0)
-    @enemies << Enemy.new(type, col, row, layer, nil)
-  end
-
   def add_effect(effect)
     @effects << effect
   end

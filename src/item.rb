@@ -9,13 +9,15 @@ class Item < IsoGameObject
     [:lifeMush, -16, -24, 1, 1],
   ].freeze
 
-  attr_reader :key, :destroyed
+  attr_reader :key, :col, :row, :destroyed
   attr_writer :on_picked_up
 
   def initialize(id, col, row, layer, on_picked_up)
     key, img_gap_x, img_gap_y, sprite_cols, sprite_rows = MAP[id]
     super(col, row, layer, 16, 16, "item_#{key}", Vector.new(img_gap_x, img_gap_y), sprite_cols, sprite_rows)
     @key = key
+    @col = col
+    @row = row
     @on_picked_up = on_picked_up
   end
 

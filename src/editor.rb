@@ -29,6 +29,37 @@ class EditorScreen < Screen
   def set_tile(tile, i, j)
     @tiles[i][j] = tile
   end
+
+  def add_block(type, col, row, layer = 0)
+    @blocks << IsoBlock.new(type, col, row, layer)
+  end
+
+  def add_item(id, col, row, layer = 0)
+    item = @items.find { |i| i.col == col && i.row == row }
+    if item
+      return if item.key == Item::MAP[id][0]
+      @items.delete(item)
+    end
+    @items << Item.new(id, col, row, layer, nil)
+  end
+
+  def add_npc(id, col, row, layer = 0)
+    npc = @npcs.find { |n| n.col == col && n.row == row }
+    if npc
+      return if npc.id == id
+      @npcs.delete(npc)
+    end
+    @npcs << Npc.new(id, col, row, layer)
+  end
+
+  def add_enemy(id, col, row, layer = 0)
+    enemy = @enemies.find { |e| e.col == col && e.row == row }
+    if enemy
+      return if enemy.type == ENEMY_TYPE_MAP[id][0]
+      @enemies.delete(enemy)
+    end
+    @enemies << Enemy.new(id, col, row, layer, nil)
+  end
 end
 
 class Editor < GameWindow

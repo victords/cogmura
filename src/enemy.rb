@@ -11,13 +11,15 @@ class Enemy < IsoGameObject
     [SQRT2_2, -SQRT2_2], [1, 0], [0, -1]
   ]
 
-  attr_reader :type, :name
+  attr_reader :type, :name, :col, :row
 
-  def initialize(type, col, row, layer, on_encounter)
-    id, size, img_gap_x, img_gap_y, sprite_cols, sprite_rows, @speed_m = ENEMY_TYPE_MAP[type]
-    super(col, row, layer, size, size, "char_#{id}", Vector.new(img_gap_x, img_gap_y), sprite_cols, sprite_rows)
-    @type = id
-    @name = id.to_s.split('_').map(&:capitalize).join(' ')
+  def initialize(id, col, row, layer, on_encounter)
+    type, size, img_gap_x, img_gap_y, sprite_cols, sprite_rows, @speed_m = ENEMY_TYPE_MAP[id]
+    super(col, row, layer, size, size, "char_#{type}", Vector.new(img_gap_x, img_gap_y), sprite_cols, sprite_rows)
+    @type = type
+    @name = type.to_s.split('_').map(&:capitalize).join(' ')
+    @col = col
+    @row = row
     @on_encounter = on_encounter
 
     @timer = 0
