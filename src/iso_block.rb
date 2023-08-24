@@ -26,7 +26,7 @@ class IsoBlock
     [4, 3, 7, :house5, -10, -94],        # 16
   ].freeze
 
-  attr_reader :x, :y, :z, :w, :h, :height, :ramps, :z_index
+  attr_reader :x, :y, :z, :w, :h, :col, :row, :height, :x_tiles, :y_tiles, :ramps, :z_index
 
   def initialize(type, col, row, layer = 0, x_tiles = 1, y_tiles = 1, height = 999, angled = false)
     x_tiles, y_tiles, height, img_id, img_gap_x, img_gap_y, angled =
@@ -98,6 +98,13 @@ class IsoBlock
     else
       bounds.intersect?(obj)
     end
+  end
+
+  def block_intersect?(other)
+    return false if @ramps || other.ramps
+
+    @col + @x_tiles > other.col && other.col + other.x_tiles > @col &&
+      @row + @y_tiles > other.row && other.row + other.y_tiles > @row
   end
 
   def move_to(col, row, layer)

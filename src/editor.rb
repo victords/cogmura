@@ -31,7 +31,9 @@ class EditorScreen < Screen
   end
 
   def add_block(type, col, row, layer = 0)
-    @blocks << IsoBlock.new(type, col, row, layer)
+    new_block = IsoBlock.new(type, col, row, layer)
+    @blocks.delete_if { |b| b.block_intersect?(new_block) }
+    @blocks << new_block
   end
 
   def add_item(id, col, row, layer = 0)
