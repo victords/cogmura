@@ -62,6 +62,16 @@ class EditorScreen < Screen
     end
     @enemies << Enemy.new(id, col, row, layer, nil)
   end
+
+  def remove(col, row)
+    [@blocks, @items, @npcs, @enemies].each do |list|
+      obj = list.find { |o| o.col == col && o.row == row }
+      if obj
+        list.delete(obj)
+        break
+      end
+    end
+  end
 end
 
 class Editor < GameWindow
@@ -139,6 +149,7 @@ class Editor < GameWindow
 
     ml_press = Mouse.button_pressed?(:left)
     ml_down = Mouse.button_down?(:left)
+    mr_press = Mouse.button_pressed?(:right)
 
     active_panel = @panel_index && @panels[@panel_index]
     over_panel = active_panel && Mouse.over?(active_panel.x, active_panel.y, active_panel.w, active_panel.h)
@@ -159,6 +170,11 @@ class Editor < GameWindow
         update_active_object_position
       end
     end
+
+    if mr_press && !over_panel
+      @screen.remove(@mouse_map_pos.x, @mouse_map_pos.y)
+    end
+
     @panel_alpha = over_panel ? 255 : 153
 
     PANEL_SHORTCUTS.each do |k, v|
