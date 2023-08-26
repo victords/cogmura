@@ -342,10 +342,12 @@ class Editor < GameWindow
 
   def change_wall_width(delta)
     @active_object.x_tiles += delta if delta > 0 || @active_object.x_tiles > 1
+    @panels[5].controls[0].text = @active_object.x_tiles.to_s
   end
 
   def change_wall_height(delta)
     @active_object.y_tiles += delta if delta > 0 || @active_object.y_tiles > 1
+    @panels[5].controls[3].text = @active_object.y_tiles.to_s
   end
 
   def set_active_object
