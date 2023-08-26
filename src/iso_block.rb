@@ -67,13 +67,15 @@ class IsoBlock
           @rects << Rectangle.new(x + (i + j + 1) * unit, @y + (j - i + 1) * unit, unit, unit) if j < y_tiles - 1
         end
       end
-    elsif image
-      @imgs = (0...(x_tiles + y_tiles - 1)).map do |i|
-        img_gap_offset = i == 0 ? 0 : -img_gap_x
-        x = (i >= x_tiles ? (i + 1) : i) * IMG_SLICE_OFFSET + img_gap_offset
-        w = i == x_tiles + y_tiles - 2 ? image.width - x :
-              (i == x_tiles - 1 ? 2 : 1) * IMG_SLICE_OFFSET + (i == 0 ? -img_gap_x : 0)
-        image.subimage(x, 0, w, image.height)
+    else
+      if image
+        @imgs = (0...(x_tiles + y_tiles - 1)).map do |i|
+          img_gap_offset = i == 0 ? 0 : -img_gap_x
+          x = (i >= x_tiles ? (i + 1) : i) * IMG_SLICE_OFFSET + img_gap_offset
+          w = i == x_tiles + y_tiles - 2 ? image.width - x :
+                (i == x_tiles - 1 ? 2 : 1) * IMG_SLICE_OFFSET + (i == 0 ? -img_gap_x : 0)
+          image.subimage(x, 0, w, image.height)
+        end
       end
       @z_index = 100 * (col + row + x_tiles + y_tiles - 2) + 10 * layer
     end

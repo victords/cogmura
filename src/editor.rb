@@ -10,6 +10,52 @@ require_relative 'ui/panel_image'
 
 include MiniGL
 
+class InvisibleWall < IsoBlock
+  OUTLINE = 0xff000000
+  FILL = 0x66ffffff
+
+  attr_writer :x_tiles, :y_tiles
+  attr_accessor :angled
+
+  def initialize(col, row, layer, x_tiles, y_tiles, angled)
+    super(nil, col, row, layer, x_tiles, y_tiles, 999, angled)
+    @angled = angled
+  end
+
+  def draw(map, man, z_index = nil, alpha = nil)
+    @z_index = z_index if z_index
+    pos = map.get_screen_pos(@col, @row)
+    if @ramps
+      x1 = pos.x
+      x2 = x1 + @x_tiles * Graphics::TILE_WIDTH
+      y1 = pos.y + Graphics::TILE_HEIGHT / 2 - @z
+      y2 = y1 + @y_tiles * Graphics::TILE_HEIGHT
+      G.window.draw_rect(x1, 0, x2 - x1, y2, FILL, @z_index)
+      G.window.draw_rect(x1, y1, x2 - x1, y2 - y1, FILL, @z_index)
+      G.window.draw_line(x1, 0, OUTLINE, x1, y2, OUTLINE, @z_index)
+      G.window.draw_line(x2, 0, OUTLINE, x2, y2, OUTLINE, @z_index)
+      G.window.draw_line(x1, y1, OUTLINE, x2, y1, OUTLINE, @z_index)
+      G.window.draw_line(x1, y2, OUTLINE, x2, y2, OUTLINE, @z_index)
+    else
+      x1 = pos.x + Graphics::TILE_WIDTH / 2
+      x2 = x1 + @x_tiles * Graphics::TILE_WIDTH / 2
+      x3 = x1 - @y_tiles * Graphics::TILE_WIDTH / 2
+      x4 = x3 + @x_tiles * Graphics::TILE_WIDTH / 2
+      y1 = pos.y - @z
+      y2 = y1 + @x_tiles * Graphics::TILE_HEIGHT / 2
+      y3 = y1 + @y_tiles * Graphics::TILE_HEIGHT / 2
+      y4 = y3 + @x_tiles * Graphics::TILE_HEIGHT / 2
+      G.window.draw_line(x1, 0, OUTLINE, x1, y1, OUTLINE, @z_index)
+      G.window.draw_line(x2, 0, OUTLINE, x2, y2, OUTLINE, @z_index)
+      G.window.draw_line(x3, 0, OUTLINE, x3, y3, OUTLINE, @z_index)
+      G.window.draw_line(x4, 0, OUTLINE, x4, y4, OUTLINE, @z_index)
+      G.window.draw_quad(x1, 0, FILL, x3, 0, FILL, x3, y3, FILL, x4, y4, FILL, @z_index)
+      G.window.draw_quad(x1, 0, FILL, x2, 0, FILL, x2, y2, FILL, x4, y4, FILL, @z_index)
+      G.window.draw_quad(x1, y1, FILL, x2, y2, FILL, x3, y3, FILL, x4, y4, FILL, @z_index)
+    end
+  end
+end
+
 class EditorScreen < Screen
   attr_reader :map
 
@@ -28,6 +74,10 @@ class EditorScreen < Screen
 
   def set_tile(tile, i, j)
     @tiles[i][j] = tile
+  end
+
+  def add_wall(col, row, layer, x_tiles, y_tiles, angled)
+    @blocks << InvisibleWall.new(col, row, layer, x_tiles, y_tiles, angled)
   end
 
   def add_block(type, col, row, layer = 0)
@@ -88,6 +138,7 @@ class Editor < GameWindow
     Gosu::KB_I => { index: 2, action: :item },
     Gosu::KB_N => { index: 3, action: :npc },
     Gosu::KB_E => { index: 4, action: :enemy },
+    Gosu::KB_W => { index: 5, action: :wall },
   }.freeze
 
   def initialize
@@ -131,6 +182,17 @@ class Editor < GameWindow
         Button.new(x: 10, y: 0, font: @font, text: '<', img: :ui_button, anchor: :left) { change_enemy_selection(-1) },
         Button.new(x: 10, y: 0, font: @font, text: '>', img: :ui_button, anchor: :right) { change_enemy_selection(1) },
       ], :ui_panel, :tiled),
+      Panel.new(10, 10, 240, 170, [
+        Label.new(x: 0, y: 23, font: @font, text: '1', anchor: :top_center),
+        Button.new(x: 10, y: 10, font: @font, text: '<', img: :ui_button, anchor: :top_left) { change_wall_width(-1) },
+        Button.new(x: 10, y: 10, font: @font, text: '>', img: :ui_button, anchor: :top_right) { change_wall_width(1) },
+        Label.new(x: 0, y: 83, font: @font, text: '1', anchor: :top_center),
+        Button.new(x: 10, y: 70, font: @font, text: '<', img: :ui_button, anchor: :top_left) { change_wall_height(-1) },
+        Button.new(x: 10, y: 70, font: @font, text: '>', img: :ui_button, anchor: :top_right) { change_wall_height(1) },
+        ToggleButton.new(x: 10, y: 10, font: @font, text: 'angled', img: :ui_checkbox, center_x: false, margin_x: 40, anchor: :bottom_left) do |checked|
+          @active_object = InvisibleWall.new(0, 0, @layer, @active_object.x_tiles, @active_object.y_tiles, checked)
+        end,
+      ], :ui_panel, :tiled),
     ]
     @layer_panel = Panel.new(-10, -10, 150, 50, [
       Label.new(x: 20, y: 0, font: @font, text: 'Layer:', anchor: :left),
@@ -166,6 +228,12 @@ class Editor < GameWindow
     elsif %i[block item npc enemy].include?(@action[0])
       if ml_press
         @screen.send("add_#{@action[0]}", @action[1], @mouse_map_pos.x, @mouse_map_pos.y, @layer)
+      else
+        update_active_object_position
+      end
+    elsif @action[0] == :wall
+      if ml_press
+        @screen.add_wall(@mouse_map_pos.x, @mouse_map_pos.y, @layer, @active_object.x_tiles, @active_object.y_tiles, @active_object.angled)
       else
         update_active_object_position
       end
@@ -272,6 +340,14 @@ class Editor < GameWindow
     set_active_object
   end
 
+  def change_wall_width(delta)
+    @active_object.x_tiles += delta if delta > 0 || @active_object.x_tiles > 1
+  end
+
+  def change_wall_height(delta)
+    @active_object.y_tiles += delta if delta > 0 || @active_object.y_tiles > 1
+  end
+
   def set_active_object
     case @action[0]
     when :block
@@ -282,6 +358,8 @@ class Editor < GameWindow
       @active_object = Npc.new(@action[1], 0, 0, 0)
     when :enemy
       @active_object = Enemy.new(@action[1], 0, 0, 0, nil)
+    when :wall
+      @active_object = InvisibleWall.new(@layer, 0, 0, 1, 1, false)
     end
   end
 
