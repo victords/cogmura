@@ -2,10 +2,6 @@ require 'minigl'
 require 'gosu'
 require_relative 'constants'
 require_relative 'game'
-require_relative 'character'
-require_relative 'iso_block'
-require_relative 'item'
-require_relative 'npc'
 require_relative 'ui/panel_image'
 
 include MiniGL
