@@ -4,19 +4,27 @@ require_relative '../constants'
 class Bed < IsoBlock
   RANGE = Physics::UNIT * 0.5
 
-  def initialize(type, col, row, layer, on_sleep)
+  def initialize(col, row, layer, args)
+    type = args[0].to_i
     super(type, col, row, layer)
-    @on_sleep = on_sleep
 
     @interactive_area = Rectangle.new(@x - RANGE, @y - RANGE, @w + 2 * RANGE, @h + 2 * RANGE)
     @alert = Res.img(:fx_alert)
   end
 
-  def update(man)
+  def collide?
+    false
+  end
+
+  def drawn?
+    @drawn
+  end
+
+  def update(man, screen)
     @drawn = false
 
     if @active && KB.key_pressed?(Gosu::KB_Z)
-      @on_sleep.call(0)
+      screen.on_sleep_confirm(0)
       return
     end
 
@@ -36,8 +44,4 @@ class Bed < IsoBlock
     end
     @drawn = true
   end
-
-  def drawn?; @drawn; end
-
-  def collide?; false; end
 end

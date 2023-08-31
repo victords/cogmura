@@ -7,30 +7,27 @@ include MiniGL
 class Box < IsoGameObject
   RANGE = Physics::UNIT
 
-  def initialize(col, row, layer, content, screen)
+  def initialize(col, row, layer, args)
     super(col, row, layer, 28, 28, :obj_box, Vector.new(-26, -72), 2, 1)
-    value = content[1..].to_i
-    @on_open = lambda do
-      case content[0]
-      when 'i'
-        screen.on_item_picked_up(Item::TYPE_MAP[value][0])
-      when '$'
-        screen.on_money_picked_up(value)
-      end
-    end
+    @args = args
   end
 
   def collide?
     true
   end
 
-  def update(man)
+  def update(man, screen)
     return if @opened
 
     if in_range?(man, RANGE)
       @in_range = true
       if KB.key_pressed?(Gosu::KB_Z)
-        @on_open.call
+        case @args[0]
+        when 'i'
+          screen.on_item_picked_up(Item::MAP[@args[1].to_i][0])
+        when '$'
+          screen.on_money_picked_up(@args[1].to_i)
+        end
         @img_index = 1
         @opened = true
       end

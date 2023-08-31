@@ -43,6 +43,10 @@ class IsoGameObject < MiniGL::GameObject
     @speed_z = 0
   end
 
+  def drawn?
+    false
+  end
+
   def draw(map, z_index = nil, alpha = 255)
     i = (@x + @w / 2).to_f / Physics::UNIT
     j = (@y + @h / 2).to_f / Physics::UNIT
@@ -55,8 +59,6 @@ class IsoGameObject < MiniGL::GameObject
     super(map, 1, 1, alpha, 0xffffff, nil, @flip ? :horiz : nil, @z_index)
     @x = phys_x; @y = phys_y
   end
-
-  def drawn?; false; end
 
   private
 

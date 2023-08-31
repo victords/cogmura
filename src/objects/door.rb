@@ -10,12 +10,12 @@ class Door < IsoGameObject
 
   attr_reader :dest_scr, :dest_entr
 
-  def initialize(type, dest_scr, dest_entr, col, row, layer, on_open)
+  def initialize(col, row, layer, args)
+    type, dest_scr, dest_entr = args.map(&:to_i)
     img_gap_x, img_gap_y, angled = TYPE_MAP[type - 1]
     super(col + 0.5, row + 0.5, layer, Physics::UNIT, Physics::UNIT, "obj_door#{type}", Vector.new(img_gap_x, img_gap_y), 4, 1)
     @dest_scr = dest_scr
     @dest_entr = dest_entr
-    @on_open = on_open
     return if angled
 
     @sub_img = @img.map { |img| img.subimage(0, 0, img.width / 2, img.height) }
@@ -25,13 +25,13 @@ class Door < IsoGameObject
     false
   end
 
-  def update(man)
+  def update(man, screen)
     if @opening
       animate_once([1, 2, 3], 7)
     elsif man.bounds.intersect?(bounds)
       @can_open = true
       if KB.key_pressed?(Gosu::KB_Z)
-        @on_open.call(self)
+        screen.on_player_leave(self)
         @opening = true
       end
     else

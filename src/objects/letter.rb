@@ -3,25 +3,24 @@ require_relative '../iso_game_object'
 class Letter < IsoGameObject
   RANGE = Physics::UNIT
 
-  def initialize(map, id, col, row, layer, on_read)
+  def initialize(col, row, layer, args)
     super(col + 0.25, row - 0.25, layer, 0, 0, :obj_letter, Vector.new(0, 0), 1, 1, 0)
     @img_gap.x = -@img[0].width / 2
     @img_gap.y = -@img[0].height / 2
-    @text_id = "message_#{id}"
-    @on_read = on_read
+    @text_id = "message_#{args[0]}"
   end
 
   def collide?
     false
   end
 
-  def update(man)
+  def update(man, screen)
     return if @opened
 
     if in_range?(man, RANGE)
       @in_range = true
       if KB.key_pressed?(Gosu::KB_Z)
-        @on_read.call(:letter, @text_id)
+        screen.on_message_read(:letter, @text_id)
       end
     else
       @in_range = false

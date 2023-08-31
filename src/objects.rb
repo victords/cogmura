@@ -1,6 +1,6 @@
-require_relative 'objects/arc'
 require_relative 'objects/bed'
 require_relative 'objects/box'
 require_relative 'objects/door'
 require_relative 'objects/graphic'
 require_relative 'objects/letter'
+require_relative 'objects/recovery_pad'
