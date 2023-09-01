@@ -50,6 +50,10 @@ class Screen
     !!@battle
   end
 
+  def add_effect(effect)
+    @effects << effect
+  end
+
   # EVENTS ####################################################################
 
   def on_player_leave(exit_obj)
