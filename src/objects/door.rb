@@ -12,6 +12,7 @@ class Door < IsoGameObject
 
   def initialize(col, row, layer, args)
     type, dest_scr, dest_entr = args.map(&:to_i)
+    type ||= 1
     img_gap_x, img_gap_y, angled = TYPE_MAP[type - 1]
     super(col + 0.5, row + 0.5, layer, Physics::UNIT, Physics::UNIT, "obj_door#{type}", Vector.new(img_gap_x, img_gap_y), 4, 1)
     @dest_scr = dest_scr
@@ -39,9 +40,10 @@ class Door < IsoGameObject
     end
   end
 
-  def draw(map)
+  def draw(map, z_index = nil, alpha = 255)
+    @z_index = z_index if z_index
     prev_z_index = @z_index
-    super(map, @z_index - (@sub_img ? 200 : 100))
+    super(map, @z_index - (@sub_img ? 200 : 100), alpha)
     @z_index = prev_z_index
 
     if @can_open && !@opening
@@ -50,6 +52,7 @@ class Door < IsoGameObject
 
     return unless @sub_img
 
-    @sub_img[@img_index].draw(@screen_x, @screen_y, @z_index - 100)
+    color = (alpha << 24) | 0xffffff
+    @sub_img[@img_index].draw(@screen_x, @screen_y, @z_index - 100, 1, 1, color)
   end
 end

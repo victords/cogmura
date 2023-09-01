@@ -25,17 +25,27 @@ class Graphic
     false
   end
 
+  def move_to(col, row, layer)
+    @col = col
+    @row = row
+    @z = layer * Physics::V_UNIT
+    @z_index = 100 * (col + row) + 10 * layer + 5
+    @pos = nil
+  end
+
   def update(_, _); end
 
-  def draw(map)
+  def draw(map, z_index = nil, alpha = 255)
     if @pos.nil?
       @pos = map.get_screen_pos(@col, @row)
     end
 
+    color = (alpha << 24) | 0xffffff
     @img.draw(
       @pos.x + 0.5 * Graphics::TILE_WIDTH + @img_gap.x,
       @pos.y + 0.5 * Graphics::TILE_HEIGHT + @img_gap.y - @z,
-      @z_index
+      z_index || @z_index,
+      1, 1, color
     )
   end
 end

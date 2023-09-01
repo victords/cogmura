@@ -18,9 +18,5 @@ class RecoveryPad < IsoGameObject
     end
   end
 
-  def draw(map)
-    super(map, @z_index)
-  end
-
   def collide?; false; end
 end

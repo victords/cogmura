@@ -109,6 +109,10 @@ class EditorScreen < Screen
     @enemies << Enemy.new(id, col, row, layer, nil)
   end
 
+  def add_object(obj)
+    @objects << obj
+  end
+
   def remove(col, row)
     [@blocks, @items, @npcs, @enemies].each do |list|
       obj = list.find { |o| o.col == col && o.row == row }
@@ -135,6 +139,7 @@ class Editor < GameWindow
     Gosu::KB_N => { index: 3, action: :npc },
     Gosu::KB_E => { index: 4, action: :enemy },
     Gosu::KB_W => { index: 5, action: :wall },
+    Gosu::KB_O => { index: 6, action: :object },
   }.freeze
 
   def initialize
@@ -151,6 +156,7 @@ class Editor < GameWindow
     @items = Item::MAP.map { |a| a[0].to_s }
     @npcs = Npc::ID_MAP.map { |a| a[0].to_s }
     @enemies = ENEMY_TYPE_MAP.map { |a| a[0].to_s }
+    @objects = Screen::OBJECT_CLASSES.values
 
     @font = Gosu::Font.new(24, name: 'DejaVu Sans')
     @panels = [
@@ -188,6 +194,12 @@ class Editor < GameWindow
         ToggleButton.new(x: 10, y: 10, font: @font, text: 'angled', img: :ui_checkbox, center_x: false, margin_x: 40, anchor: :bottom_left) do |checked|
           @active_object = InvisibleWall.new(0, 0, @layer, @active_object.x_tiles, @active_object.y_tiles, checked)
         end,
+      ], :ui_panel, :tiled),
+      Panel.new(10, 10, 240, 110, [
+        Label.new(x: 0, y: 23, font: @font, text: @objects[0].name, anchor: :top_center),
+        Button.new(x: 10, y: 10, font: @font, text: '<', img: :ui_button, anchor: :top_left) { change_object_selection(-1) },
+        Button.new(x: 10, y: 10, font: @font, text: '>', img: :ui_button, anchor: :top_right) { change_object_selection(1) },
+        TextField.new(x: 10, y: 10, font: @font, img: :ui_textField, anchor: :bottom_left, margin_x: 8, margin_y: 3) { set_active_object },
       ], :ui_panel, :tiled),
     ]
     @layer_panel = Panel.new(-10, -10, 150, 50, [
@@ -233,6 +245,12 @@ class Editor < GameWindow
       else
         update_active_object_position
       end
+    elsif @action[0] == :object
+      if ml_press
+        @screen.add_object(@objects[@action[1]].new(@mouse_map_pos.x, @mouse_map_pos.y, @layer, @panels[6].controls[3].text.split(',')))
+      else
+        update_active_object_position
+      end
     end
 
     if mr_press && !over_panel
@@ -261,8 +279,8 @@ class Editor < GameWindow
     @screen.draw
     if @active_object.is_a?(IsoBlock)
       @active_object.draw(@screen.map, nil, Graphics::UI_Z_INDEX, 127)
-    elsif @active_object.is_a?(IsoGameObject)
-      @active_object.draw(@screen.map, Graphics::UI_Z_INDEX, 127)
+    else
+      @active_object&.draw(@screen.map, Graphics::UI_Z_INDEX, 127)
     end
 
     mouse_tile_pos = @screen.map.get_screen_pos(@mouse_map_pos.x, @mouse_map_pos.y)
@@ -329,6 +347,12 @@ class Editor < GameWindow
     @panels[4].controls[0].text = @enemies[@action[1]]
   end
 
+  def change_object_selection(delta)
+    change_selection(@objects, delta)
+    @panels[6].controls[0].text = @objects[@action[1]].name
+    @panels[6].controls[3].text = ''
+  end
+
   def change_selection(list, delta)
     @action[1] += delta
     @action[1] = 0 if @action[1] >= list.size
@@ -358,6 +382,8 @@ class Editor < GameWindow
       @active_object = Enemy.new(@action[1], 0, 0, 0, nil)
     when :wall
       @active_object = InvisibleWall.new(@layer, 0, 0, 1, 1, false)
+    when :object
+      @active_object = @objects[@action[1]].new(0, 0, @layer, @panels[6].controls[3].text.split(','))
     end
   end
 

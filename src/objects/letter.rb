@@ -27,7 +27,7 @@ class Letter < IsoGameObject
     end
   end
 
-  def draw(map)
+  def draw(map, z_index = nil, alpha = 255)
     super
     return unless @in_range && !@opened
 

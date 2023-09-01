@@ -31,7 +31,7 @@ class Bed < IsoBlock
     @active = man.bounds.intersect?(@interactive_area)
   end
 
-  def draw(map, man)
+  def draw(map, man, z_index = nil, alpha = nil)
     super
     if @active
       if @alert_screen_x.nil?
