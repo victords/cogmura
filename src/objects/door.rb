@@ -26,6 +26,10 @@ class Door < IsoGameObject
     false
   end
 
+  def move_to(col, row, layer)
+    super(col + 0.5, row + 0.5, layer)
+  end
+
   def update(man, screen)
     if @opening
       animate_once([1, 2, 3], 7)
