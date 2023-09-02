@@ -15,6 +15,14 @@ class IsoGameObject < MiniGL::GameObject
     @img_size = Vector.new(@img[0].width, @img[0].height)
   end
 
+  def col
+    (@x / Physics::UNIT).floor
+  end
+
+  def row
+    (@y / Physics::UNIT).floor
+  end
+
   def height_level
     (@z / Physics::V_UNIT).floor
   end

@@ -5,6 +5,8 @@ class Graphic
     [:bush1, -64, -72]
   ]
 
+  attr_reader :col, :row
+
   def initialize(col, row, layer, args)
     @col = col
     @row = row

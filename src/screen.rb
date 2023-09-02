@@ -9,14 +9,18 @@ require_relative 'objects'
 
 include MiniGL
 
-class Exit < Rectangle
-  attr_reader :dest_scr, :dest_entr, :z
+Entrance = Struct.new(:col, :row, :layer)
 
-  def initialize(dest_scr, dest_entr, i, j, z)
-    super(i * Physics::UNIT, j * Physics::UNIT, Physics::UNIT, Physics::UNIT)
+class Exit < Rectangle
+  attr_reader :dest_scr, :dest_entr, :col, :row, :layer
+
+  def initialize(dest_scr, dest_entr, col, row, layer)
+    super(col * Physics::UNIT, row * Physics::UNIT, Physics::UNIT, Physics::UNIT)
     @dest_scr = dest_scr
     @dest_entr = dest_entr
-    @z = z
+    @col = col
+    @row = row
+    @layer = layer
   end
 end
 
@@ -161,7 +165,7 @@ class Screen
         @blocks.select { |b| b.z >= @man.z + @man.height },
         @man.grounded ? @blocks.select { |b| b.height_level == @man.height_level + 1 } : [],
         obstacles.map(&:ramps).compact.flatten,
-        @exits.select { |e| e.z == @man.height_level }
+        @exits.select { |e| e.layer == @man.height_level }
       )
 
       npc_in_range = nil
@@ -243,7 +247,7 @@ class Screen
       @tileset = Res.tileset(info[0], T_W, T_H)
       fill = info[1]
 
-      @entrances = entrances.split(';').map { |e| e.split(',').map(&:to_f) }
+      @entrances = entrances.split(';').map { |e| Entrance.new(*e.split(',').map(&:to_f)) }
       @exits = exits.split(';').map do |e|
         d = e.split(',')
         Exit.new(d[0].to_i, d[1].to_i, d[2].to_f, d[3].to_f, d[4].to_i)
@@ -301,7 +305,7 @@ class Screen
 
   def init_player(entrance_index)
     entrance = @entrances[entrance_index]
-    @man = Character.new(entrance[0], entrance[1], entrance[2])
+    @man = Character.new(entrance.col, entrance.row, entrance.layer)
     @man.on_exit = method(:on_player_leave)
   end
 

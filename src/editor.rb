@@ -52,11 +52,61 @@ class InvisibleWall < IsoBlock
   end
 end
 
+class EditorEntrance
+  attr_reader :col, :row
+
+  def initialize(col, row, layer)
+    @col = col
+    @row = row
+    @layer = layer
+    @z = layer * Physics::V_UNIT
+    @font = Gosu::Font.new(24, name: 'DejaVu Sans')
+  end
+
+  def move_to(col, row, layer)
+    @col = col
+    @row = row
+    @layer = layer
+    @z = layer * Physics::V_UNIT
+    @pos = nil
+  end
+
+  def draw(map, index)
+    @pos = map.get_screen_pos(@col, @row) + Vector.new(Graphics::TILE_WIDTH / 2, Graphics::TILE_HEIGHT / 2) if @pos.nil?
+    G.window.draw_rect(@pos.x - 12, @pos.y - 12 - @z, 24, 24, 0xff0000ff, Graphics::UI_Z_INDEX)
+    @font.draw_text(index.to_s, @pos.x - 10, @pos.y - 12, Graphics::UI_Z_INDEX, 1, 1, 0xffffffff)
+  end
+end
+
+class EditorExit < Exit
+  def initialize(dest_scr, dest_entr, col, row, layer)
+    super
+    @z = layer * Physics::V_UNIT
+    @font = Gosu::Font.new(24, name: 'DejaVu Sans')
+  end
+
+  def move_to(col, row, layer)
+    @col = col
+    @row = row
+    @layer = layer
+    @z = layer * Physics::V_UNIT
+    @pos = nil
+  end
+
+  def draw(map)
+    @pos = map.get_screen_pos(@col, @row) + Vector.new(Graphics::TILE_WIDTH / 2, Graphics::TILE_HEIGHT / 2) if @pos.nil?
+    G.window.draw_rect(@pos.x - 24, @pos.y - 12 - @z, 48, 24, 0xffff0000, Graphics::UI_Z_INDEX)
+    @font.draw_text("#{@dest_scr},#{@dest_entr}", @pos.x - 22, @pos.y - 12, Graphics::UI_Z_INDEX, 1, 1, 0xffffffff)
+  end
+end
+
 class EditorScreen < Screen
   attr_reader :map
 
   def initialize(id = nil, tileset = '1')
     init_props
+    @entrances = []
+    @exits = []
     if id
       load_from_file(id)
     else
@@ -113,14 +163,28 @@ class EditorScreen < Screen
     @objects << obj
   end
 
+  def add_entrance(col, row, layer)
+    @entrances << EditorEntrance.new(col, row, layer)
+  end
+
+  def add_exit(col, row, layer, dest_scr, dest_entr)
+    @exits << EditorExit.new(dest_scr, dest_entr, col, row, layer)
+  end
+
   def remove(col, row)
-    [@blocks, @items, @npcs, @enemies].each do |list|
+    [@blocks, @items, @npcs, @enemies, @objects, @entrances, @exits].each do |list|
       obj = list.find { |o| o.col == col && o.row == row }
       if obj
         list.delete(obj)
         break
       end
     end
+  end
+
+  def draw
+    super
+    @entrances.each_with_index { |e, i| e.draw(@map, i) }
+    @exits.each { |x| x.draw(@map) }
   end
 end
 
@@ -140,6 +204,8 @@ class Editor < GameWindow
     Gosu::KB_E => { index: 4, action: :enemy },
     Gosu::KB_W => { index: 5, action: :wall },
     Gosu::KB_O => { index: 6, action: :object },
+    Gosu::KB_Z => { index: 7, action: :entrance },
+    Gosu::KB_X => { index: 8, action: :exit },
   }.freeze
 
   def initialize
@@ -201,6 +267,13 @@ class Editor < GameWindow
         Button.new(x: 10, y: 10, font: @font, text: '>', img: :ui_button, anchor: :top_right) { change_object_selection(1) },
         TextField.new(x: 10, y: 10, font: @font, img: :ui_textField, anchor: :bottom_left, margin_x: 8, margin_y: 3) { set_active_object },
       ], :ui_panel, :tiled),
+      Panel.new(10, 10, 120, 50, [
+        Label.new(x: 0, y: 0, font: @font, text: 'Entrance', anchor: :center),
+      ], :ui_panel, :tiled),
+      Panel.new(10, 10, 240, 84, [
+        Label.new(x: 10, y: 10, font: @font, text: 'Exit'),
+        TextField.new(x: 10, y: 10, font: @font, img: :ui_textField, anchor: :bottom_left, margin_x: 8, margin_y: 3),
+      ], :ui_panel, :tiled),
     ]
     @layer_panel = Panel.new(-10, -10, 150, 50, [
       Label.new(x: 20, y: 0, font: @font, text: 'Layer:', anchor: :left),
@@ -251,6 +324,10 @@ class Editor < GameWindow
       else
         update_active_object_position
       end
+    elsif @action[0] == :entrance && ml_press
+      @screen.add_entrance(@mouse_map_pos.x, @mouse_map_pos.y, @layer)
+    elsif @action[0] == :exit && ml_press
+      @screen.add_exit(@mouse_map_pos.x, @mouse_map_pos.y, @layer, *@panels[8].controls[1].text.split(',').map(&:to_i))
     end
 
     if mr_press && !over_panel
