@@ -55,12 +55,13 @@ end
 class EditorEntrance
   attr_reader :col, :row
 
-  def initialize(col, row, layer)
+  def initialize(col, row, layer, spawn_point)
     @col = col
     @row = row
     @layer = layer
     @z = layer * Physics::V_UNIT
     @font = Gosu::Font.new(24, name: 'DejaVu Sans')
+    @spawn_point = spawn_point
   end
 
   def move_to(col, row, layer)
@@ -73,8 +74,8 @@ class EditorEntrance
 
   def draw(map, index)
     @pos = map.get_screen_pos(@col, @row) + Vector.new(Graphics::TILE_WIDTH / 2, Graphics::TILE_HEIGHT / 2) if @pos.nil?
-    G.window.draw_rect(@pos.x - 12, @pos.y - 12 - @z, 24, 24, 0xff0000ff, Graphics::UI_Z_INDEX)
-    @font.draw_text(index.to_s, @pos.x - 10, @pos.y - 12, Graphics::UI_Z_INDEX, 1, 1, 0xffffffff)
+    G.window.draw_rect(@pos.x - 12, @pos.y - 12 - @z, 24, 24, @spawn_point ? 0xffffff00 : 0xff0000ff, Graphics::UI_Z_INDEX)
+    @font.draw_text(index.to_s, @pos.x - 10, @pos.y - 12, Graphics::UI_Z_INDEX, 1, 1, @spawn_point ? 0xff000000 : 0xffffffff)
   end
 end
 
@@ -107,6 +108,7 @@ class EditorScreen < Screen
     init_props
     @entrances = []
     @exits = []
+    @spawn_points = []
     if id
       load_from_file(id)
     else
@@ -163,8 +165,9 @@ class EditorScreen < Screen
     @objects << obj
   end
 
-  def add_entrance(col, row, layer)
-    @entrances << EditorEntrance.new(col, row, layer)
+  def add_entrance(col, row, layer, spawn_point)
+    list = spawn_point ? @spawn_points : @entrances
+    list << EditorEntrance.new(col, row, layer, spawn_point)
   end
 
   def add_exit(col, row, layer, dest_scr, dest_entr)
@@ -172,7 +175,7 @@ class EditorScreen < Screen
   end
 
   def remove(col, row)
-    [@blocks, @items, @npcs, @enemies, @objects, @entrances, @exits].each do |list|
+    [@blocks, @items, @npcs, @enemies, @objects, @entrances, @exits, @spawn_points].each do |list|
       obj = list.find { |o| o.col == col && o.row == row }
       if obj
         list.delete(obj)
@@ -185,6 +188,7 @@ class EditorScreen < Screen
     super
     @entrances.each_with_index { |e, i| e.draw(@map, i) }
     @exits.each { |x| x.draw(@map) }
+    @spawn_points.each_with_index { |s, i| s.draw(@map, i) }
   end
 end
 
@@ -267,8 +271,9 @@ class Editor < GameWindow
         Button.new(x: 10, y: 10, font: @font, text: '>', img: :ui_button, anchor: :top_right) { change_object_selection(1) },
         TextField.new(x: 10, y: 10, font: @font, img: :ui_textField, anchor: :bottom_left, margin_x: 8, margin_y: 3) { set_active_object },
       ], :ui_panel, :tiled),
-      Panel.new(10, 10, 120, 50, [
-        Label.new(x: 0, y: 0, font: @font, text: 'Entrance', anchor: :center),
+      Panel.new(10, 10, 200, 84, [
+        Label.new(x: 10, y: 10, font: @font, text: 'Entrance'),
+        ToggleButton.new(x: 10, y: 10, font: @font, text: 'spawn point', img: :ui_checkbox, center_x: false, margin_x: 40, anchor: :bottom_left),
       ], :ui_panel, :tiled),
       Panel.new(10, 10, 240, 84, [
         Label.new(x: 10, y: 10, font: @font, text: 'Exit'),
@@ -325,7 +330,7 @@ class Editor < GameWindow
         update_active_object_position
       end
     elsif @action[0] == :entrance && ml_press
-      @screen.add_entrance(@mouse_map_pos.x, @mouse_map_pos.y, @layer)
+      @screen.add_entrance(@mouse_map_pos.x, @mouse_map_pos.y, @layer, @panels[7].controls[1].checked)
     elsif @action[0] == :exit && ml_press
       @screen.add_exit(@mouse_map_pos.x, @mouse_map_pos.y, @layer, *@panels[8].controls[1].text.split(',').map(&:to_i))
     end
