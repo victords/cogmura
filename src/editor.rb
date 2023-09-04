@@ -124,6 +124,10 @@ class EditorScreen < Screen
     @tiles[i][j] = tile
   end
 
+  def change_fill_tile(tile)
+    fill_tiles(tile, M_S / 2 - 1, 0)
+  end
+
   def add_wall(col, row, layer, x_tiles, y_tiles, angled)
     @blocks << InvisibleWall.new(col, row, layer, x_tiles, y_tiles, angled)
   end
@@ -220,6 +224,7 @@ class Editor < GameWindow
 
     @tilesets = Dir["#{Res.prefix}tileset/*"].sort.map { |s| s.split('/').last.chomp('.png') }
     @tileset_index = 0
+    @fill_tile = 0
     @layer = 0
 
     @blocks = IsoBlock::TYPE_MAP.map { |a| a[3].to_s }
@@ -230,9 +235,12 @@ class Editor < GameWindow
 
     @font = Gosu::Font.new(24, name: 'DejaVu Sans')
     @panels = [
-      Panel.new(10, 10, 2 * T_W + 20, 7 * T_H + 80, [
-        Button.new(x: -30, y: 10, font: @font, text: '<', img: :ui_button, anchor: :bottom),
-        Button.new(x: 30, y: 10, font: @font, text: '>', img: :ui_button, anchor: :bottom),
+      Panel.new(10, 10, 2 * T_W + 20, 7 * T_H + 140, [
+        Button.new(x: -30, y: 70, font: @font, text: '<', img: :ui_button, anchor: :bottom),
+        Button.new(x: 30, y: 70, font: @font, text: '>', img: :ui_button, anchor: :bottom),
+        Button.new(x: -50, y: 10, font: @font, text: '<', img: :ui_button, anchor: :bottom) { change_fill_tile(-1) },
+        Button.new(x: 50, y: 10, font: @font, text: '>', img: :ui_button, anchor: :bottom) { change_fill_tile(1) },
+        Label.new(x: 0, y: 23, font: @font, text: '0', img: :ui_button, anchor: :bottom),
       ], :ui_panel, :tiled),
       Panel.new(10, 10, 240, 70, [
         Label.new(x: 0, y: 0, font: @font, text: @blocks[0], anchor: :center),
@@ -255,10 +263,10 @@ class Editor < GameWindow
         Button.new(x: 10, y: 0, font: @font, text: '>', img: :ui_button, anchor: :right) { change_enemy_selection(1) },
       ], :ui_panel, :tiled),
       Panel.new(10, 10, 240, 170, [
-        Label.new(x: 0, y: 23, font: @font, text: '1', anchor: :top_center),
+        Label.new(x: 0, y: 23, font: @font, text: '1', anchor: :top),
         Button.new(x: 10, y: 10, font: @font, text: '<', img: :ui_button, anchor: :top_left) { change_wall_width(-1) },
         Button.new(x: 10, y: 10, font: @font, text: '>', img: :ui_button, anchor: :top_right) { change_wall_width(1) },
-        Label.new(x: 0, y: 83, font: @font, text: '1', anchor: :top_center),
+        Label.new(x: 0, y: 83, font: @font, text: '1', anchor: :top),
         Button.new(x: 10, y: 70, font: @font, text: '<', img: :ui_button, anchor: :top_left) { change_wall_height(-1) },
         Button.new(x: 10, y: 70, font: @font, text: '>', img: :ui_button, anchor: :top_right) { change_wall_height(1) },
         ToggleButton.new(x: 10, y: 10, font: @font, text: 'angled', img: :ui_checkbox, center_x: false, margin_x: 40, anchor: :bottom_left) do |checked|
@@ -266,7 +274,7 @@ class Editor < GameWindow
         end,
       ], :ui_panel, :tiled),
       Panel.new(10, 10, 240, 110, [
-        Label.new(x: 0, y: 23, font: @font, text: @objects[0].name, anchor: :top_center),
+        Label.new(x: 0, y: 23, font: @font, text: @objects[0].name, anchor: :top),
         Button.new(x: 10, y: 10, font: @font, text: '<', img: :ui_button, anchor: :top_left) { change_object_selection(-1) },
         Button.new(x: 10, y: 10, font: @font, text: '>', img: :ui_button, anchor: :top_right) { change_object_selection(1) },
         TextField.new(x: 10, y: 10, font: @font, img: :ui_textField, anchor: :bottom_left, margin_x: 8, margin_y: 3) { set_active_object },
@@ -407,6 +415,15 @@ class Editor < GameWindow
         set_active_object
       end
     end
+  end
+
+  def change_fill_tile(delta)
+    tileset = Res.tileset(@tilesets[@tileset_index], T_W, T_H)
+    @fill_tile += delta
+    @fill_tile = 0 if @fill_tile >= tileset.size
+    @fill_tile = tileset.size - 1 if @fill_tile < 0
+    @panels[0].controls[4].text = @fill_tile.to_s
+    @screen.change_fill_tile(@fill_tile)
   end
 
   def change_block_selection(delta)
