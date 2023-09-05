@@ -26,12 +26,13 @@ class IsoBlock
     [4, 3, 7, :house5, -10, -94],        # 16
   ].freeze
 
-  attr_reader :x, :y, :z, :w, :h, :col, :row, :height, :x_tiles, :y_tiles, :ramps, :z_index
+  attr_reader :type, :x, :y, :z, :w, :h, :col, :row, :height, :x_tiles, :y_tiles, :ramps, :z_index
 
   def initialize(type, col, row, layer = 0, x_tiles = 1, y_tiles = 1, height = 999, angled = false)
     x_tiles, y_tiles, height, img_id, img_gap_x, img_gap_y, angled =
       type ? TYPE_MAP[type] : [x_tiles, y_tiles, height, nil, 0, 0, angled]
 
+    @type = type
     layer ||= 0
     unit = Physics::UNIT
     # in case of angled blocks, collision will be checked against the ramps

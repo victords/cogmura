@@ -52,6 +52,23 @@ class InvisibleWall < IsoBlock
   end
 end
 
+class WithArgs
+  attr_reader :args
+
+  def initialize(type, *args)
+    @obj = type.new(*args)
+    @args = args[-1]
+  end
+
+  def inner_class
+    @obj.class
+  end
+
+  def method_missing(symbol, *args)
+    @obj.send(symbol, *args)
+  end
+end
+
 class EditorEntrance
   attr_reader :col, :row
 
@@ -102,7 +119,7 @@ class EditorExit < Exit
 end
 
 class EditorScreen < Screen
-  attr_reader :map, :tileset_id, :fill_tile
+  attr_reader :map, :tileset_id, :fill_tile, :entrances, :exits, :spawn_points
 
   def initialize(id = nil, tileset = '1')
     init_props
@@ -168,8 +185,9 @@ class EditorScreen < Screen
     @enemies << Enemy.new(id, col, row, layer, nil)
   end
 
-  def add_object(obj)
-    @objects << obj
+  def add_object(type, *args)
+    @objects << (obj = WithArgs.new(type, *args))
+    @blocks << obj if type.ancestors.include?(IsoBlock)
   end
 
   def add_entrance(col, row, layer, spawn_point)
@@ -189,6 +207,10 @@ class EditorScreen < Screen
         break
       end
     end
+  end
+
+  def objects
+    @blocks + @items + @npcs + @enemies + @objects
   end
 
   def draw
@@ -235,7 +257,7 @@ class Editor < GameWindow
     @items = Item::MAP.map { |a| a[0].to_s }
     @npcs = Npc::ID_MAP.map { |a| a[0].to_s }
     @enemies = ENEMY_TYPE_MAP.map { |a| a[0].to_s }
-    @objects = Screen::OBJECT_CLASSES.values
+    @objects = Screen::OBJECT_CLASSES
 
     @font = Gosu::Font.new(24, name: 'DejaVu Sans')
     @panels = [
@@ -342,7 +364,7 @@ class Editor < GameWindow
       end
     elsif @action[0] == :object
       if ml_press
-        @screen.add_object(@objects[@action[1]].new(@mouse_map_pos.x, @mouse_map_pos.y, @layer, @panels[6].controls[3].text.split(',')))
+        @screen.add_object(@objects[@action[1]], @mouse_map_pos.x, @mouse_map_pos.y, @layer, @panels[6].controls[3].text.split(','))
       else
         update_active_object_position
       end
@@ -512,7 +534,37 @@ class Editor < GameWindow
   end
 
   def save
+    contents = [
+      "#{@tileset_index + 1},#{@fill_tile}",
+      @screen.entrances.map { |e| "#{e.col},#{e.row},#{e.layer}" }.join(';'),
+      @screen.exits.map { |e| "#{e.dest_scr},#{e.dest_entr},#{e.col},#{e.row},#{e.layer}" }.join(';'),
+      @screen.spawn_points.map { |e| "#{e.col},#{e.row},#{e.layer}" }.join(';'),
+    ]
 
+    objects = @screen.objects.map do |obj|
+      case obj
+      when InvisibleWall
+        "w#{obj.col},#{obj.row},#{obj.x_tiles},#{obj.y_tiles},#{obj.height_level}#{obj.angled ? ',.' : ''}"
+      when IsoBlock
+        "b#{obj.type},#{obj.col},#{obj.row},#{obj.height_level}"
+      when Item
+        "i#{Item::MAP.index { |a| a[0] == obj.key }},#{obj.col},#{obj.row},#{obj.height_level}"
+      when Npc
+        "n#{obj.id},#{obj.col},#{obj.row},#{obj.height_level}"
+      when Enemy
+        "e#{ENEMY_TYPE_MAP.index { |a| a[0] == obj.type }},#{obj.col},#{obj.row},#{obj.height_level}"
+      else
+        "o#{@objects.index(obj.inner_class)},#{obj.col},#{obj.row},#{obj.height_level},#{obj.args.join(',')}"
+      end
+    end
+    contents << objects.join(';')
+
+    tiles = ['00']
+    contents << tiles.join(';')
+
+    File.open("#{Res.prefix}screen/#{@panels[9].controls[0].text}", 'w') do |f|
+      f.write(contents.join('#'))
+    end
   end
 end
 

@@ -30,19 +30,20 @@ class Screen
   T_W = Graphics::TILE_WIDTH
   T_H = Graphics::TILE_HEIGHT
 
-  OBJECT_CLASSES = {
-    0 => Graphic,
-    1 => Door,
-    2 => Letter,
-    3 => Bed,
-    4 => Box,
-    5 => RecoveryPad,
-  }.freeze
+  OBJECT_CLASSES = [
+    Graphic,
+    Door,
+    Letter,
+    Bed,
+    Box,
+    RecoveryPad,
+  ].freeze
 
   attr_writer :on_exit
 
   def initialize(id, entrance_index = 0)
     init_props
+    init_walls
     load_from_file(id)
     init_player(entrance_index)
     init_transition
@@ -198,7 +199,7 @@ class Screen
       @grid.draw(x, y, 0) if @grid
     end
     @blocks.each { |b| b.draw(@map, @man) }
-    @objects.each { |o| o.draw(@map) unless o.drawn? }
+    @objects.each { |o| o.draw(@map) unless @blocks.index(o) }
 
     if @battle
       @battle.draw(@map)
@@ -223,7 +224,16 @@ class Screen
     @map.set_camera(M_S / 4.0 * T_W, M_S / 4.0 * T_H - Graphics::V_OFFSET)
 
     @tiles = Array.new(M_S) { Array.new(M_S) }
-    @blocks = [
+    @blocks = []
+    @objects = []
+    @npcs = []
+    @items = []
+    @enemies = []
+    @effects = []
+  end
+
+  def init_walls
+    @blocks += [
       IsoBlock.new(nil, -1, M_S / 2 - 2, -100, 16, 1, 999, true),
       IsoBlock.new(nil, M_S / 2, M_S - 1, -100, 16, 1, 999, true),
       IsoBlock.new(nil, -1, M_S / 2, -100, 1, 16, 999, true),
@@ -233,11 +243,6 @@ class Screen
       IsoBlock.new(nil, M_S / 2 - 0.5, M_S - 0.5, -100),
       IsoBlock.new(nil, M_S - 0.5, M_S / 2 - 0.5, -100)
     ]
-    @objects = []
-    @npcs = []
-    @items = []
-    @enemies = []
-    @effects = []
   end
 
   def load_from_file(id)

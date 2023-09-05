@@ -16,13 +16,7 @@ class Bed < IsoBlock
     false
   end
 
-  def drawn?
-    @drawn
-  end
-
   def update(man, screen)
-    @drawn = false
-
     if @active && KB.key_pressed?(Gosu::KB_Z)
       screen.on_sleep_confirm(0)
       return
@@ -42,6 +36,5 @@ class Bed < IsoBlock
       end
       @alert.draw(@alert_screen_x, @alert_screen_y, Graphics::UI_Z_INDEX)
     end
-    @drawn = true
   end
 end
