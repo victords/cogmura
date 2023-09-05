@@ -102,7 +102,7 @@ class EditorExit < Exit
 end
 
 class EditorScreen < Screen
-  attr_reader :map
+  attr_reader :map, :tileset_id, :fill_tile
 
   def initialize(id = nil, tileset = '1')
     init_props
@@ -111,6 +111,9 @@ class EditorScreen < Screen
     @spawn_points = []
     if id
       load_from_file(id)
+      @entrances.map! { |e| EditorEntrance.new(e.col, e.row, e.layer, false) }
+      @exits.map! { |e| EditorExit.new(e.dest_scr, e.dest_entr, e.col, e.row, e.layer) }
+      @spawn_points.map! { |s| EditorEntrance.new(s[0], s[1], 0, true) }
     else
       @tileset = Res.tileset(tileset, T_W, T_H)
       fill_tiles(0, M_S / 2 - 1, 0)
@@ -125,7 +128,7 @@ class EditorScreen < Screen
   end
 
   def change_fill_tile(tile)
-    fill_tiles(tile, M_S / 2 - 1, 0)
+    fill_tiles(@fill_tile = tile, M_S / 2 - 1, 0)
   end
 
   def add_wall(col, row, layer, x_tiles, y_tiles, angled)
@@ -214,6 +217,7 @@ class Editor < GameWindow
     Gosu::KB_O => { index: 6, action: :object },
     Gosu::KB_Z => { index: 7, action: :entrance },
     Gosu::KB_X => { index: 8, action: :exit },
+    Gosu::KB_S => { index: 9 },
   }.freeze
 
   def initialize
@@ -277,7 +281,7 @@ class Editor < GameWindow
         Label.new(x: 0, y: 23, font: @font, text: @objects[0].name, anchor: :top),
         Button.new(x: 10, y: 10, font: @font, text: '<', img: :ui_button, anchor: :top_left) { change_object_selection(-1) },
         Button.new(x: 10, y: 10, font: @font, text: '>', img: :ui_button, anchor: :top_right) { change_object_selection(1) },
-        TextField.new(x: 10, y: 10, font: @font, img: :ui_textField, anchor: :bottom_left, margin_x: 8, margin_y: 3) { set_active_object },
+        TextField.new(x: 10, y: 10, font: @font, img: :ui_textField, margin_x: 8, margin_y: 3, anchor: :bottom_left) { set_active_object },
       ], :ui_panel, :tiled),
       Panel.new(10, 10, 200, 84, [
         Label.new(x: 10, y: 10, font: @font, text: 'Entrance'),
@@ -285,8 +289,13 @@ class Editor < GameWindow
       ], :ui_panel, :tiled),
       Panel.new(10, 10, 240, 84, [
         Label.new(x: 10, y: 10, font: @font, text: 'Exit'),
-        TextField.new(x: 10, y: 10, font: @font, img: :ui_textField, anchor: :bottom_left, margin_x: 8, margin_y: 3),
+        TextField.new(x: 10, y: 10, font: @font, img: :ui_textField, margin_x: 8, margin_y: 3, anchor: :bottom_left),
       ], :ui_panel, :tiled),
+      Panel.new(0, 0, 240, 110, [
+        TextField.new(x: 0, y: 10, font: @font, img: :ui_textField, margin_x: 8, margin_y: 3, anchor: :top),
+        Button.new(x: -30, y: 10, font: @font, text: 'load', img: :ui_button, anchor: :bottom) { load },
+        Button.new(x: 30, y: 10, font: @font, text: 'save', img: :ui_button, anchor: :bottom) { save },
+      ], :ui_panel, :tiled, nil, 1, 1, :center)
     ]
     @layer_panel = Panel.new(-10, -10, 150, 50, [
       Label.new(x: 20, y: 0, font: @font, text: 'Layer:', anchor: :left),
@@ -404,16 +413,15 @@ class Editor < GameWindow
   end
 
   def toggle_panel(index, action)
-    if @panel_index == index
-      hide_panels
-    else
-      hide_panels
-      @panel_index = index
-      @panels[@panel_index].visible = true
-      if action
-        @action = [action, 0]
-        set_active_object
-      end
+    hide_only = @panel_index == index
+    hide_panels
+    return if hide_only
+
+    @panel_index = index
+    @panels[@panel_index].visible = true
+    if action
+      @action = [action, 0]
+      set_active_object
     end
   end
 
@@ -494,6 +502,17 @@ class Editor < GameWindow
     @layer += delta
     update_active_object_position
     @layer_panel.controls[1].text = @layer.to_s
+  end
+
+  def load
+    @screen = EditorScreen.new(@panels[9].controls[0].text)
+    @tileset_index = @screen.tileset_id.to_i - 1
+    @fill_tile = @screen.fill_tile
+    @panels[0].controls[4].text = @fill_tile.to_s
+  end
+
+  def save
+
   end
 end
 

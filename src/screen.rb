@@ -243,9 +243,9 @@ class Screen
   def load_from_file(id)
     File.open("#{Res.prefix}screen/#{id}") do |f|
       info, entrances, exits, spawn_points, objects, tiles = f.read.split('#')
-      info = info.split(',')
-      @tileset = Res.tileset(info[0], T_W, T_H)
-      fill = info[1]
+      @tileset_id, fill_tile = info.split(',')
+      @tileset = Res.tileset(@tileset_id, T_W, T_H)
+      @fill_tile = fill_tile&.to_i
 
       @entrances = entrances.split(';').map { |e| Entrance.new(*e.split(',').map(&:to_f)) }
       @exits = exits.split(';').map do |e|
@@ -292,7 +292,7 @@ class Screen
         end
       end
 
-      fill_tiles(fill, i, j) if fill
+      fill_tiles(@fill_tile, i, j) if @fill_tile
     end
   end
 
