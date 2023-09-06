@@ -31,12 +31,12 @@ class Screen
   T_H = Graphics::TILE_HEIGHT
 
   OBJECT_CLASSES = [
-    Graphic,
-    Door,
-    Letter,
-    Bed,
-    Box,
-    RecoveryPad,
+    Graphic,     # 0
+    Door,        # 1
+    Letter,      # 2
+    Bed,         # 3
+    Box,         # 4
+    RecoveryPad, # 5
   ].freeze
 
   attr_writer :on_exit
@@ -199,7 +199,7 @@ class Screen
       @grid.draw(x, y, 0) if @grid
     end
     @blocks.each { |b| b.draw(@map, @man) }
-    @objects.each { |o| o.draw(@map) unless @blocks.index(o) }
+    @objects.each { |o| o.draw(@map) }
 
     if @battle
       @battle.draw(@map)
@@ -273,9 +273,7 @@ class Screen
           @npcs << Npc.new(d[0], d[1], d[2], d[3])
         when 'o'
           obj_class = OBJECT_CLASSES[d[0].to_i]
-          object = obj_class.new(d[1].to_i, d[2].to_i, d[3].to_i, d[4..])
-          @objects << object
-          @blocks << object if object.is_a?(IsoBlock)
+          @objects << obj_class.new(d[1].to_i, d[2].to_i, d[3].to_i, d[4..])
         when 'w' # invisible block
           @blocks << IsoBlock.new(nil, d[0], d[1], d[4] || 0, d[2], d[3], 999, d[5])
         end

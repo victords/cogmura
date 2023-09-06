@@ -26,7 +26,7 @@ class IsoBlock
     [4, 3, 7, :house5, -10, -94],        # 16
   ].freeze
 
-  attr_reader :type, :x, :y, :z, :w, :h, :col, :row, :height, :x_tiles, :y_tiles, :ramps, :z_index
+  attr_reader :type, :x, :y, :z, :w, :h, :col, :row, :layer, :height, :x_tiles, :y_tiles, :ramps, :z_index
 
   def initialize(type, col, row, layer = 0, x_tiles = 1, y_tiles = 1, height = 999, angled = false)
     x_tiles, y_tiles, height, img_id, img_gap_x, img_gap_y, angled =
@@ -43,6 +43,7 @@ class IsoBlock
     @h = y_tiles * unit
     @col = col
     @row = row
+    @layer = layer
     @height = height * Physics::V_UNIT
     @x_tiles = x_tiles
     @y_tiles = y_tiles
@@ -113,6 +114,7 @@ class IsoBlock
   def move_to(col, row, layer)
     @col = col
     @row = row
+    @layer = layer
     @x = @ramps ? -10000 : col * Physics::UNIT
     @y = row * Physics::UNIT
     @z = layer * Physics::V_UNIT

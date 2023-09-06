@@ -1,14 +1,16 @@
 require_relative '../iso_block'
 require_relative '../constants'
 
-class Bed < IsoBlock
+class Bed < IsoGameObject
   RANGE = Physics::UNIT * 0.5
 
   def initialize(col, row, layer, args)
-    type = args[0].to_i
-    super(type, col, row, layer)
+    unit = Physics::UNIT
+    super(col, row, layer, unit, unit, :block_bed1, nil, 1, 1)
 
-    @interactive_area = Rectangle.new(@x - RANGE, @y - RANGE, @w + 2 * RANGE, @h + 2 * RANGE)
+    @x_tiles = args[0]&.to_i || 1
+    @y_tiles = args[1]&.to_i || 1
+    @interactive_area = Rectangle.new(@x - RANGE, @y - RANGE, @x_tiles * unit + 2 * RANGE, @y_tiles * unit + 2 * RANGE)
     @alert = Res.img(:fx_alert)
   end
 
@@ -25,16 +27,21 @@ class Bed < IsoBlock
     @active = man.bounds.intersect?(@interactive_area)
   end
 
-  def draw(map, man, z_index = nil, alpha = nil)
-    super
-    if @active
-      if @alert_screen_x.nil?
-        screen_pos = map.get_screen_pos(@col, @row)
-        screen_width = (@x_tiles + @y_tiles) * Graphics::TILE_WIDTH / 2
-        @alert_screen_x = screen_pos.x - ((@y_tiles - 1) * Graphics::TILE_WIDTH / 2) + screen_width / 2 - @alert.width / 2
-        @alert_screen_y = screen_pos.y + Graphics::TILE_HEIGHT / 2 - @z - @height - @alert.height
+  def draw(map, z_index = nil, alpha = nil)
+    if @alert_screen_x.nil?
+      screen_pos = map.get_screen_pos(col, row)
+      screen_width = (@x_tiles + @y_tiles) * Graphics::TILE_WIDTH / 2
+      @alert_screen_x = screen_pos.x - ((@y_tiles - 1) * Graphics::TILE_WIDTH / 2) + screen_width / 2 - @alert.width / 2
+      @alert_screen_y = screen_pos.y + Graphics::TILE_HEIGHT / 2 - @z - @height - @alert.height
+      if Game.editor
+        @screen_x = screen_pos.x
+        @screen_y = screen_pos.y
       end
-      @alert.draw(@alert_screen_x, @alert_screen_y, Graphics::UI_Z_INDEX)
     end
+
+    Game.font.draw_text("B#{@x_tiles},#{@y_tiles}", @screen_x, @screen_y, Graphics::UI_Z_INDEX, 0.5, 0.5, 0xff000000) if Game.editor
+    return unless @active
+
+    @alert.draw(@alert_screen_x, @alert_screen_y, Graphics::UI_Z_INDEX)
   end
 end

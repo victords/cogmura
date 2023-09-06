@@ -186,8 +186,7 @@ class EditorScreen < Screen
   end
 
   def add_object(type, *args)
-    @objects << (obj = WithArgs.new(type, *args))
-    @blocks << obj if type.ancestors.include?(IsoBlock)
+    @objects << WithArgs.new(type, *args)
   end
 
   def add_entrance(col, row, layer, spawn_point)
@@ -245,7 +244,7 @@ class Editor < GameWindow
   def initialize
     super(Graphics::SCR_W, Graphics::SCR_H, true)
     Res.prefix = File.expand_path(__FILE__).split('/')[0..-3].join('/') + '/data'
-    Game.init
+    Game.init(editor: true)
     @screen = EditorScreen.new
 
     @tilesets = Dir["#{Res.prefix}tileset/*"].sort.map { |s| s.split('/').last.chomp('.png') }
@@ -544,9 +543,9 @@ class Editor < GameWindow
     objects = @screen.objects.map do |obj|
       case obj
       when InvisibleWall
-        "w#{obj.col},#{obj.row},#{obj.x_tiles},#{obj.y_tiles},#{obj.height_level}#{obj.angled ? ',.' : ''}"
+        "w#{obj.col},#{obj.row},#{obj.x_tiles},#{obj.y_tiles},#{obj.layer}#{obj.angled ? ',.' : ''}"
       when IsoBlock
-        "b#{obj.type},#{obj.col},#{obj.row},#{obj.height_level}"
+        "b#{obj.type},#{obj.col},#{obj.row},#{obj.layer}"
       when Item
         "i#{Item::MAP.index { |a| a[0] == obj.key }},#{obj.col},#{obj.row},#{obj.height_level}"
       when Npc
