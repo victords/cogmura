@@ -1,7 +1,7 @@
-require_relative '../iso_game_object'
+require_relative 'iso_game_object_with_args'
 require_relative '../constants'
 
-class Door < IsoGameObject
+class Door < IsoGameObjectWithArgs
   TYPE_MAP = [
     [-28, -112],
     [-79, -128, true],
@@ -14,7 +14,7 @@ class Door < IsoGameObject
     type, dest_scr, dest_entr = args.map(&:to_i)
     type ||= 1
     img_gap_x, img_gap_y, angled = TYPE_MAP[type - 1]
-    super(col + 0.5, row + 0.5, layer, Physics::UNIT, Physics::UNIT, "obj_door#{type}", Vector.new(img_gap_x, img_gap_y), 4, 1)
+    super(col + 0.5, row + 0.5, layer, args, Physics::UNIT, Physics::UNIT, "obj_door#{type}", Vector.new(img_gap_x, img_gap_y), 4, 1)
     @dest_scr = dest_scr
     @dest_entr = dest_entr
     return if angled

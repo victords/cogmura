@@ -1,10 +1,10 @@
-require_relative '../iso_game_object'
+require_relative 'iso_game_object_with_args'
 
-class Letter < IsoGameObject
+class Letter < IsoGameObjectWithArgs
   RANGE = Physics::UNIT
 
   def initialize(col, row, layer, args)
-    super(col + 0.25, row - 0.25, layer, 0, 0, :obj_letter, Vector.new(0, 0), 1, 1, 0)
+    super(col + 0.25, row - 0.25, layer, args, 0, 0, :obj_letter, Vector.new(0, 0), 1, 1, 0)
     @img_gap.x = -@img[0].width / 2
     @img_gap.y = -@img[0].height / 2
     @text_id = "message_#{args[0]}"

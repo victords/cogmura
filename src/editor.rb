@@ -52,25 +52,8 @@ class InvisibleWall < IsoBlock
   end
 end
 
-class WithArgs
-  attr_reader :args
-
-  def initialize(type, *args)
-    @obj = type.new(*args)
-    @args = args[-1]
-  end
-
-  def inner_class
-    @obj.class
-  end
-
-  def method_missing(symbol, *args)
-    @obj.send(symbol, *args)
-  end
-end
-
 class EditorEntrance
-  attr_reader :col, :row
+  attr_reader :col, :row, :layer
 
   def initialize(col, row, layer, spawn_point)
     @col = col
@@ -185,8 +168,8 @@ class EditorScreen < Screen
     @enemies << Enemy.new(id, col, row, layer, nil)
   end
 
-  def add_object(type, *args)
-    @objects << WithArgs.new(type, *args)
+  def add_object(object)
+    @objects << object
   end
 
   def add_entrance(col, row, layer, spawn_point)
@@ -363,7 +346,7 @@ class Editor < GameWindow
       end
     elsif @action[0] == :object
       if ml_press
-        @screen.add_object(@objects[@action[1]], @mouse_map_pos.x, @mouse_map_pos.y, @layer, @panels[6].controls[3].text.split(','))
+        @screen.add_object(@objects[@action[1]].new(@mouse_map_pos.x, @mouse_map_pos.y, @layer, @panels[6].controls[3].text.split(',')))
       else
         update_active_object_position
       end
@@ -553,7 +536,7 @@ class Editor < GameWindow
       when Enemy
         "e#{ENEMY_TYPE_MAP.index { |a| a[0] == obj.type }},#{obj.col},#{obj.row},#{obj.height_level}"
       else
-        "o#{@objects.index(obj.inner_class)},#{obj.col},#{obj.row},#{obj.height_level},#{obj.args.join(',')}"
+        "o#{@objects.index(obj.class)},#{obj.col},#{obj.row},#{obj.height_level},#{obj.args.join(',')}"
       end
     end
     contents << objects.join(';')

@@ -5,12 +5,13 @@ class Graphic
     [:bush1, -64, -72]
   ]
 
-  attr_reader :col, :row
+  attr_reader :col, :row, :args
 
   def initialize(col, row, layer, args)
     @col = col
     @row = row
     @layer = layer || 0
+    @args = args
     type = args[0].to_i
     img, img_gap_x, img_gap_y = TYPE_MAP[type]
     @z = @layer * Physics::V_UNIT

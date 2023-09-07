@@ -1,9 +1,13 @@
-require_relative '../iso_game_object'
+require_relative 'iso_game_object_with_args'
 
-class RecoveryPad < IsoGameObject
+class RecoveryPad < IsoGameObjectWithArgs
   def initialize(col, row, layer, _args)
-    super(col, row, layer, 20, 20, :obj_recoveryPad, Vector.new(-54, -12), 1, 1)
+    super(col, row, layer, args, 20, 20, :obj_recoveryPad, Vector.new(-54, -12), 1, 1)
     @z_index = 100 * (col + row - 1) + 10 * layer
+  end
+
+  def collide?
+    false;
   end
 
   def update(man, screen)
@@ -18,5 +22,7 @@ class RecoveryPad < IsoGameObject
     end
   end
 
-  def collide?; false; end
+  def draw(map, z_index = nil, alpha = 255)
+    super(map, @z_index, alpha)
+  end
 end

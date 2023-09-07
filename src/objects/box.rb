@@ -1,15 +1,14 @@
-require_relative '../iso_game_object'
+require_relative 'iso_game_object_with_args'
 require_relative '../constants'
 require_relative '../item'
 
 include MiniGL
 
-class Box < IsoGameObject
+class Box < IsoGameObjectWithArgs
   RANGE = Physics::UNIT
 
   def initialize(col, row, layer, args)
-    super(col, row, layer, 28, 28, :obj_box, Vector.new(-26, -72), 2, 1)
-    @args = args
+    super(col, row, layer, args, 28, 28, :obj_box, Vector.new(-26, -72), 2, 1)
   end
 
   def collide?

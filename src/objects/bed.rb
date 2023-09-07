@@ -1,12 +1,12 @@
-require_relative '../iso_block'
+require_relative 'iso_game_object_with_args'
 require_relative '../constants'
 
-class Bed < IsoGameObject
+class Bed < IsoGameObjectWithArgs
   RANGE = Physics::UNIT * 0.5
 
   def initialize(col, row, layer, args)
     unit = Physics::UNIT
-    super(col, row, layer, unit, unit, :block_bed1, nil, 1, 1)
+    super(col, row, layer, args, unit, unit, :block_bed1, nil, 1, 1)
 
     @x_tiles = args[0]&.to_i || 1
     @y_tiles = args[1]&.to_i || 1
