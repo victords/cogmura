@@ -75,7 +75,7 @@ class EditorEntrance
   def draw(map, index)
     @pos = map.get_screen_pos(@col, @row) + Vector.new(Graphics::TILE_WIDTH / 2, Graphics::TILE_HEIGHT / 2) if @pos.nil?
     G.window.draw_rect(@pos.x - 12, @pos.y - 12 - @z, 24, 24, @spawn_point ? 0xffffff00 : 0xff0000ff, Graphics::UI_Z_INDEX)
-    @font.draw_text(index.to_s, @pos.x - 10, @pos.y - 12, Graphics::UI_Z_INDEX, 1, 1, @spawn_point ? 0xff000000 : 0xffffffff)
+    @font.draw_text(index.to_s, @pos.x - 10, @pos.y - 12 - @z, Graphics::UI_Z_INDEX, 1, 1, @spawn_point ? 0xff000000 : 0xffffffff)
   end
 end
 
@@ -97,7 +97,7 @@ class EditorExit < Exit
   def draw(map)
     @pos = map.get_screen_pos(@col, @row) + Vector.new(Graphics::TILE_WIDTH / 2, Graphics::TILE_HEIGHT / 2) if @pos.nil?
     G.window.draw_rect(@pos.x - 24, @pos.y - 12 - @z, 48, 24, 0xffff0000, Graphics::UI_Z_INDEX)
-    @font.draw_text("#{@dest_scr},#{@dest_entr}", @pos.x - 22, @pos.y - 12, Graphics::UI_Z_INDEX, 1, 1, 0xffffffff)
+    @font.draw_text("#{@dest_scr},#{@dest_entr}", @pos.x - 22, @pos.y - 12 - @z, Graphics::UI_Z_INDEX, 1, 1, 0xffffffff)
   end
 end
 

@@ -54,6 +54,8 @@ class Door < IsoGameObjectWithArgs
       Res.img(:fx_alert).draw(@screen_x + @img[0].width / 2 - 8, @screen_y - 28, Graphics::UI_Z_INDEX)
     end
 
+    Game.font.draw_text("#{@dest_scr},#{@dest_entr}", @screen_x, @screen_y, Graphics::UI_Z_INDEX, 0.5, 0.5, 0xff000000) if Game.editor
+
     return unless @sub_img
 
     color = (alpha << 24) | 0xffffff
