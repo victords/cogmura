@@ -5,6 +5,6 @@ class IsoGameObjectWithArgs < IsoGameObject
 
   def initialize(col, row, layer, args, w, h, img, img_gap, sprite_cols, sprite_rows, height = 1)
     super(col, row, layer, w, h, img, img_gap, sprite_cols, sprite_rows, height)
-    @args = args
+    @args = args || []
   end
 end

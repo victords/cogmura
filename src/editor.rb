@@ -114,6 +114,7 @@ class EditorScreen < Screen
       @entrances.map! { |e| EditorEntrance.new(e.col, e.row, e.layer, false) }
       @exits.map! { |e| EditorExit.new(e.dest_scr, e.dest_entr, e.col, e.row, e.layer) }
       @spawn_points.map! { |s| EditorEntrance.new(s[0], s[1], 0, true) }
+      @blocks.map! { |b| b.type.nil? ? InvisibleWall.new(b.col, b.row, b.layer, b.x_tiles, b.y_tiles, !!b.ramps) : b }
     else
       @tileset = Res.tileset(tileset, T_W, T_H)
       fill_tiles(0, M_S / 2 - 1, 0)
@@ -193,6 +194,15 @@ class EditorScreen < Screen
 
   def objects
     @blocks + @items + @npcs + @enemies + @objects
+  end
+
+  def each_tile
+    i = M_S / 2 - 1
+    j = 0
+    until @tiles[i].nil? || @tiles[i][j].nil?
+      yield @tiles[i][j]
+      i, j = next_tile(i, j)
+    end
   end
 
   def draw
@@ -541,7 +551,26 @@ class Editor < GameWindow
     end
     contents << objects.join(';')
 
-    tiles = ['00']
+    tiles = []
+    count = 0
+    last_tile = -1
+    @screen.each_tile do |tile|
+      if tile == last_tile
+        count += 1
+        next
+      end
+
+      if last_tile != -1
+        str = '%02d' % last_tile
+        str += "*#{count}" if count > 1
+        tiles << str
+      end
+      last_tile = tile
+      count = 1
+    end
+    str = '%02d' % last_tile
+    str += "*#{count}" if count > 1
+    tiles << str
     contents << tiles.join(';')
 
     File.open("#{Res.prefix}screen/#{@panels[9].controls[0].text}", 'w') do |f|
